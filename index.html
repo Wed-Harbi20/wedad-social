@@ -31,6 +31,7 @@ th,td{padding:8px;border-bottom:1px solid var(--bd);text-align:right;white-space
 .reg .rh{background-color:var(--rh);color:#f7ecd4;text-align:center;padding:12px 10px;border-bottom:3px double var(--rg);background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.07) 0 10px,transparent 10px 20px),repeating-linear-gradient(-45deg,rgba(255,255,255,.07) 0 10px,transparent 10px 20px)}
 .reg .rh h2{font-size:1.6rem;margin:0}.reg .rh span{font-size:.95rem;opacity:.9;display:block}
 .reg .rb{padding:12px}
+.reg .sc{max-height:75vh;overflow:auto}.reg th{position:sticky;top:0;z-index:3;box-shadow:0 2px 0 var(--rg)}.reg td:nth-child(2){position:sticky;right:0;z-index:1;background:var(--rb)}
 .reg table{font-size:1rem}.reg th{background:var(--rb2);color:var(--rr);border:1px solid var(--rg);font-weight:700}
 .reg td{border:1px solid var(--rg)}.reg tr:nth-child(even) td{background:var(--rb2)}
 .reg .mu{color:var(--rt);opacity:.75}.reg .tag{background:var(--rb2);color:var(--rr);border:1px solid var(--rg)}
@@ -462,18 +463,28 @@ async function saveRows(rows) {
   rows.forEach(x => { GM[x.student_id + '|' + x.work_id] = { ...(GM[x.student_id + '|' + x.work_id] || {}), ...x }; });
   return true;
 }
+const ALLPH = new Set(Object.values(PH).flat());
+function autoNoteFor(sid, wid, score, max) {
+  if (score == null) return null;
+  const a = PH[lvl(score / max * 100)]; let h = 0; const s = sid + wid;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0;
+  return a[h % a.length];
+}
+function noteIsAuto(sid, wid) { const n = G(sid, wid).note; return !n || ALLPH.has(n); }
 async function setG(sid, wid, el) {
   const W = D.works.find(x => x.id === wid); let v = el.value;
   const score = v === '' ? null : Math.max(0, Math.min(+W.max_score, +v));
   if (score !== null) el.value = score;
-  if (await saveRows([{ student_id: sid, work_id: wid, score }])) toast('تم الحفظ ✓');
+  const row = { student_id: sid, work_id: wid, score };
+  if (noteIsAuto(sid, wid)) row.note = autoNoteFor(sid, wid, score, +W.max_score);
+  if (await saveRows([row])) { toast('تم الحفظ ✓'); app(); }
 }
 async function fillCol(wid) {
   const W = D.works.find(x => x.id === wid), L = fs(); let v = $('f_' + wid).value;
   if (v === '' && L.length) v = G(L[0].id, wid).score ?? '';
   if (v === '') return alert('اكتبي الدرجة أو ضعيها في أول طالبة');
   v = Math.max(0, Math.min(+W.max_score, +v));
-  const rows = L.filter(s => fo || G(s.id, wid).score == null).map(s => ({ student_id: s.id, work_id: wid, score: v }));
+  const rows = L.filter(s => fo || G(s.id, wid).score == null).map(s => { const r = { student_id: s.id, work_id: wid, score: v }; if (noteIsAuto(s.id, wid)) r.note = autoNoteFor(s.id, wid, v, +W.max_score); return r; });
   if (rows.length && await saveRows(rows)) app();
 }
 function clearCol(wid) {
@@ -481,7 +492,9 @@ function clearCol(wid) {
   dlg('حذف درجات «' + W.title + '» لـ ' + L.length + ' طالبة (' + clsLabel() + ')؟', null, async () => {
     const r = await sb.from('grades').update({ score: null }).eq('work_id', wid).in('student_id', L.map(s => s.id));
     if (r.error) return alert('تعذّر الحذف');
-    L.forEach(s => { const k = s.id + '|' + wid; if (GM[k]) GM[k].score = null; });
+    const nr = L.filter(s => GM[s.id + '|' + wid] && ALLPH.has(GM[s.id + '|' + wid].note)).map(s => ({ student_id: s.id, work_id: wid, note: null }));
+    if (nr.length) await sb.from('grades').upsert(nr, { onConflict: 'student_id,work_id' });
+    L.forEach(s => { const k = s.id + '|' + wid; if (GM[k]) { GM[k].score = null; if (ALLPH.has(GM[k].note)) GM[k].note = null; } });
     app();
   });
 }
