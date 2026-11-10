@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl"><head><meta charset="utf-8"><title>منصة مادة الدراسات الاجتماعية</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f7f4ed;--card:#fffdf7;--tx:#3a3226;--mu:#7a6f5c;--pr:#2f6b5e;--pr2:#e3efe9;--bd:#e2d5b5;--ok:#2f7a52;--bad:#b0463c;--wa:#a9741a;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:Tajawal,Tahoma,sans-serif;line-height:1.6}
+.w{max-width:960px;margin:0 auto;padding:16px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:16px;margin-bottom:14px}
+h1{font-family:Amiri,Tajawal,serif;font-size:1.6rem;color:var(--pr);margin:0}h2{font-size:1.05rem;margin:0 0 10px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+button,input,select{font:inherit;color:inherit}
+button{background:var(--pr);color:#fff;border:0;border-radius:10px;padding:8px 14px;cursor:pointer}
+button.g{background:var(--pr2);color:var(--pr)}button.d{background:var(--bad)}
+input,select{background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:8px 10px;max-width:100%}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px}.tabs button{white-space:nowrap}
+.sc{overflow-x:auto}table{border-collapse:collapse;width:100%;font-size:.92rem}
+th,td{padding:8px;border-bottom:1px solid var(--bd);text-align:right;white-space:nowrap}th{color:var(--mu);font-weight:500}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:14px}
+.st{background:var(--pr2);border-radius:12px;padding:12px}.st b{display:block;font-size:1.4rem;color:var(--pr)}.st span{color:var(--mu);font-size:.85rem}
+.tag{padding:2px 10px;border-radius:99px;font-size:.8rem;background:var(--pr2);color:var(--pr)}
+.t-ok{color:var(--ok)}.t-bad{color:var(--bad)}.t-wa{color:var(--wa)}
+.an{background:var(--pr2);border-radius:10px;padding:10px;margin-bottom:8px}
+.mu{color:var(--mu);font-size:.85rem}
+.gi{width:70px}
+:root{--rb:#fbf3de;--rb2:#f1e4c3;--rt:#3a3226;--rg:#b08a3e;--rr:#24544b;--rh:#24544b}
+.reg{background:var(--rb);color:var(--rt);border:3px double var(--rg);border-radius:6px;padding:0;overflow:hidden;font-family:Amiri,Tajawal,serif;font-size:1.02rem;box-shadow:0 0 0 5px var(--rb),0 0 0 6px var(--rg)}
+.reg .rh{background-color:var(--rh);color:#f7ecd4;text-align:center;padding:12px 10px;border-bottom:3px double var(--rg);background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.07) 0 10px,transparent 10px 20px),repeating-linear-gradient(-45deg,rgba(255,255,255,.07) 0 10px,transparent 10px 20px)}
+.reg .rh h2{font-size:1.6rem;margin:0}.reg .rh span{font-size:.95rem;opacity:.9;display:block}
+.reg .rb{padding:12px}
+.reg table{font-size:1rem}.reg th{background:var(--rb2);color:var(--rr);border:1px solid var(--rg);font-weight:700}
+.reg td{border:1px solid var(--rg)}.reg tr:nth-child(even) td{background:var(--rb2)}
+.reg .mu{color:var(--rt);opacity:.75}.reg .tag{background:var(--rb2);color:var(--rr);border:1px solid var(--rg)}
+.reg input,.reg select{background:var(--rb);color:var(--rt);border:1px solid var(--rg)}
+.cb{height:280px;overflow-y:auto;background:var(--bg);border:1px solid var(--bd);border-radius:12px;padding:10px;margin-bottom:8px;display:flex;flex-direction:column;gap:6px}
+.m{max-width:85%;background:var(--pr2);border-radius:12px;padding:6px 10px;align-self:flex-start;word-break:break-word}
+.m.me{align-self:flex-end;background:#f1e4c3}.m.te{border:1px solid #b08a3e;background:#fbf3de}
+.m b{display:block;font-size:.8rem;color:var(--pr)}.m.te b{color:#8a5a12}
+.m small{display:block;color:var(--mu);font-size:.7rem}.m a{color:var(--bad);cursor:pointer;margin-inline-start:6px}
+.m a{color:var(--pr);text-decoration:underline}.m small a{color:var(--bad)}.m img{display:block;max-width:100%;max-height:200px;border-radius:8px;margin-top:4px;cursor:zoom-in}
+.ag{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.ai{background:var(--pr2);border-radius:12px;padding:8px}.ai img,.ai video{width:100%;height:130px;object-fit:cover;border-radius:8px;cursor:zoom-in;background:#000}.ai .mu{margin:4px 0;font-size:.8rem}
+.hero{text-align:center;margin-top:4vh}.hero h1{font-family:Amiri,serif;font-size:clamp(1.5rem,5.5vw,2.2rem);line-height:1.5;color:var(--pr)}.bis{font-family:Amiri,serif;font-size:1.6rem;color:#b08a3e}.hero p{color:var(--tx);font-family:Amiri,serif;font-size:1.2rem;margin:4px 0 16px}
+.login{max-width:380px;margin:0 auto;background:rgba(255,253,247,.92);backdrop-filter:blur(4px)}
+:root{--art:url(art.jpg)}
+#bg{position:fixed;inset:0;z-index:-1;background:var(--bg) var(--art) no-repeat center/cover;transition:opacity .3s}
+@media(max-aspect-ratio:1/1){#bg{background-size:100% auto}}
+body:not(.in) #bg{display:none}body.in #bg{opacity:.16}
+.himg{position:relative;left:50%;transform:translateX(-50%);width:min(100vw,1200px);aspect-ratio:1206/880;margin:18px 0 -16px;background:var(--art) center/cover no-repeat;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 24%),linear-gradient(to right,transparent 0,#000 14%,#000 86%,transparent 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,transparent 0,#000 24%),linear-gradient(to right,transparent 0,#000 14%,#000 86%,transparent 100%);mask-composite:intersect}
+body{overflow-x:hidden}.card{background:rgba(255,253,247,.96)}
+
+.bd{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin:10px 0}
+.b{text-align:center;padding:10px 6px;border-radius:14px;border:2px dashed var(--bd);background:var(--bg);filter:grayscale(1);opacity:.6}
+.b .bi{display:block;font-size:2rem}.b b{display:block;font-size:.85rem;margin:2px 0}.b small{color:var(--mu);font-size:.72rem}
+.b.on{border:2px solid #b08a3e;background:linear-gradient(160deg,#fff8e1,#f1e4c3);filter:none;opacity:1;box-shadow:0 2px 10px rgba(176,138,62,.35);animation:pop .5s ease-out}
+.hb{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px;border:2px dashed var(--bd);background:var(--bg);filter:grayscale(1);opacity:.65}
+.hb>span{font-size:2.6rem}.hb b{display:block}.hb small{color:var(--mu)}
+.hb.on{border:3px solid #b08a3e;background:linear-gradient(135deg,#ffe9a8,#f5cf6a 55%,#e8b94a);filter:none;opacity:1;box-shadow:0 0 18px rgba(232,185,74,.7);color:#4a2e1a;animation:pop .6s ease-out}
+.hb.on small{color:#5a3d1c}
+@keyframes pop{0%{transform:scale(.85)}60%{transform:scale(1.05)}100%{transform:scale(1)}}
+@media(prefers-reduced-motion:reduce){.b.on,.hb.on{animation:none}}
+</style></head><body><div id="bg"></div><div class="w" id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+/* ============================================================
+   منصة مادة الدراسات الاجتماعية - الواجهة (متصلة بـ Supabase)
+   ضعي رابط المشروع والمفتاح العام (anon) في السطرين التاليين فقط
+   ============================================================ */
+const CFG = {
+  url: 'https://dqhzvghuocaxtchmqhul.supabase.co',
+  key: 'sb_publishable_c18je76xJ2Ut1pTw1-8Jbw_JsQaUuO5'
+};
+
+const READY = !/PUT_/.test(CFG.url + CFG.key);
+let sb = null;
+try { if (READY && window.supabase) sb = window.supabase.createClient(CFG.url, CFG.key); } catch (e) { console.error(e); }
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const lk = t => esc(t).replace(/https?:\/\/[^\s<]+/g, u => `<a href="${u}" target="_blank" rel="noopener noreferrer">${u.length > 40 ? u.slice(0, 40) + '…' : u}</a>`);
+const uid = () => (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now() + '-' + Math.random().toString(36).slice(2));
+const tm = iso => { try { return new Date(iso).toLocaleTimeString('ar-SA', { hour: '2-digit', minute: '2-digit' }); } catch (e) { return ''; } };
+const dt = iso => { try { return new Date(iso).toLocaleDateString('ar-SA'); } catch (e) { return ''; } };
+const pub = (bucket, path) => sb.storage.from(bucket).getPublicUrl(path).data.publicUrl;
+
+const CN = { 1: 'رابع ١', 2: 'رابع ٢', 3: 'خامس ١', 4: 'خامس ٢', 5: 'خامس ٣', 6: 'سادس ١', 7: 'سادس ٢' };
+const CL = [1, 2, 3, 4, 5, 6, 7];
+const STG = [[4, 'الصف الرابع'], [5, 'الصف الخامس'], [6, 'الصف السادس']];
+const stName = k => (STG.find(x => x[0] === +k) || [0, ''])[1];
+const rcls = r => (r === 'ممتاز' || r === 'جيد جداً') ? 't-ok' : (r === 'جيد' || r === 'مقبول') ? 't-wa' : 't-bad';
+
+/* ---------- الحالة العامة ---------- */
+let me = null;            // {t:1} معلمة | {t:0, token, sid, name, cls, stage} طالبة
+let tm_ = false;          // وضع دخول المعلمة
+let msg = '', booting = true, busy = false;
+let SV = null;            // بيانات الطالبة {home, chat, ach}
+let D = null, GM = {}, TM = [];   // بيانات المعلمة
+let tab = 'chat', fc = 'all', cs = 4, fo = false;
+
+/* ---------- نوافذ الحوار والتنبيه ---------- */
+function dlg(text, def, ok) {
+  const o = document.createElement('div');
+  o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9;padding:16px';
+  o.innerHTML = `<div class="card" style="max-width:380px;width:100%;margin:0"><p>${esc(text)}</p>${def === null ? '' : `<input id="dv" value="${esc(def)}" style="width:100%;margin-bottom:10px">`}<div class="row" style="margin:0"><button id="dok">موافق</button><button class="g" id="dno">إلغاء</button></div></div>`;
+  document.body.appendChild(o);
+  const d = $('dv'); if (d) d.focus();
+  $('dno').onclick = () => o.remove();
+  $('dok').onclick = () => { const v = d ? d.value : true; o.remove(); ok(v); };
+}
+window.alert = m => dlg(String(m), null, () => { });
+function toast(t) {
+  const e = document.createElement('div');
+  e.textContent = t;
+  e.style.cssText = 'position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:#24544b;color:#fff;padding:8px 16px;border-radius:99px;z-index:9;font-size:.9rem';
+  document.body.appendChild(e); setTimeout(() => e.remove(), 1400);
+}
+function zoom(u) {
+  const o = document.createElement('div');
+  o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.8);display:flex;align-items:center;justify-content:center;z-index:9';
+  o.onclick = () => o.remove();
+  const i = document.createElement('img'); i.src = u; i.style.cssText = 'max-width:95%;max-height:95%;border-radius:8px';
+  o.appendChild(i); document.body.appendChild(o);
+}
+
+/* ---------- ضغط الصور (JPEG فقط، أقل من 600 كيلوبايت) ---------- */
+function shrink(file, max, q, limit) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onerror = rej;
+    r.onload = () => {
+      const im = new Image();
+      im.onerror = rej;
+      im.onload = () => {
+        let scale = Math.min(1, max / Math.max(im.width, im.height)), quality = q;
+        const attempt = () => {
+          const c = document.createElement('canvas');
+          c.width = Math.max(1, Math.round(im.width * scale)); c.height = Math.max(1, Math.round(im.height * scale));
+          const g = c.getContext('2d'); g.fillStyle = '#fff'; g.fillRect(0, 0, c.width, c.height); g.drawImage(im, 0, 0, c.width, c.height);
+          c.toBlob(b => {
+            if (!b) return rej(new Error('blob'));
+            if (b.size > limit && (quality > .4 || scale > .4)) { quality = Math.max(.4, quality - .15); scale *= .85; return attempt(); }
+            res(b);
+          }, 'image/jpeg', quality);
+        };
+        attempt();
+      };
+      im.src = r.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+/* ---------- تشغيل الصفحة ---------- */
+function app() {
+  document.body.classList.toggle('in', !!me);
+  let h;
+  if (booting) h = `<div class="hero"><div class="bis">﷽</div><h1>منصة مادة الدراسات الاجتماعية</h1><p>جارٍ التحميل…</p></div>`;
+  else if (!me) h = loginV();
+  else h = me.t ? teacherV() : studentV();
+  $('app').innerHTML = h;
+  const b = $('cb'); if (b) b.scrollTop = b.scrollHeight;
+}
+async function boot() {
+  if (!sb) { booting = false; app(); return; }
+  try {
+    const s = await sb.auth.getSession();
+    if (s.data && s.data.session) {
+      const r = await sb.rpc('is_teacher');
+      if (r.data === true) { me = { t: 1 }; await loadTeacher(); booting = false; app(); return; }
+      await sb.auth.signOut();
+    }
+    const st = localStorage.getItem('stu');
+    if (st) { me = JSON.parse(st); const ok = await loadStudent(); if (!ok) me = null; }
+  } catch (e) { console.error(e); me = null; }
+  booting = false; app();
+}
+
+/* ---------- الدخول ---------- */
+function loginV() {
+  const hero = `<div class="hero"><div class="bis">﷽</div><h1>منصة مادة الدراسات الاجتماعية<br>للصف الرابع والخامس والسادس</h1><p>المعلمة/ وداد محمد الكحيلي</p></div>`;
+  const img = `<div class="himg" role="img" aria-label="لوحة تاريخية للمملكة"></div>`;
+  if (!sb) return hero + `<div class="card login"><p class="t-bad">الموقع غير مربوط بقاعدة البيانات بعد.</p><p class="mu">افتحي ملف index.html وضعي رابط مشروع Supabase والمفتاح العام في أول الملف (CFG).</p></div>` + img;
+  return hero + `<div class="card login">${tm_ ? `<p class="mu" style="margin-top:0">دخول المعلمة</p>
+<div class="row"><input id="em" type="email" placeholder="البريد الإلكتروني" style="width:100%" autocomplete="username"></div>
+<div class="row"><input id="pw" type="password" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')loginT()" style="width:100%" autocomplete="current-password"></div>
+<button onclick="loginT()" style="width:100%" ${busy ? 'disabled' : ''}>دخول</button><p class="t-bad">${esc(msg)}</p>
+<button class="g" onclick="tm_=false;msg='';app()">← دخول الطالبات</button>` : `<p class="mu" style="margin-top:0">اكتبي اسمك كما في كشف الفصل ثم اضغطي دخول.</p>
+<div class="row"><input id="u" placeholder="اسم الطالبة بالعربية" onkeydown="if(event.key==='Enter')loginS()" style="width:100%"></div>
+<button onclick="loginS()" style="width:100%" ${busy ? 'disabled' : ''}>دخول</button><p class="t-bad">${esc(msg)}</p>
+<button class="g" onclick="tm_=true;msg='';app()">دخول المعلمة</button>`}</div>` + img;
+}
+async function loginS() {
+  const u = ($('u').value || '').trim(); if (!u || busy) return;
+  busy = true; msg = '';
+  try {
+    const r = await sb.rpc('student_login', { p_name: u });
+    const d = r.data;
+    if (r.error || !d) msg = 'تعذّر الاتصال، حاولي مرة أخرى';
+    else if (d.error === 'ambiguous') msg = 'يوجد أكثر من طالبة بهذا الاسم، أضيفي بقية اسمك كما في كشف الفصل';
+    else if (d.error) msg = /[A-Za-z]/.test(u) ? 'اكتبي اسمك بالعربية فقط، كما في كشف الفصل' : 'لم أجد هذا الاسم، اكتبي اسمك كما في كشف الفصل';
+    else {
+      me = { t: 0, token: d.token, sid: d.sid, name: d.name, cls: d.cls, stage: d.stage };
+      localStorage.setItem('stu', JSON.stringify(me));
+      if (!(await loadStudent())) { me = null; msg = 'تعذّر تحميل صفحتك'; }
+    }
+  } catch (e) { msg = 'تعذّر الاتصال، حاولي مرة أخرى'; }
+  busy = false; app();
+}
+async function loginT() {
+  const email = ($('em').value || '').trim(), password = $('pw').value || ''; if (!email || !password || busy) return;
+  busy = true; msg = '';
+  try {
+    const r = await sb.auth.signInWithPassword({ email, password });
+    if (r.error) msg = 'بيانات الدخول غير صحيحة';
+    else {
+      const t = await sb.rpc('is_teacher');
+      if (t.data !== true) { await sb.auth.signOut(); msg = 'هذا الحساب ليس حساب المعلمة'; }
+      else { me = { t: 1 }; tab = 'chat'; await loadTeacher(); }
+    }
+  } catch (e) { msg = 'تعذّر الاتصال، حاولي مرة أخرى'; me = null; }
+  busy = false; app();
+}
+async function out() {
+  if (me && me.t) { try { await sb.auth.signOut(); } catch (e) { } }
+  localStorage.removeItem('stu'); me = null; SV = null; D = null; tm_ = false; msg = ''; app();
+}
+function chpw() {
+  dlg('كلمة المرور الجديدة (6 أحرف أو أرقام على الأقل):', '', async n => {
+    n = (n || '').trim();
+    if (n.length < 6) return dlg('يجب أن تكون 6 أحرف أو أرقام على الأقل', null, () => { });
+    const r = await sb.auth.updateUser({ password: n });
+    dlg(r.error ? 'تعذّر تغيير كلمة المرور' : 'تم تغيير كلمة المرور ✔', null, () => { });
+  });
+}
+
+/* =====================================================================
+   صفحة الطالبة
+   ===================================================================== */
+async function loadStudent() {
+  const [h, c, a] = await Promise.all([
+    sb.rpc('student_home', { p_token: me.token }),
+    sb.rpc('chat_get', { p_token: me.token }),
+    sb.rpc('ach_list', { p_token: me.token })]);
+  if (h.error || !h.data || h.data.error) { localStorage.removeItem('stu'); return false; }
+  SV = { home: h.data, chat: (c.data && !c.data.error) ? c.data : null, ach: (a.data && !a.data.error) ? a.data : [] };
+  return true;
+}
+const bIcon = t => /كتاب/.test(t) ? '📚' : /أوراق|اوراق/.test(t) ? '📝' : /مشاركة/.test(t) ? '🙋‍♀️' : /أدائية|تصميم/.test(t) ? '🎨' : /اختبار/.test(t) ? '🏆' : '🏅';
+function badgesHtml(W) {
+  const got = W.filter(w => w.full).length, all = W.length > 0 && got === W.length;
+  return `<div class="card"><h2>🏅 أوسمتي</h2><p class="mu">${got ? 'حصلتِ على ' + got + ' من ' + W.length + ' أوسمة، بارك الله فيكِ' : 'تنالين وساماً كلما حصلتِ على الدرجة كاملة في عمل'}</p><div class="bd">${W.map(w => w.full ? `<div class="b on"><span class="bi">${bIcon(w.title)}</span><b>${esc(w.title)}</b><small>وسام الدرجة الكاملة</small></div>` : `<div class="b"><span class="bi">🔒</span><b>${esc(w.title)}</b><small>بانتظار الدرجة الكاملة</small></div>`).join('')}</div>${all ? '<div class="hb on"><span>👑</span><div><b>الوسام الأعلى: وسام التميّز</b><small>أكملتِ الدرجة الكاملة في جميع الأعمال، ما شاء الله!</small></div></div>' : '<div class="hb"><span>👑</span><div><b>الوسام الأعلى: وسام التميّز</b><small>يُمنح عند إكمال الدرجة الكاملة في جميع الأعمال</small></div></div>'}</div>`;
+}
+function msgsHtml(L, del) {
+  return L.map(m => `<div class="m ${m.is_teacher ? 'te' : ''} ${m.mine ? 'me' : ''}"><b>${esc(m.author)}</b>${m.is_teacher ? lk(m.body || '') : esc(m.body || '')}${m.is_teacher && m.image_path ? `<img src="${pub('chat', m.image_path)}" onclick="zoom(this.src)" loading="lazy">` : ''}<small>${tm(m.created_at)}${del ? ` <a onclick="delMsg(${m.id})">حذف</a>` : ''}</small></div>`).join('') || '<p class="mu">لا توجد رسائل بعد</p>';
+}
+function chatBoxS() {
+  const c = SV.chat; if (!c) return '';
+  if (!c.open) return `<div class="card chat"><h2>💬 دردشة ${stName(me.stage)}</h2><p class="mu">${c.auto ? 'أُغلقت الدردشة مؤقتاً بسبب كثرة الرسائل 🔒' : 'الدردشة مغلقة حالياً من المعلمة 🔒'}</p></div>`;
+  return `<div class="card chat"><h2>💬 دردشة ${stName(me.stage)}</h2><div class="cb" id="cb">${msgsHtml(c.messages, false)}</div><div class="row"><input id="ci" placeholder="اكتبي رسالتك (نص فقط)" maxlength="300" style="flex:1" onkeydown="if(event.key==='Enter')sendS()"><button onclick="sendS()">إرسال</button></div></div>`;
+}
+function studentV() {
+  const h = SV.home;
+  const pr = h.done ? h.progress + '%' : '—';
+  return `<div class="top"><h1>أهلاً ${esc(h.name)} <span class="tag">${esc(CN[h.cls] || '')}</span></h1><div><button class="g" onclick="out()">خروج</button></div></div>
+<div class="stats"><div class="st" style="grid-column:1/-1"><span>نسبة تقدمك</span><b>${pr}</b><div style="height:10px;background:var(--bd);border-radius:99px;overflow:hidden;margin-top:6px"><div style="width:${h.done ? h.progress : 0}%;height:100%;background:var(--pr)"></div></div>${h.done ? '' : '<span>لم تُرصد أعمال بعد</span>'}</div><div class="st"><b>${h.done}</b><span>أعمال مصحّحة</span></div><div class="st"><b>${h.left}</b><span>متبقية</span></div></div>
+${badgesHtml(h.works)}
+${chatBoxS()}
+<div class="card"><h2>إعلانات</h2>${h.announcements.map(a => `<div class="an">${esc(a.body)}<div class="mu">${dt(a.at)}</div></div>`).join('') || '<p class="mu">لا توجد إعلانات</p>'}</div>
+<div class="card reg"><div class="rh"><span>﷽</span><h2>سجل متابعتي</h2><span>${esc(CN[h.cls] || '')}</span></div><div class="rb"><div class="sc"><table><tr><th>العمل</th><th>الدرجة</th><th>الحالة</th><th>ملاحظة المعلمة</th></tr>
+${h.works.map(w => `<tr><td>${esc(w.title)}</td><td>${w.max}</td><td class="${w.rating ? rcls(w.rating) : ''}">${w.rating ? esc(w.rating) : ''}</td><td>${esc(w.note || '')}</td></tr>`).join('')}</table></div></div></div>
+<div class="card"><h2>🏆 إنجازاتي</h2><p class="mu">ارفعي صور أعمالك (الصور فقط).</p><div class="row"><input id="at2" placeholder="عنوان العمل (اختياري)" maxlength="60" style="flex:1"><label style="cursor:pointer;padding:8px 14px;border-radius:10px;background:var(--pr);color:#fff">⬆ رفع صورة<input type="file" accept="image/*" multiple hidden onchange="addAch(this)"></label></div>
+<div class="ag">${SV.ach.map(a => `<div class="ai"><img src="${pub('achievements', a.path)}" loading="lazy" onclick="zoom(this.src)"><div class="mu">${esc(a.title || '')}${a.title ? ' · ' : ''}${dt(a.at)}</div><button class="d" onclick="delAch('${a.id}')">حذف</button></div>`).join('') || '<p class="mu">لم تُرفعي أي إنجاز بعد</p>'}</div></div>
+<div class="card"><h2>القادم</h2>${h.upcoming.map(w => `<div class="an"><b>${esc(w.title)}</b> · الموعد ${esc(w.hijri || w.due || '')}</div>`).join('') || '<p class="mu">لا يوجد أعمال قادمة</p>'}</div>`;
+}
+async function sendS() {
+  const i = $('ci'); if (!i || busy) return;
+  const b = i.value.trim().slice(0, 300); if (!b) return;
+  if (/(https?:|www\.|\.(com|net|org|sa|me|io|ly|co|tv|app)\b)/i.test(b)) return alert('الدردشة للكتابة فقط، والروابط غير مسموحة');
+  busy = true;
+  const r = await sb.rpc('chat_send', { p_token: me.token, p_body: b });
+  busy = false;
+  const d = r.data || {};
+  if (r.error) return alert('تعذّر الإرسال، حاولي مرة أخرى');
+  if (d.error === 'links') return alert('الدردشة للكتابة فقط، والروابط غير مسموحة');
+  if (d.error === 'closed') { await refreshChat(); return app(); }
+  i.value = '';
+  await refreshChat(true);
+  if (d.closed) app();
+  const ni = $('ci'); if (ni) ni.focus();
+}
+async function addAch(el) {
+  const files = [...el.files]; el.value = ''; if (!files.length) return;
+  const title = ($('at2').value || '').trim().slice(0, 60);
+  for (const f of files) {
+    if (!f.type.startsWith('image/')) { alert('يُسمح برفع الصور فقط'); continue; }
+    try {
+      const blob = await shrink(f, 1280, .8, 600000);
+      const path = me.sid + '/' + uid() + '.jpg';
+      const up = await sb.storage.from('achievements').upload(path, blob, { contentType: 'image/jpeg', upsert: false });
+      if (up.error) throw up.error;
+      const r = await sb.rpc('ach_add', { p_token: me.token, p_path: path, p_title: title });
+      if (r.error || (r.data && r.data.error)) throw new Error('add');
+    } catch (e) { alert('تعذّر رفع الصورة، حاولي مرة أخرى'); }
+  }
+  const a = await sb.rpc('ach_list', { p_token: me.token });
+  if (a.data && !a.data.error) SV.ach = a.data;
+  app();
+}
+function delAch(id) {
+  dlg('حذف هذا الإنجاز؟', null, async () => {
+    await sb.rpc('ach_delete', { p_token: me.token, p_id: id });
+    const a = await sb.rpc('ach_list', { p_token: me.token });
+    if (a.data && !a.data.error) SV.ach = a.data;
+    app();
+  });
+}
+
+/* ---------- تحديث الدردشة دورياً ---------- */
+async function refreshChat(force) {
+  if (!me || !sb) return;
+  try {
+    if (!me.t) {
+      const r = await sb.rpc('chat_get', { p_token: me.token });
+      if (r.error || !r.data || r.data.error) return;
+      const old = SV.chat; SV.chat = r.data;
+      if (!old || old.open !== r.data.open) { app(); return; }
+      paintMsgs();
+    } else if (tab === 'chat') {
+      const before = D.rooms[cs] && D.rooms[cs].is_open;
+      await loadTeacherChat();
+      if (before !== (D.rooms[cs] && D.rooms[cs].is_open)) app(); else paintMsgs();
+    }
+  } catch (e) { console.error(e); }
+}
+function paintMsgs() {
+  const b = $('cb'); if (!b) return;
+  const near = b.scrollHeight - b.scrollTop - b.clientHeight < 60;
+  b.innerHTML = me.t ? msgsHtml(TM, true) : msgsHtml(SV.chat.messages, false);
+  if (near) b.scrollTop = b.scrollHeight;
+}
+setInterval(() => { if (!document.hidden && me) refreshChat(); }, 5000);
+
+/* =====================================================================
+   لوحة المعلمة
+   ===================================================================== */
+async function fetchAll(t, cols, orders) {
+  const out = [];
+  for (let from = 0; ; from += 1000) {
+    let q = sb.from(t).select(cols);
+    for (const o of orders) q = q.order(o);
+    const r = await q.range(from, from + 999);
+    if (r.error) throw r.error;
+    out.push(...r.data);
+    if (r.data.length < 1000) break;
+  }
+  return out;
+}
+async function loadTeacher() {
+  const [students, works, grades, ann, rooms] = await Promise.all([
+    fetchAll('students', 'id,num,name,cls', ['cls', 'num']),
+    fetchAll('works', '*', ['sort_order']),
+    fetchAll('grades', 'student_id,work_id,score,note', ['student_id', 'work_id']),
+    sb.from('announcements').select('*').order('id', { ascending: false }).then(r => { if (r.error) throw r.error; return r.data; }),
+    sb.from('chat_rooms').select('*').then(r => { if (r.error) throw r.error; return r.data; })]);
+  D = { students, works, ann, rooms: Object.fromEntries(rooms.map(r => [r.stage, r])) };
+  GM = {}; grades.forEach(g => GM[g.student_id + '|' + g.work_id] = g);
+  await loadTeacherChat();
+}
+async function loadTeacherChat() {
+  const [m, r] = await Promise.all([
+    sb.from('chat_messages').select('*').eq('stage', cs).order('id', { ascending: false }).limit(100),
+    sb.from('chat_rooms').select('*').eq('stage', cs).single()]);
+  if (!m.error) TM = m.data.reverse();
+  if (!r.error) D.rooms[cs] = r.data;
+}
+const G = (s, w) => GM[s + '|' + w] || {};
+const fs = () => fc === 'all' ? D.students : D.students.filter(s => String(s.cls) === String(fc));
+const clsSel = () => `<div class="row"><b>الفصل:</b><select onchange="fc=this.value;app()"><option value="all">الكل</option>${CL.map(c => `<option value="${c}" ${String(fc) === String(c) ? 'selected' : ''}>${CN[c]}</option>`).join('')}</select></div>`;
+const clsLabel = () => fc === 'all' ? 'جميع الفصول' : CN[fc];
+function sum(sid) {
+  let sc = 0, mx = 0, wn = 0, wd = 0, done = 0;
+  const wt = D.works.reduce((a, w) => a + (+w.weight || 0), 0);
+  D.works.forEach(w => { const g = G(sid, w.id); if (g.score != null) { sc += +g.score; mx += +w.max_score; wn += g.score / w.max_score * w.weight; wd += +w.weight; done++; } });
+  return { sc, mx, pct: wd ? Math.round(wn / wd * 100) : 0, prog: wt ? Math.round(wn / wt * 100) : 0, done, left: D.works.length - done };
+}
+function teacherV() {
+  const T = [['chat', '💬 الدردشة'], ['grades', 'رصد الدرجات'], ['students', 'الطالبات'], ['works', 'الأعمال'], ['reports', 'التقارير'], ['ann', 'الإعلانات']];
+  return `<div class="top"><h1>لوحة المعلمة</h1><div><button class="g" onclick="chpw()">تغيير كلمة المرور</button> <button class="g" onclick="out()">خروج</button></div></div>
+<div class="tabs">${T.map(t => `<button class="${tab === t[0] ? '' : 'g'}" onclick="goTab('${t[0]}')">${t[1]}</button>`).join('')}</div>${tabV()}`;
+}
+async function goTab(t) { tab = t; if (t === 'chat') { await loadTeacherChat(); } app(); }
+function tabV() {
+  if (tab === 'chat') return chatTab();
+  if (tab === 'grades') return gradesTab();
+  if (tab === 'students') return studentsTab();
+  if (tab === 'works') return worksTab();
+  if (tab === 'reports') return reportsTab();
+  return annTab();
+}
+
+/* ---------- الدردشة (المعلمة) ---------- */
+function chatTab() {
+  const rm = D.rooms[cs] || { is_open: true };
+  return `<div class="row">${STG.map(x => `<button class="${cs === x[0] ? '' : 'g'}" onclick="setStage(${x[0]})">${x[1]}${D.rooms[x[0]] && !D.rooms[x[0]].is_open ? ' 🔒' : ''}</button>`).join('')} <button class="d" onclick="allRooms(false)">🔒 إغلاق الكل</button> <button class="g" onclick="allRooms(true)">🔓 فتح الكل</button></div>
+<div class="card chat"><h2>💬 دردشة ${stName(cs)}${rm.is_open ? '' : ' <span class="tag t-bad">مغلقة</span>'}</h2>${!rm.is_open && rm.auto_closed ? '<p class="t-bad">أُغلقت تلقائياً بسبب كثرة الرسائل، افتحيها متى شئتِ.</p>' : ''}<button class="${rm.is_open ? 'd' : 'g'}" style="margin-bottom:8px" onclick="togRoom()">${rm.is_open ? '🔒 إغلاق الدردشة' : '🔓 فتح الدردشة للطالبات'}</button>
+<div class="cb" id="cb">${msgsHtml(TM, true)}</div>
+<div class="row"><input id="ci" placeholder="اكتبي رسالتك (يمكنك إرسال الروابط والصور)..." maxlength="300" style="flex:1" onkeydown="if(event.key==='Enter')tSend()"><label style="cursor:pointer;padding:8px 12px;border-radius:10px;background:var(--pr2);color:var(--pr)" title="إرفاق صورة">📷<input type="file" accept="image/*" hidden onchange="tImg(this)"></label><button onclick="tSend()">إرسال</button></div></div>`;
+}
+async function setStage(k) { cs = k; await loadTeacherChat(); app(); }
+async function setRoom(stage, open) {
+  const r = await sb.from('chat_rooms').update({ is_open: open }).eq('stage', stage);
+  if (r.error) alert('تعذّر تغيير حالة الدردشة');
+}
+async function togRoom() { const rm = D.rooms[cs]; await setRoom(cs, !(rm && rm.is_open)); await loadTeacherChat(); app(); }
+async function allRooms(open) { for (const s of [4, 5, 6]) await setRoom(s, open); await loadTeacherChat(); const r = await sb.from('chat_rooms').select('*'); if (!r.error) D.rooms = Object.fromEntries(r.data.map(x => [x.stage, x])); app(); }
+async function tSend(imgPath) {
+  const i = $('ci'); const body = i ? i.value.trim().slice(0, 300) : '';
+  if (!body && !imgPath) return;
+  const r = await sb.from('chat_messages').insert({ stage: cs, author: 'المعلمة', body: body || null, image_path: imgPath || null, is_teacher: true });
+  if (r.error) return alert('تعذّر الإرسال');
+  if (i) i.value = '';
+  await loadTeacherChat(); paintMsgs();
+}
+async function tImg(el) {
+  const f = el.files[0]; el.value = ''; if (!f) return;
+  if (!f.type.startsWith('image/')) return alert('اختاري صورة فقط');
+  try {
+    const blob = await shrink(f, 1000, .8, 600000);
+    const path = cs + '/' + uid() + '.jpg';
+    const up = await sb.storage.from('chat').upload(path, blob, { contentType: 'image/jpeg' });
+    if (up.error) throw up.error;
+    await tSend(path);
+  } catch (e) { alert('تعذّر رفع الصورة'); }
+}
+function delMsg(id) {
+  dlg('حذف الرسالة؟', null, async () => { await sb.from('chat_messages').delete().eq('id', id); await loadTeacherChat(); paintMsgs(); });
+}
+
+/* ---------- رصد الدرجات ---------- */
+const PH = {
+  a: ['عمل ممتاز رعاك الله وبارك فيك', 'أحسنتِ، استمرّي على هذا التميّز', 'مستوى رائع، بارك الله فيك ونفع بك', 'إبداع متميّز، فخورة بك'],
+  b: ['عمل جيد جداً، بارك الله فيك', 'أحسنتِ، وبقي القليل لتصلي إلى الامتياز', 'مستوى مميّز، واصلي اجتهادك'],
+  c: ['عمل جيد، وفّقك الله', 'أنتِ قادرة على الأفضل، واصلي المحاولة', 'جهد مشكور، مع مزيد من التركيز ستتميّزين'],
+  d: ['بداية مقبولة، يلزمك مزيد من الاهتمام والمراجعة', 'حاولي مراجعة الدرس لتحسين مستواك', 'أنتِ قادرة على التحسّن، وأنا بجانبك'],
+  e: ['لا بأس، تحتاجين إلى مراجعة الدرس وسأساعدك', 'لا تيأسي، حاولي من جديد وسيتحسن مستواك', 'أتمنى أن أراكِ أفضل في المرة القادمة، تواصلي معي']
+};
+const LN = { a: 'ممتاز', b: 'جيد جداً', c: 'جيد', d: 'مقبول', e: 'يحتاج إلى تحسين' };
+const lvl = p => p >= 90 ? 'a' : p >= 80 ? 'b' : p >= 70 ? 'c' : p >= 60 ? 'd' : 'e';
+function gradesTab() {
+  const L = fs();
+  return `<div class="card reg"><div class="rh"><span>﷽</span><h2>سجل المتابعة</h2><span>${clsLabel()}</span></div><div class="rb">${clsSel()}
+<p class="mu">اكتبي الدرجة وتُحفظ تلقائياً. لتعبئة عمود كامل: اكتبي الدرجة في «للكل» ثم اضغطي ⬇ (أو اتركيها فارغة لنسخ درجة أول طالبة). <label><input type="checkbox" ${fo ? 'checked' : ''} onchange="fo=this.checked"> استبدال الدرجات الموجودة</label></p>
+<div class="sc"><table><tr><th>م</th><th>الطالبة</th>${D.works.map(w => `<th>${esc(w.title)}<br><span class="mu">من ${w.max_score}</span></th>`).join('')}</tr>
+<tr><td></td><td></td>${D.works.map(w => `<td><input class="gi" id="f_${w.id}" placeholder="للكل"> <button onclick="fillCol('${w.id}')">⬇</button> <button class="d" title="حذف درجات العمود" onclick="clearCol('${w.id}')">🗑</button> <button class="g" title="عبارات تعزيز تلقائية حسب الدرجة" onclick="autoNotes('${w.id}')">💬</button></td>`).join('')}</tr>
+${L.map((s, i) => `<tr><td>${i + 1}</td><td>${esc(s.name)} <span style="cursor:pointer" title="إنجازات الطالبة" onclick="showAch('${s.id}')">📜</span></td>${D.works.map(w => { const g = G(s.id, w.id); return `<td><input class="gi" type="number" min="0" max="${w.max_score}" step="0.5" value="${g.score ?? ''}" onchange="setG('${s.id}','${w.id}',this)"> <span onclick="noteDlg('${s.id}','${w.id}')" style="cursor:pointer" title="${esc(g.note || '')}">${g.note ? '📝' : '✏️'}</span></td>`; }).join('')}</tr>`).join('')}</table></div></div></div>`;
+}
+async function saveRows(rows) {
+  const r = await sb.from('grades').upsert(rows, { onConflict: 'student_id,work_id' });
+  if (r.error) { alert('تعذّر حفظ الدرجات، تحققي من الاتصال'); return false; }
+  rows.forEach(x => { GM[x.student_id + '|' + x.work_id] = { ...(GM[x.student_id + '|' + x.work_id] || {}), ...x }; });
+  return true;
+}
+async function setG(sid, wid, el) {
+  const W = D.works.find(x => x.id === wid); let v = el.value;
+  const score = v === '' ? null : Math.max(0, Math.min(+W.max_score, +v));
+  if (score !== null) el.value = score;
+  if (await saveRows([{ student_id: sid, work_id: wid, score }])) toast('تم الحفظ ✓');
+}
+async function fillCol(wid) {
+  const W = D.works.find(x => x.id === wid), L = fs(); let v = $('f_' + wid).value;
+  if (v === '' && L.length) v = G(L[0].id, wid).score ?? '';
+  if (v === '') return alert('اكتبي الدرجة أو ضعيها في أول طالبة');
+  v = Math.max(0, Math.min(+W.max_score, +v));
+  const rows = L.filter(s => fo || G(s.id, wid).score == null).map(s => ({ student_id: s.id, work_id: wid, score: v }));
+  if (rows.length && await saveRows(rows)) app();
+}
+function clearCol(wid) {
+  const L = fs(), W = D.works.find(x => x.id === wid);
+  dlg('حذف درجات «' + W.title + '» لـ ' + L.length + ' طالبة (' + clsLabel() + ')؟', null, async () => {
+    const r = await sb.from('grades').update({ score: null }).eq('work_id', wid).in('student_id', L.map(s => s.id));
+    if (r.error) return alert('تعذّر الحذف');
+    L.forEach(s => { const k = s.id + '|' + wid; if (GM[k]) GM[k].score = null; });
+    app();
+  });
+}
+function noteDlg(sid, wid) {
+  const W = D.works.find(x => x.id === wid), st = D.students.find(x => x.id === sid), g = G(sid, wid);
+  const keys = g.score != null ? [lvl(g.score / W.max_score * 100)] : Object.keys(PH);
+  const o = document.createElement('div');
+  o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9;padding:16px';
+  o.innerHTML = '<div class="card" style="max-width:460px;width:100%;margin:0;max-height:90vh;overflow:auto"><b></b><textarea id="nv" rows="3" style="width:100%;margin:8px 0;font:inherit"></textarea><div class="mu">عبارات التعزيز (اضغطي على عبارة لاختيارها):</div><div id="nc"></div><div class="row" style="margin-top:10px"><button id="nok">حفظ</button><button class="g" id="nno">إلغاء</button></div></div>';
+  document.body.appendChild(o);
+  o.querySelector('b').textContent = 'ملاحظة لـ ' + st.name + (g.score != null ? ' (' + g.score + '/' + W.max_score + ')' : '');
+  const ta = $('nv'); ta.value = g.note || '';
+  const nc = $('nc');
+  keys.forEach(k => {
+    const h = document.createElement('div'); h.className = 'mu'; h.style.margin = '6px 0 2px'; h.textContent = LN[k]; nc.appendChild(h);
+    PH[k].forEach(t => { const c = document.createElement('button'); c.className = 'g'; c.style.cssText = 'margin:2px;font-size:.85rem'; c.textContent = t; c.onclick = () => { ta.value = t; }; nc.appendChild(c); });
+  });
+  $('nno').onclick = () => o.remove();
+  $('nok').onclick = async () => { const v = ta.value.trim(); o.remove(); if (await saveRows([{ student_id: sid, work_id: wid, note: v || null }])) app(); };
+}
+function autoNotes(wid) {
+  const W = D.works.find(x => x.id === wid), L = fs().filter(s => G(s.id, wid).score != null && !G(s.id, wid).note);
+  if (!L.length) return alert('لا توجد درجات بدون عبارة تعزيز في هذا العمود');
+  dlg('إضافة عبارات تعزيز مناسبة للدرجات لـ ' + L.length + ' طالبة في «' + W.title + '» (لن تتغير الملاحظات المكتوبة)؟', null, async () => {
+    const rows = L.map((s, i) => { const a = PH[lvl(G(s.id, wid).score / W.max_score * 100)]; return { student_id: s.id, work_id: wid, note: a[i % a.length] }; });
+    if (await saveRows(rows)) app();
+  });
+}
+
+/* ---------- إنجازات الطالبة (عرض للمعلمة) ---------- */
+async function showAch(id) {
+  const s = D.students.find(x => x.id === id); if (!s) return;
+  const o = document.createElement('div');
+  o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9;overflow:auto;padding:16px';
+  o.innerHTML = '<div class="card" style="max-width:720px;margin:0 auto"><div class="top"><h2 style="margin:0"></h2><button class="g">إغلاق</button></div><div class="ag"><p class="mu">جارٍ التحميل…</p></div></div>';
+  document.body.appendChild(o);
+  o.querySelector('h2').textContent = '📜 إنجازات ' + s.name;
+  o.querySelector('button').onclick = () => o.remove();
+  const box = o.querySelector('.ag');
+  const r = await sb.from('achievements').select('*').eq('student_id', id).order('created_at', { ascending: false });
+  if (r.error) { box.innerHTML = '<p class="mu">تعذّر تحميل الإنجازات</p>'; return; }
+  box.innerHTML = r.data.length ? '' : '<p class="mu">لم ترفع هذه الطالبة إنجازات بعد</p>';
+  r.data.forEach(a => {
+    const c = document.createElement('div'); c.className = 'ai';
+    c.innerHTML = '<img loading="lazy"><div class="mu"></div><button class="d">حذف</button>';
+    const im = c.querySelector('img'); im.src = pub('achievements', a.image_path); im.onclick = () => zoom(im.src);
+    c.querySelector('.mu').textContent = (a.title || '') + (a.title ? ' · ' : '') + dt(a.created_at);
+    c.querySelector('button').onclick = () => dlg('حذف هذا الإنجاز؟', null, async () => {
+      await sb.from('achievements').delete().eq('id', a.id); await sb.storage.from('achievements').remove([a.image_path]); c.remove();
+    });
+    box.appendChild(c);
+  });
+}
+
+/* ---------- الطالبات ---------- */
+function studentsTab() {
+  return `<div class="card"><h2>الطالبات</h2>${clsSel()}<div class="row"><input id="ns" placeholder="اسم الطالبة"><input id="ni" placeholder="رقم الطالبة"><select id="nc">${CL.map(c => `<option value="${c}">${CN[c]}</option>`).join('')}</select><button onclick="addS()">إضافة</button></div>
+<div class="sc"><table><tr><th>م</th><th>الرقم</th><th>الاسم</th><th>الفصل</th><th></th></tr>${fs().map((s, i) => `<tr><td>${i + 1}</td><td>${esc(s.num)}</td><td>${esc(s.name)} <span style="cursor:pointer" title="إنجازات الطالبة" onclick="showAch('${s.id}')">📜</span></td><td>${CN[s.cls]}</td><td><button class="d" onclick="delS('${s.id}')">حذف</button></td></tr>`).join('')}</table></div></div>`;
+}
+async function addS() {
+  const name = $('ns').value.trim(), num = $('ni').value.trim(), cls = +$('nc').value;
+  if (!name || !num) return alert('أدخلي اسماً ورقماً غير مكرر');
+  const r = await sb.from('students').insert({ name, num, cls }).select('id,num,name,cls').single();
+  if (r.error) return alert('تعذّرت الإضافة، قد يكون الرقم مكرراً');
+  D.students.push(r.data); D.students.sort((a, b) => a.cls - b.cls || a.num.localeCompare(b.num)); app();
+}
+function delS(id) {
+  dlg('حذف الطالبة وكل درجاتها؟', null, async () => {
+    const r = await sb.from('students').delete().eq('id', id);
+    if (r.error) return alert('تعذّر الحذف');
+    D.students = D.students.filter(s => s.id !== id); Object.keys(GM).forEach(k => { if (k.startsWith(id + '|')) delete GM[k]; }); app();
+  });
+}
+
+/* ---------- الأعمال ---------- */
+function worksTab() {
+  return `<div class="card"><h2>الأعمال</h2><div class="row"><input id="wt" placeholder="اسم العمل"><select id="wy"><option>واجب</option><option>اختبار قصير</option><option>اختبار نهائي</option><option>مشاركة</option><option>تصميم</option><option>مشروع</option></select><input id="wm" type="number" placeholder="الدرجة" style="width:90px"><input id="ww" type="number" placeholder="الوزن" style="width:80px"><input id="wd" type="date"><input id="wh" placeholder="الموعد هجري (اختياري)" style="width:170px"><button onclick="addW()">إضافة</button></div>
+<div class="sc"><table><tr><th>العمل</th><th>النوع</th><th>الدرجة</th><th>الوزن</th><th>الموعد</th><th></th></tr>${D.works.map(w => `<tr><td>${esc(w.title)}</td><td>${esc(w.kind)}</td><td>${w.max_score}</td><td>${w.weight}</td><td>${esc(w.due_hijri || w.due || '')}</td><td><button class="d" onclick="delW('${w.id}')">حذف</button></td></tr>`).join('')}</table></div>
+<p class="mu">نسبة تقدم الطالبة تُحسب من مجموع أوزان الأعمال، فاجعلي مجموع الأوزان 100.</p></div>`;
+}
+async function addW() {
+  const title = $('wt').value.trim(), max = +$('wm').value, weight = +$('ww').value || max;
+  if (!title || !max) return alert('أدخلي اسم العمل والدرجة');
+  const so = D.works.reduce((a, w) => Math.max(a, w.sort_order), 0) + 1;
+  const r = await sb.from('works').insert({ title, kind: $('wy').value, max_score: max, weight, due: $('wd').value || null, due_hijri: $('wh').value.trim() || null, sort_order: so }).select().single();
+  if (r.error) return alert('تعذّرت الإضافة');
+  D.works.push(r.data); app();
+}
+function delW(id) {
+  dlg('حذف العمل ودرجاته؟', null, async () => {
+    const r = await sb.from('works').delete().eq('id', id);
+    if (r.error) return alert('تعذّر الحذف');
+    D.works = D.works.filter(w => w.id !== id); Object.keys(GM).forEach(k => { if (k.endsWith('|' + id)) delete GM[k]; }); app();
+  });
+}
+
+/* ---------- التقارير والتصدير ---------- */
+function reportsTab() {
+  const r = fs().map(s => ({ n: s.name, ...sum(s.id) })).filter(x => x.done);
+  const av = r.length ? Math.round(r.reduce((a, x) => a + x.pct, 0) / r.length) : 0;
+  const mx = r.slice().sort((a, b) => b.pct - a.pct), weak = r.filter(x => x.pct < 60);
+  return `${clsSel()}<div class="stats"><div class="st"><b>${av}%</b><span>متوسط الأعمال المرصودة</span></div><div class="st"><b>${mx[0] ? mx[0].pct + '%' : '-'}</b><span>الأعلى ${mx[0] ? esc(mx[0].n) : ''}</span></div><div class="st"><b>${mx.length ? mx[mx.length - 1].pct + '%' : '-'}</b><span>الأقل ${mx.length ? esc(mx[mx.length - 1].n) : ''}</span></div></div>
+<div class="card"><h2>الطالبات المتعثرات (أقل من 60%)</h2>${weak.map(x => `<div class="an">${esc(x.n)} · ${x.pct}%</div>`).join('') || '<p class="mu">لا توجد حالياً</p>'}</div>
+<div class="card"><h2>متوسط كل فصل</h2>${CL.map(c => { const a = D.students.filter(s => s.cls === c).map(s => sum(s.id)).filter(x => x.done); return `<div class="an">${CN[c]} · ${a.length ? Math.round(a.reduce((t, x) => t + x.pct, 0) / a.length) + '%' : 'لا توجد درجات'}</div>`; }).join('')}</div>
+<div class="card"><h2>تصدير</h2><button onclick="exp()">تصدير الدرجات (CSV يفتح في Excel)</button></div>`;
+}
+function exp() {
+  const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  let c = '﻿' + [q('م'), q('الفصل'), q('الطالبة'), ...D.works.map(w => q(w.title)), q('المجموع'), q('نسبة التقدم')].join(',') + '\n';
+  fs().forEach((s, i) => { const m = sum(s.id); c += [q(i + 1), q(CN[s.cls]), q(s.name), ...D.works.map(w => q(G(s.id, w.id).score ?? '')), q(m.sc + '/' + m.mx), q(m.prog + '%')].join(',') + '\n'; });
+  const b = new Blob([c], { type: 'text/csv;charset=utf-8' }), a = document.createElement('a');
+  a.href = URL.createObjectURL(b); a.download = 'grades.csv'; document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* ---------- الإعلانات ---------- */
+function annTab() {
+  return `<div class="card"><h2>إعلان جديد</h2><div class="row"><input id="at" placeholder="نص الإعلان" style="flex:1"><button onclick="addA()">نشر</button></div>${D.ann.map(a => `<div class="an">${esc(a.body)}<div class="mu">${dt(a.created_at)} <a style="cursor:pointer;color:var(--bad)" onclick="delA(${a.id})">حذف</a></div></div>`).join('') || '<p class="mu">لا توجد إعلانات</p>'}</div>`;
+}
+async function addA() {
+  const t = $('at').value.trim(); if (!t) return;
+  const r = await sb.from('announcements').insert({ body: t }).select().single();
+  if (r.error) return alert('تعذّر النشر');
+  D.ann.unshift(r.data); app();
+}
+function delA(id) {
+  dlg('حذف الإعلان؟', null, async () => { const r = await sb.from('announcements').delete().eq('id', id); if (r.error) return alert('تعذّر الحذف'); D.ann = D.ann.filter(a => a.id !== id); app(); });
+}
+
+boot();
+
+</script></body></html>
