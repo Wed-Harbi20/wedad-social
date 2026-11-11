@@ -215,6 +215,7 @@ body.show .layout,body.show .tools,body.show .classbar,body.show .topbar .in{max
       <div><h1>لوحة نجمات الدراسات الاجتماعية</h1><p>المعلمة / وداد محمد الكحيلي</p></div>
     </div>
     <button class="ibtn hide-show" id="sndBtn" onclick="toggleSound()"></button>
+    <button class="ibtn hide-show" id="vcBtn" onclick="toggleVoice()"></button>
     <button class="ibtn hide-show" onclick="openSettings()">⚙️ الإعدادات</button>
     <button class="ibtn pri" onclick="toggleFull()">📺 عرض على الشاشة</button>
   </div>
@@ -319,6 +320,10 @@ body.show .layout,body.show .tools,body.show .classbar,body.show .topbar .in{max
         <div class="lbl2" id="tState">جاهز</div>
       </div>
     </div>
+    <div class="row" style="justify-content:center;margin-top:14px;gap:18px">
+      <label style="display:flex;gap:6px;align-items:center;font-weight:700;font-size:14px"><input type="checkbox" id="tTickC" onchange="S.tTick=this.checked;save()" style="width:18px;height:18px;accent-color:var(--pri)"> 🕰️ تكتكة كل ثانية</label>
+      <label style="display:flex;gap:6px;align-items:center;font-weight:700;font-size:14px"><input type="checkbox" id="tVoiceC" onchange="S.tVoice=this.checked;save()" style="width:18px;height:18px;accent-color:var(--pri)"> 🗣️ إعلان صوتي للوقت</label>
+    </div>
     <div class="tctl">
       <button class="ibtn pri big" id="tGo" onclick="tToggle()">▶️ ابدئي</button>
       <button class="ibtn big" onclick="tReset()">↺ إعادة</button>
@@ -419,7 +424,7 @@ const nextLvl = p => LEVELS.find(l => Math.max(0, p) < l.n);
 const ptsWord = n => { n = Math.abs(n); return n === 1 ? 'نقطة' : n === 2 ? 'نقطتان' : ar(n) + (n <= 10 ? ' نقاط' : ' نقطة'); };
 
 /* ======================= الحفظ ======================= */
-let S = { cur:1, sort:'name', sound:true, lastPhrase:'', cls:{}, log:{}, goal:{}, picked:{} };
+let S = { cur:1, sort:'name', sound:true, voice:true, tTick:true, tVoice:true, lastPhrase:'', cls:{}, log:{}, goal:{}, picked:{} };
 try {
   const raw = localStorage.getItem(KEY);
   if (raw) S = Object.assign(S, JSON.parse(raw));
@@ -436,25 +441,63 @@ const L = () => S.cls[S.cur];
 
 /* ======================= الصوت ======================= */
 let AC;
+function ac(){ AC = AC || new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); return AC; }
 function tone(f, d = .15, t = 0, type = 'sine', v = .18){
   if (!S.sound) return;
   try {
-    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
-    const o = AC.createOscillator(), g = AC.createGain(), s = AC.currentTime + t;
-    o.type = type; o.frequency.value = f; g.gain.setValueAtTime(v, s); g.gain.exponentialRampToValueAtTime(.001, s + d);
-    o.connect(g).connect(AC.destination); o.start(s); o.stop(s + d);
+    const A = ac(), o = A.createOscillator(), g = A.createGain(), s = A.currentTime + t;
+    o.type = type; o.frequency.value = f; g.gain.setValueAtTime(.0001, s); g.gain.linearRampToValueAtTime(v, s + .01); g.gain.exponentialRampToValueAtTime(.001, s + d);
+    o.connect(g).connect(A.destination); o.start(s); o.stop(s + d + .02);
   } catch(e) {}
 }
-const chime = () => { tone(784,.18); tone(988,.18,.1); tone(1318,.35,.2); };
-const levelUp = () => [523,659,784,1046,1318].forEach((f,i) => tone(f,.25,i*.09,'triangle'));
-const sad = () => { tone(330,.2,0,'triangle',.12); tone(262,.3,.15,'triangle',.12); };
-function toggleSound(){ S.sound = !S.sound; save(); $('sndBtn').innerHTML = S.sound ? '🔊 الصوت' : '🔇 الصوت'; }
+let NB;
+function noiseBuf(){ const A = ac(); if (NB) return NB; NB = A.createBuffer(1, A.sampleRate * .2, A.sampleRate); const d = NB.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1; return NB; }
+function clap(t, v = .5){
+  const A = ac(), src = A.createBufferSource(), bp = A.createBiquadFilter(), g = A.createGain(), s = A.currentTime + t;
+  src.buffer = noiseBuf(); bp.type = 'bandpass'; bp.frequency.value = 900 + Math.random() * 1600; bp.Q.value = .9;
+  g.gain.setValueAtTime(v, s); g.gain.exponentialRampToValueAtTime(.001, s + .07 + Math.random() * .05);
+  src.connect(bp).connect(g).connect(A.destination); src.start(s); src.stop(s + .15);
+}
+// تصفيق جمهور: عدد من المصفقين بتوقيتات عشوائية
+function applause(dur = 2.2, people = 14){
+  if (!S.sound) return;
+  try { for (let p = 0; p < people; p++) { let t = Math.random() * .25; const gap = .11 + Math.random() * .08;
+    while (t < dur) { const fade = 1 - t / dur; clap(t, .12 + .3 * fade * Math.random()); t += gap + (Math.random() - .5) * .04; } } } catch(e) {}
+}
+// نغمة ترحيب احتفالية
+function fanfare(){ [[523,0,.14],[659,.12,.14],[784,.24,.14],[1046,.38,.5]].forEach(([f,t,d]) => { tone(f,d,t,'triangle',.16); tone(f*2,d,t,'sine',.05); }); }
+function sparkle(){ for (let k = 0; k < 6; k++) tone(1800 + Math.random() * 1400, .12, .5 + k * .07, 'sine', .05); }
+const chime = () => { fanfare(); applause(1.8, 10); sparkle(); };
+const levelUp = () => { [523,659,784,1046,1318,1568].forEach((f,i) => tone(f,.3,i*.1,'triangle',.16)); applause(3.2, 20); sparkle(); };
+const pickSnd = () => { tone(784,.15,0,'triangle'); tone(1175,.3,.1,'triangle'); applause(1.2, 8); };
+const sad = () => { tone(392,.25,0,'triangle',.12); tone(330,.35,.18,'triangle',.12); };
+const tickSnd = (hi) => tone(hi ? 1600 : 1100, .03, 0, 'square', hi ? .07 : .04);
+
+/* ===== النطق العربي ===== */
+let arVoice = null;
+function pickVoice(){ try { const vs = speechSynthesis.getVoices(); arVoice = vs.find(v => /^ar[-_]SA/i.test(v.lang)) || vs.find(v => /^ar/i.test(v.lang)) || null; } catch(e) {} }
+if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
+const clean = t => String(t).replace(/[\p{Extended_Pictographic}️‍]/gu, '').replace(/\s+/g, ' ').trim();
+function speak(text, opts = {}){
+  if (!S.voice || !('speechSynthesis' in window)) return;
+  try {
+    if (!opts.queue) speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(clean(text));
+    u.lang = 'ar-SA'; if (arVoice) u.voice = arVoice; u.rate = opts.rate || .95; u.pitch = opts.pitch || 1.1; u.volume = 1;
+    setTimeout(() => speechSynthesis.speak(u), opts.delay || 0);
+  } catch(e) {}
+}
+const firstName = n => String(n).trim().split(/\s+/)[0];
+function toggleSound(){ S.sound = !S.sound; save(); render(); }
+function toggleVoice(){ S.voice = !S.voice; save(); render(); if (S.voice) speak('تم تفعيل النطق'); else try { speechSynthesis.cancel(); } catch(e) {} }
 
 /* ======================= العرض ======================= */
 let multi = false, sel = new Set();
 function render(){
   $('seg').innerHTML = Object.entries(CLASSES).map(([k,v]) => `<button class="${+k === +S.cur ? 'on' : ''}" onclick="setCls(${k})">${v}<small>(${ar(S.cls[k].length)})</small></button>`).join('');
-  $('sndBtn').innerHTML = S.sound ? '🔊 الصوت' : '🔇 الصوت';
+  $('sndBtn').innerHTML = S.sound ? '🔊 المؤثرات' : '🔇 المؤثرات';
+  $('vcBtn').innerHTML = S.voice ? '🗣️ النطق' : '🤐 النطق';
+  $('vcBtn').classList.toggle('on', !!S.voice); $('sndBtn').classList.toggle('on', !!S.sound);
   $('sortBtn').innerHTML = S.sort === 'pts' ? '🏅 حسب النقاط' : '🔤 أبجديًا';
   renderGrid(); renderSide();
 }
@@ -551,7 +594,10 @@ function give(k, j){
     const el = targets.length === 1 ? $('st' + targets[0]) : null, r = el ? el.getBoundingClientRect() : null;
     confetti(r ? r.left + r.width / 2 : innerWidth / 2, r ? r.top + 40 : innerHeight / 2.5, up ? 220 : targets.length > 1 ? 160 : 90);
     up ? levelUp() : chime();
-  } else sad();
+    const who = targets.length === 1 ? 'يا ' + firstName(list[targets[0]].name) : targets.length === list.length ? 'يا بطلات الفصل' : 'يا بطلات';
+    const welcome = ['ما شاء الله','أحسنتِ','برافو','رائع','ممتاز'][Math.floor(Math.random() * 5)];
+    speak(up ? `مبروك ${who}! وصلتِ إلى ${up.t}. ${phrase}` : `${welcome} ${who}! ${phrase}`, { delay:250 });
+  } else { sad(); speak((targets.length === 1 ? firstName(list[targets[0]].name) + '، ' : '') + phrase, { delay:150, pitch:1 }); }
   showToast(targets.length === 1 ? list[targets[0]].name : null, name, phrase, b, up);
 }
 let tT;
@@ -595,7 +641,7 @@ function doPick(){
       elapsed += delay; delay *= 1.09;
       if (elapsed < stopAt) return setTimeout(spin, delay);
       const s = L()[idx]; el.classList.remove('spin'); el.classList.add('done');
-      el.innerHTML = `${avHTML(s.name)}<b>${esc(s.name)}</b>`; chime();
+      el.innerHTML = `${avHTML(s.name)}<b>${esc(s.name)}</b>`; pickSnd(); speak(s.name, { queue:true, delay:200 });
       const r2 = el.getBoundingClientRect(); confetti(r2.left + r2.width / 2, r2.top + r2.height / 2, 70);
       if (k === n - 1) { picking = false; lastPicked = res; $('pickAw').style.display = ''; }
     })();
@@ -636,7 +682,7 @@ function awardGroup(k){ closeM('mGroups'); openAward(lastGroups[k], 'تعزيز 
 /* ======================= المؤقت ======================= */
 let tDown = 1, tTotal = 300, tLeft = 300, tElapsed = 0, tRun = false, tLast = 0, tInt, tLastBeep = -1;
 const PRE = [[30,'٣٠ ث'],[60,'١ د'],[120,'٢ د'],[180,'٣ د'],[300,'٥ د'],[600,'١٠ د'],[900,'١٥ د']];
-function openTimer(){ $('presets').innerHTML = PRE.map(([s,l]) => `<button class="chip ${s === tTotal ? 'on' : ''}" onclick="setT(${s})">${l}</button>`).join(''); tDraw(); openM('timer'); }
+function openTimer(){ $('tTickC').checked = S.tTick; $('tVoiceC').checked = S.tVoice; $('presets').innerHTML = PRE.map(([s,l]) => `<button class="chip ${s === tTotal ? 'on' : ''}" onclick="setT(${s})">${l}</button>`).join(''); tDraw(); openM('timer'); }
 function tMode(m){ tDown = m; $('tm1').classList.toggle('on', m === 1); $('tm0').classList.toggle('on', m === 0); $('tPresets').style.display = m ? '' : 'none'; tReset(); }
 function setT(s){ tTotal = s; tReset(); openTimer(); }
 function setCustom(){ const s = Math.max(0, +$('tMin').value || 0) * 60 + Math.min(59, Math.max(0, +$('tSec').value || 0)); if (s > 0) setT(s); }
@@ -656,28 +702,52 @@ function tDraw(){
   $('tState').textContent = tDown && tLeft <= 0 ? '⏰ انتهى الوقت!' : tRun ? (tDown ? 'الوقت يمضي…' : 'العدّ مستمر…') : (tDown ? (tLeft < tTotal ? 'متوقف مؤقتًا' : 'جاهز') : (tElapsed ? 'متوقف مؤقتًا' : 'جاهز'));
   $('tGo').innerHTML = tRun ? '⏸️ إيقاف مؤقت' : '▶️ ابدئي';
 }
+const NUMW = ['','واحد','اثنان','ثلاثة','أربعة','خمسة','ستة','سبعة','ثمانية','تسعة','عشرة'];
+function tSay(t){ if (S.tVoice) speak(t, { rate:1 }); }
+function minsWord(n){ return n === 1 ? 'دقيقة واحدة' : n === 2 ? 'دقيقتان' : n <= 10 ? `${n} دقائق` : `${n} دقيقة`; }
 function tToggle(){
   if (tDown && tLeft <= 0) tReset();
   tRun = !tRun;
-  if (tRun) { tLast = performance.now(); tInt = setInterval(tTick, 100); tone(880,.1); }
-  else clearInterval(tInt);
+  if (tRun) {
+    tLast = performance.now(); tInt = setInterval(tTick, 100); tone(880,.1); tone(1320,.15,.1);
+    const fresh = tDown ? tLeft >= tTotal - .05 : tElapsed < .05;
+    tSay(fresh ? (tDown ? 'انطلقنا! بدأ الوقت' : 'بدأ العد') : 'نكمل');
+  } else { clearInterval(tInt); tSay('توقف مؤقت'); }
   tDraw();
 }
+let tPrevSec = null;
 function tTick(){
   const now = performance.now(), dt = (now - tLast) / 1000; tLast = now;
   if (tDown) {
     tLeft -= dt;
     const sec = Math.ceil(tLeft);
-    if (sec <= 10 && sec > 0 && sec !== tLastBeep) { tLastBeep = sec; tone(660, .08, 0, 'square', .08); }
+    if (sec !== tPrevSec && sec > 0) {
+      tPrevSec = sec;
+      if (sec <= 10) { tone(660, .09, 0, 'square', .09); if (S.tVoice) speak(NUMW[sec], { rate:1.15 }); }
+      else if (S.tTick) tickSnd(sec % 2 === 0);
+      if (sec > 10 && tTotal > sec) {
+        if (sec % 60 === 0) tSay(`بقي ${minsWord(sec / 60)}`);
+        else if (sec === 30) tSay('بقيت ثلاثون ثانية');
+      }
+    }
     if (tLeft <= 0) {
       tLeft = 0; tRun = false; clearInterval(tInt);
       [0,.35,.7,1.05].forEach(t => { tone(880,.25,t,'square',.15); tone(1175,.25,t+.12,'square',.12); });
+      tSay('انتهى الوقت! أحسنتنّ');
       confetti(innerWidth / 2, innerHeight / 2.5, 200);
     }
-  } else tElapsed += dt;
+  } else {
+    tElapsed += dt;
+    const sec = Math.floor(tElapsed);
+    if (sec !== tPrevSec) {
+      tPrevSec = sec;
+      if (S.tTick && sec > 0) tickSnd(sec % 2 === 0);
+      if (sec > 0 && sec % 60 === 0) { tone(988,.2,0,'triangle',.12); tSay(`مرّت ${minsWord(sec / 60)}`); }
+    }
+  }
   tDraw();
 }
-function tReset(){ tRun = false; clearInterval(tInt); tLeft = tTotal; tElapsed = 0; tLastBeep = -1; tDraw(); }
+function tReset(){ tRun = false; clearInterval(tInt); tLeft = tTotal; tElapsed = 0; tLastBeep = -1; tPrevSec = null; tDraw(); }
 
 /* ======================= القصاصات ======================= */
 const cv = $('fx'), cx = cv.getContext('2d'); let P = [], running = false;
