@@ -31,6 +31,26 @@ th,td{padding:8px;border-bottom:1px solid var(--bd);text-align:right;white-space
 .reg .rh{background-color:var(--rh);color:#f7ecd4;text-align:center;padding:12px 10px;border-bottom:3px double var(--rg);background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.07) 0 10px,transparent 10px 20px),repeating-linear-gradient(-45deg,rgba(255,255,255,.07) 0 10px,transparent 10px 20px)}
 .reg .rh h2{font-size:1.6rem;margin:0}.reg .rh span{font-size:.95rem;opacity:.9;display:block}
 .ics{display:inline-flex;gap:8px;vertical-align:middle}.ic{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;text-decoration:none;box-shadow:0 1px 4px rgba(0,0,0,.25)}.ic:hover{transform:scale(1.08)}.ic.tg{background:#229ed9}.ic.pd{background:none;box-shadow:none;width:40px;height:40px}.tgw{text-align:center;margin:10px 0}
+.coin{position:relative;width:64px;height:64px;margin:4px auto 8px;perspective:420px}
+.coin.big{width:84px;height:84px;margin:0}
+.coin .ci{position:absolute;inset:0;transform-style:preserve-3d;animation:spin 7s linear infinite}
+.coin.big .ci{animation-duration:5s}
+.coin .ed{position:absolute;inset:0;border-radius:50%;background:linear-gradient(90deg,var(--c3),var(--c2),var(--c3))}
+.coin .fc,.coin .bk{position:absolute;inset:0;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.8rem;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;background:radial-gradient(circle at 32% 26%,var(--c1) 0%,var(--c2) 52%,var(--c3) 100%);box-shadow:inset 0 0 0 4px rgba(255,255,255,.4),inset 0 0 0 6px rgba(0,0,0,.18),inset 0 -7px 12px rgba(0,0,0,.28),inset 0 5px 9px rgba(255,255,255,.55)}
+.coin.big .fc,.coin.big .bk{font-size:2.5rem}
+.coin .fc{transform:translateZ(3px)}.coin .bk{transform:rotateY(180deg) translateZ(3px)}
+.coin .fc::after,.coin .bk::after{content:'';position:absolute;inset:0;border-radius:50%;background:linear-gradient(115deg,transparent 36%,rgba(255,255,255,.75) 50%,transparent 64%);background-size:260% 100%;animation:shine 3.4s ease-in-out infinite}
+.coin.lk .ci{animation:none}.coin.lk .fc{transform:none;backface-visibility:visible;-webkit-backface-visibility:visible;background:radial-gradient(circle at 32% 26%,#f2f2f2,#d6d6d6 58%,#b4b4b4);box-shadow:inset 0 0 0 4px rgba(255,255,255,.6),inset 0 -5px 9px rgba(0,0,0,.18)}.coin.lk .fc::after{display:none}
+.b.on .coin{animation:flt 3.2s ease-in-out infinite;filter:drop-shadow(0 6px 5px rgba(0,0,0,.3))}
+.b.on{cursor:pointer}
+.hb.on .coin{filter:drop-shadow(0 0 12px rgba(232,185,74,.9));animation:flt 3s ease-in-out infinite}
+.cel{position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:21;max-width:92%;text-align:center;padding:12px 22px;border-radius:16px;background:linear-gradient(135deg,#ffe9a8,#f5cf6a 55%,#e8b94a);color:#4a2e1a;font-weight:700;box-shadow:0 6px 24px rgba(0,0,0,.3);animation:celin .5s cubic-bezier(.2,1.4,.4,1),celout .5s ease-in 4.2s forwards}
+@keyframes spin{to{transform:rotateY(360deg)}}
+@keyframes shine{0%{background-position:160% 0}55%,100%{background-position:-60% 0}}
+@keyframes flt{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+@keyframes celin{from{opacity:0;transform:translate(-50%,-30px) scale(.8)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+@keyframes celout{to{opacity:0;transform:translate(-50%,-20px)}}
+@media(prefers-reduced-motion:reduce){.coin .ci,.coin .fc::after,.coin .bk::after,.b.on .coin,.hb.on .coin,.cel{animation:none}}
 .reg .rb{padding:12px}
 .reg .sc{max-height:75vh;overflow:auto}.reg th{position:sticky;top:0;z-index:3;box-shadow:0 2px 0 var(--rg)}.reg td:nth-child(2){position:sticky;right:0;z-index:1;background:var(--rb)}
 .reg table{font-size:1rem}.reg th{background:var(--rb2);color:var(--rr);border:1px solid var(--rg);font-weight:700}
@@ -163,6 +183,7 @@ function app() {
   else h = me.t ? teacherV() : studentV();
   $('app').innerHTML = h;
   const b = $('cb'); if (b) b.scrollTop = b.scrollHeight;
+  celebrateOnEntry();
 }
 async function boot() {
   if (!sb) { booting = false; app(); return; }
@@ -234,7 +255,7 @@ async function loginT() {
 }
 async function out() {
   if (me && me.t) { try { await sb.auth.signOut(); } catch (e) { } }
-  localStorage.removeItem('stu'); me = null; SV = null; D = null; tm_ = false; msg = ''; app();
+  localStorage.removeItem('stu'); me = null; SV = null; D = null; tm_ = false; msg = ''; CEL = false; app();
 }
 function chpw() {
   dlg('كلمة المرور الجديدة (6 أحرف أو أرقام على الأقل):', '', async n => {
@@ -270,9 +291,59 @@ async function loadStudent() {
   return true;
 }
 const bIcon = t => /كتاب/.test(t) ? '📚' : /أوراق|اوراق/.test(t) ? '📝' : /مشاركة/.test(t) ? '🙋‍♀️' : /أدائية|تصميم/.test(t) ? '🎨' : /اختبار/.test(t) ? '🏆' : '🏅';
+const COINS = [['#fff3b0', '#f5c542', '#a8780a'], ['#c9f5dc', '#43b581', '#1d6b49'], ['#cfe8ff', '#4a90e2', '#1d4f91'], ['#ffd1dc', '#e8556d', '#8f2338'], ['#e6d4ff', '#9b5de5', '#5a2a9a'], ['#ffe0c2', '#ff924c', '#a64d12']];
+function coinHtml(icon, i, big, lock) {
+  if (lock) return `<div class="coin lk${big ? ' big' : ''}"><div class="ci"><div class="fc">${icon}</div></div></div>`;
+  const c = COINS[i % COINS.length];
+  return `<div class="coin${big ? ' big' : ''}" style="--c1:${c[0]};--c2:${c[1]};--c3:${c[2]}"><div class="ci">${[-2, -1, 0, 1, 2].map(z => `<i class="ed" style="transform:translateZ(${z}px)"></i>`).join('')}<div class="fc">${icon}</div><div class="bk">${icon}</div></div></div>`;
+}
 function badgesHtml(W) {
   const got = W.filter(w => w.full).length, all = W.length > 0 && got === W.length;
-  return `<div class="card"><h2>🏅 أوسمتي</h2><p class="mu">${got ? 'حصلتِ على ' + got + ' من ' + W.length + ' أوسمة، بارك الله فيكِ' : 'تنالين وساماً كلما حصلتِ على الدرجة كاملة في عمل'}</p><div class="bd">${W.map(w => w.full ? `<div class="b on"><span class="bi">${bIcon(w.title)}</span><b>${esc(w.title)}</b><small>وسام الدرجة الكاملة</small></div>` : `<div class="b"><span class="bi">🔒</span><b>${esc(w.title)}</b><small>بانتظار الدرجة الكاملة</small></div>`).join('')}</div>${all ? '<div class="hb on"><span>👑</span><div><b>الوسام الأعلى: وسام التميّز</b><small>أكملتِ الدرجة الكاملة في جميع الأعمال، ما شاء الله!</small></div></div>' : '<div class="hb"><span>👑</span><div><b>الوسام الأعلى: وسام التميّز</b><small>يُمنح عند إكمال الدرجة الكاملة في جميع الأعمال</small></div></div>'}</div>`;
+  return `<div class="card"><h2>🏅 أوسمتي</h2><p class="mu">${got ? 'حصلتِ على ' + got + ' من ' + W.length + ' أوسمة، بارك الله فيكِ' : 'تنالين وساماً كلما حصلتِ على الدرجة كاملة في عمل'}</p><div class="bd">${W.map((w, i) => w.full ? `<div class="b on" onclick="celebrate(false)">${coinHtml(bIcon(w.title), i)}<b>${esc(w.title)}</b><small>وسام الدرجة الكاملة</small></div>` : `<div class="b">${coinHtml('🔒', i, false, true)}<b>${esc(w.title)}</b><small>بانتظار الدرجة الكاملة</small></div>`).join('')}</div>${all ? `<div class="hb on" onclick="celebrate(true)">${coinHtml('👑', 0, true)}<div><b>الوسام الأعلى: وسام التميّز</b><small>أكملتِ الدرجة الكاملة في جميع الأعمال، ما شاء الله!</small></div></div>` : `<div class="hb">${coinHtml('👑', 0, true, true)}<div><b>الوسام الأعلى: وسام التميّز</b><small>يُمنح عند إكمال الدرجة الكاملة في جميع الأعمال</small></div></div>`}</div>`;
+}
+let CEL = false;
+function cel(text) {
+  const d = document.createElement('div'); d.className = 'cel'; d.textContent = text;
+  document.body.appendChild(d); setTimeout(() => d.remove(), 4800);
+}
+function celebrate(big) {
+  try {
+    if (typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const cv = document.createElement('canvas');
+    cv.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:20';
+    document.body.appendChild(cv);
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const W = cv.width = Math.round(innerWidth * dpr), H = cv.height = Math.round(innerHeight * dpr);
+    const x = cv.getContext('2d');
+    const cols = ['#f5c542', '#e8556d', '#3fa7d6', '#59c36a', '#9b5de5', '#ff924c', '#ffffff'];
+    const P = [];
+    const mk = (ox, oy, ang, spd) => P.push({ x: ox, y: oy, vx: Math.cos(ang) * spd, vy: Math.sin(ang) * spd, w: (6 + Math.random() * 7) * dpr, h: (4 + Math.random() * 6) * dpr, r: Math.random() * 6.3, vr: (Math.random() - .5) * .35, c: cols[(Math.random() * cols.length) | 0], s: 0 });
+    const n = big ? 130 : 80;
+    for (let i = 0; i < n; i++) {
+      mk(0, H, -Math.PI / 2 + .15 + Math.random() * .6, (14 + Math.random() * 16) * dpr);
+      mk(W, H, -Math.PI / 2 - .15 - Math.random() * .6, (14 + Math.random() * 16) * dpr);
+    }
+    const t0 = performance.now(); let rain = 0;
+    (function f(t) {
+      const el = (t - t0) / 1000;
+      if (big && el < 2.2 && rain++ % 2 === 0) for (let i = 0; i < 6; i++) mk(Math.random() * W, -10 * dpr, Math.PI / 2 + (Math.random() - .5) * .8, (2 + Math.random() * 4) * dpr);
+      x.clearRect(0, 0, W, H);
+      for (const p of P) {
+        p.vy += .42 * dpr; p.vx *= .985; p.vy *= .985; p.x += p.vx; p.y += p.vy; p.r += p.vr; p.s += .12;
+        x.save(); x.translate(p.x, p.y); x.rotate(p.r); x.scale(1, Math.abs(Math.cos(p.s)) * .8 + .2);
+        x.globalAlpha = Math.max(0, Math.min(1, (5 - el) / 1.2)); x.fillStyle = p.c; x.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); x.restore();
+      }
+      if (el < 5.2) requestAnimationFrame(f); else cv.remove();
+    })(t0);
+  } catch (e) { }
+}
+function celebrateOnEntry() {
+  if (CEL || !me || me.t || !SV) return;
+  CEL = true;
+  const W = (SV.home && SV.home.works) || [], got = W.filter(w => w.full).length;
+  if (!got) return;
+  const all = W.length > 0 && got === W.length, first = String(SV.home.name || '').split(' ')[0];
+  setTimeout(() => { celebrate(all); cel(all ? '🎉 ما شاء الله يا ' + first + '! أكملتِ جميع الأوسمة، وسام التميّز لكِ 👑' : '🎉 مبروك يا ' + first + '! حصلتِ على ' + got + ' من ' + W.length + ' أوسمة 🏅'); }, 500);
 }
 function msgsHtml(L, del) {
   return L.map(m => `<div class="m ${m.is_teacher ? 'te' : ''} ${m.mine ? 'me' : ''}"><b>${esc(m.author)}</b>${m.is_teacher ? lk(m.body || '') : esc(m.body || '')}${m.is_teacher && m.image_path ? `<img src="${pub('chat', m.image_path)}" onclick="zoom(this.src)" loading="lazy">` : ''}<small>${tm(m.created_at)}${del ? ` <a onclick="delMsg(${m.id})">حذف</a>` : ''}</small></div>`).join('') || '<p class="mu">لا توجد رسائل بعد</p>';
