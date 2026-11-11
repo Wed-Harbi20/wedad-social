@@ -258,7 +258,7 @@ body.show .layout,body.show .tools,body.show .classbar,body.show .topbar .in{max
   </aside>
 </div>
 
-<div id="toast"><div class="av" id="tA"></div><div class="tn" id="tN"></div><div class="tp" id="tP"></div><div class="tb" id="tB"></div><div class="tl" id="tL"></div></div>
+<div id="toast"><div class="av" id="tA"></div><div class="tn" id="tN"></div><div class="tp" id="tP"></div><div class="tb" id="tB"></div><div class="tl" id="tL"></div><div id="tS" style="margin-top:8px;font-size:14px;font-weight:700;color:var(--muted)"></div></div>
 
 <!-- ===== نافذة التعزيز ===== -->
 <div class="modal" id="mAward"><div class="box">
@@ -347,6 +347,15 @@ body.show .layout,body.show .tools,body.show .classbar,body.show .topbar .in{max
       <div class="row"><label class="ibtn pri" style="cursor:pointer">📂 اختيار ملف grades.csv<input type="file" accept=".csv,text/csv" style="display:none" onchange="importCSV(this)"></label></div>
       <div class="msg" id="csvMsg"></div>
     </div>
+    <div class="sec" style="border-color:#c4b5fd">
+      <h4>🔗 درجة المشاركة في المنصة</h4>
+      <div class="note">عند كل تعزيز إيجابي تُضاف <b>درجة واحدة</b> للطالبة في عمل المشاركة بالمنصة (بحد أقصى درجة العمل). يعمل فقط إذا كنتِ داخلة المنصة كمعلمة على نفس المتصفح.</div>
+      <label style="display:flex;gap:8px;align-items:center;font-weight:700;margin-top:10px"><input type="checkbox" id="syncC" onchange="S.sync=this.checked;save();syncStatus()" style="width:18px;height:18px;accent-color:var(--pri)"> إضافة درجة المشاركة تلقائيًا</label>
+      <label class="lbl">عمل المشاركة في المنصة</label>
+      <select class="inp" id="syncW" onchange="S.syncWork=this.value;save()"><option value="">— جاري التحميل —</option></select>
+      <div class="row"><button class="ibtn" onclick="loadPlatform(true).then(syncStatus)">🔄 تحديث الاتصال</button></div>
+      <div class="msg" id="syncMsg"></div>
+    </div>
     <div class="sec">
       <h4>✍️ لصق الأسماء يدويًا</h4>
       <label class="lbl">الفصل</label><select class="inp" id="pc" onchange="fillPaste()"></select>
@@ -422,7 +431,7 @@ const nextLvl = p => LEVELS.find(l => Math.max(0, p) < l.n);
 const ptsWord = n => { n = Math.abs(n); return n === 1 ? 'نقطة' : n === 2 ? 'نقطتان' : ar(n) + (n <= 10 ? ' نقاط' : ' نقطة'); };
 
 /* ======================= الحفظ ======================= */
-let S = { cur:1, sort:'name', sound:true, voice:true, tTick:true, tVoice:true, lastPhrase:'', cls:{}, log:{}, goal:{}, picked:{} };
+let S = { cur:1, sort:'name', sound:true, sync:true, syncWork:'', voice:true, tTick:true, tVoice:true, lastPhrase:'', cls:{}, log:{}, goal:{}, picked:{} };
 try {
   const raw = localStorage.getItem(KEY);
   if (raw) S = Object.assign(S, JSON.parse(raw));
@@ -597,6 +606,8 @@ function give(k, j){
     speak(up ? `مبروك ${who}! وصلتِ إلى ${up.t}. ${phrase}` : `${welcome} ${who}! ${phrase}`, { delay:250 });
   } else { sad(); speak((targets.length === 1 ? firstName(list[targets[0]].name) + '، ' : '') + phrase, { delay:150, pitch:1 }); }
   showToast(targets.length === 1 ? list[targets[0]].name : null, name, phrase, b, up);
+  $('tS').textContent = '';
+  if (b.p > 0 && S.sync) syncParticipation(targets.map(i => list[i].name), S.cur);
 }
 let tT;
 function showToast(nm, name, phrase, b, up){
@@ -604,7 +615,7 @@ function showToast(nm, name, phrase, b, up){
   $('tN').textContent = name; $('tP').textContent = phrase;
   $('tB').className = 'tb ' + (b.p > 0 ? 'g' : 'b'); $('tB').textContent = `${b.e} ${b.t} ${b.p > 0 ? '+' : '−'}${ptsWord(b.p)}`;
   $('tL').textContent = up ? `🎉 مبروك! وصلتِ إلى ${up.t} ${up.m}` : '';
-  const t = $('toast'); t.classList.add('on'); clearTimeout(tT); tT = setTimeout(() => t.classList.remove('on'), up ? 3000 : 2200);
+  const t = $('toast'); t.classList.add('on'); clearTimeout(tT); tT = setTimeout(() => t.classList.remove('on'), up || S.sync ? 3200 : 2200);
 }
 
 /* ======================= الاختيار العشوائي ======================= */
@@ -786,6 +797,7 @@ function openSettings(){
   $('gTarget').value = S.goal[S.cur].target; $('gReward').value = S.goal[S.cur].reward;
   ['r1','r2'].forEach(i => { $(i).dataset.ok = ''; $(i).style.cssText = ''; });
   $('r1').textContent = 'تصفير الفصل الحالي'; $('r2').textContent = 'تصفير جميع الفصول';
+  $('syncC').checked = !!S.sync; syncStatus();
   openM('mSet');
 }
 function fillPaste(){ $('pt').value = S.cls[$('pc').value].map(s => s.name).join('\n'); }
@@ -840,6 +852,78 @@ function importCSV(inp){
     inp.value = '';
   };
   rd.readAsText(f, 'utf-8');
+}
+/* ======================= الربط بالمنصة ======================= */
+let PSB = null, PD = null; // عميل المنصة + بياناتها (الطالبات والأعمال)
+async function platformClient(){
+  await loadSupabase();
+  if (!PSB) PSB = window.supabase.createClient(SITE.url, SITE.key); // نفس جلسة المنصة على نفس الموقع
+  return PSB;
+}
+async function loadPlatform(force){
+  if (PD && !force) return PD;
+  const sb = await platformClient();
+  const g = await sb.auth.getSession();
+  if (!g.data || !g.data.session) throw new Error('nosession');
+  const t = await sb.rpc('is_teacher'); if (t.data !== true) throw new Error('notteacher');
+  const [st, wk] = await Promise.all([
+    sb.from('students').select('id,name,cls').limit(5000),
+    sb.from('works').select('id,title,kind,max_score,sort_order').order('sort_order')]);
+  if (st.error) throw st.error; if (wk.error) throw wk.error;
+  const key = (c, n) => c + '|' + String(n).replace(/\s+/g, ' ').trim();
+  PD = { works: wk.data, ids: new Map(st.data.map(x => [key(x.cls, x.name), x.id])), key };
+  if (!PD.works.some(w => w.id === S.syncWork)) {
+    const w = PD.works.find(w => w.kind === 'مشاركة') || PD.works.find(w => /مشارك/.test(w.title));
+    S.syncWork = w ? w.id : ''; save();
+  }
+  return PD;
+}
+function platErr(e){
+  const m = e && e.message;
+  return m === 'nosession' ? 'لستِ داخلة المنصة على هذا المتصفح. افتحي المنصة وادخلي كمعلمة ثم ارجعي.'
+    : m === 'notteacher' ? 'الحساب المفتوح في المنصة ليس حساب المعلمة.'
+    : m === 'net' ? 'تعذّر الاتصال بالمنصة، تأكدي من الإنترنت.'
+    : 'تعذّر الاتصال بالمنصة: ' + (m || e);
+}
+async function syncStatus(){
+  const m = $('syncMsg'), sel = $('syncW'); if (!m) return;
+  m.className = 'msg'; m.textContent = '⏳ جاري التحقق من المنصة...';
+  try {
+    const d = await loadPlatform();
+    const cand = d.works.filter(w => w.kind === 'مشاركة' || /مشارك/.test(w.title));
+    const list = cand.length ? cand : d.works;
+    sel.innerHTML = (S.syncWork ? '' : '<option value="">— اختاري العمل —</option>') + list.map(w => `<option value="${w.id}" ${w.id === S.syncWork ? 'selected' : ''}>${esc(w.title)} (من ${w.max_score})</option>`).join('');
+    if (!d.works.length) { m.className = 'msg bad'; m.textContent = 'لا توجد أعمال في المنصة. أضيفي عملًا من نوع «مشاركة» من تبويب الأعمال.'; return; }
+    if (!cand.length) { m.className = 'msg bad'; m.textContent = 'لم أجد عملًا من نوع «مشاركة»؛ اختاري العمل المناسب من القائمة، أو أضيفي عمل مشاركة في المنصة.'; return; }
+    m.className = 'msg ok'; m.textContent = '✔️ متصلة بالمنصة' + (S.sync ? '، وستُضاف درجة المشاركة مع كل تعزيز' : ' (الإضافة التلقائية متوقفة)');
+  } catch(e) { sel.innerHTML = '<option value="">—</option>'; m.className = 'msg bad'; m.textContent = platErr(e); }
+}
+async function syncParticipation(names, cls){
+  const out = $('tS');
+  try {
+    const d = await loadPlatform();
+    const w = d.works.find(x => x.id === S.syncWork);
+    if (!w) { out.textContent = '⚠️ لم يُحدَّد عمل المشاركة في الإعدادات'; return; }
+    const sb = await platformClient();
+    const ids = [], missing = [];
+    for (const n of names) { const id = d.ids.get(d.key(cls, n)); id ? ids.push(id) : missing.push(n); }
+    if (!ids.length) { out.textContent = '⚠️ الطالبة غير موجودة في المنصة بنفس الاسم'; return; }
+    const cur = await sb.from('grades').select('student_id,score').eq('work_id', w.id).in('student_id', ids);
+    if (cur.error) throw cur.error;
+    const sc = new Map(cur.data.map(g => [g.student_id, g.score]));
+    const rows = [], full = [];
+    for (const id of ids) {
+      const v = Number(sc.get(id)) || 0;
+      if (v >= w.max_score) full.push(id); else rows.push({ student_id:id, work_id:w.id, score:Math.min(w.max_score, v + 1) });
+    }
+    if (rows.length) { const r = await sb.from('grades').upsert(rows, { onConflict:'student_id,work_id' }); if (r.error) throw r.error; }
+    let txt = '';
+    if (rows.length === 1 && ids.length === 1) txt = `✔️ المنصة: ${w.title} ← ${ar(rows[0].score)} من ${ar(w.max_score)}`;
+    else if (rows.length) txt = `✔️ المنصة: أُضيفت درجة «${w.title}» لـ ${ar(rows.length)} طالبة`;
+    if (full.length) txt += (txt ? ' · ' : '') + (ids.length === 1 ? `ℹ️ وصلت للدرجة الكاملة في «${w.title}»` : `${ar(full.length)} وصلن للدرجة الكاملة`);
+    if (missing.length) txt += ` · ⚠️ ${ar(missing.length)} غير موجودة بالمنصة`;
+    out.textContent = txt;
+  } catch(e) { out.textContent = '⚠️ ' + platErr(e); }
 }
 function loadSupabase(){
   return new Promise((res, rej) => { if (window.supabase) return res(); const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'; s.onload = res; s.onerror = () => rej(new Error('net')); document.head.appendChild(s); });
