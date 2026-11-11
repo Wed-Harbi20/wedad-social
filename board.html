@@ -215,7 +215,6 @@ body.show .layout,body.show .tools,body.show .classbar,body.show .topbar .in{max
       <div><h1>لوحة نجمات الدراسات الاجتماعية</h1><p>المعلمة / وداد محمد الكحيلي</p></div>
     </div>
     <button class="ibtn hide-show" id="sndBtn" onclick="toggleSound()"></button>
-    <button class="ibtn hide-show" id="vcBtn" onclick="toggleVoice()"></button>
     <button class="ibtn hide-show" onclick="openSettings()">⚙️ الإعدادات</button>
     <button class="ibtn pri" onclick="toggleFull()">📺 عرض على الشاشة</button>
   </div>
@@ -322,7 +321,6 @@ body.show .layout,body.show .tools,body.show .classbar,body.show .topbar .in{max
     </div>
     <div class="row" style="justify-content:center;margin-top:14px;gap:18px">
       <label style="display:flex;gap:6px;align-items:center;font-weight:700;font-size:14px"><input type="checkbox" id="tTickC" onchange="S.tTick=this.checked;save()" style="width:18px;height:18px;accent-color:var(--pri)"> 🕰️ تكتكة كل ثانية</label>
-      <label style="display:flex;gap:6px;align-items:center;font-weight:700;font-size:14px"><input type="checkbox" id="tVoiceC" onchange="S.tVoice=this.checked;save()" style="width:18px;height:18px;accent-color:var(--pri)"> 🗣️ إعلان صوتي للوقت</label>
     </div>
     <div class="tctl">
       <button class="ibtn pri big" id="tGo" onclick="tToggle()">▶️ ابدئي</button>
@@ -479,6 +477,7 @@ function pickVoice(){ try { const vs = speechSynthesis.getVoices(); arVoice = vs
 if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.onvoiceschanged = pickVoice; }
 const clean = t => String(t).replace(/[\p{Extended_Pictographic}️‍]/gu, '').replace(/\s+/g, ' ').trim();
 function speak(text, opts = {}){
+  return; // النطق ملغى بطلب المعلمة
   if (!S.voice || !('speechSynthesis' in window)) return;
   try {
     if (!opts.queue) speechSynthesis.cancel();
@@ -495,9 +494,8 @@ function toggleVoice(){ S.voice = !S.voice; save(); render(); if (S.voice) speak
 let multi = false, sel = new Set();
 function render(){
   $('seg').innerHTML = Object.entries(CLASSES).map(([k,v]) => `<button class="${+k === +S.cur ? 'on' : ''}" onclick="setCls(${k})">${v}<small>(${ar(S.cls[k].length)})</small></button>`).join('');
-  $('sndBtn').innerHTML = S.sound ? '🔊 المؤثرات' : '🔇 المؤثرات';
-  $('vcBtn').innerHTML = S.voice ? '🗣️ النطق' : '🤐 النطق';
-  $('vcBtn').classList.toggle('on', !!S.voice); $('sndBtn').classList.toggle('on', !!S.sound);
+  $('sndBtn').innerHTML = S.sound ? '🔊 الصوت' : '🔇 الصوت';
+  $('sndBtn').classList.toggle('on', !!S.sound);
   $('sortBtn').innerHTML = S.sort === 'pts' ? '🏅 حسب النقاط' : '🔤 أبجديًا';
   renderGrid(); renderSide();
 }
@@ -682,7 +680,7 @@ function awardGroup(k){ closeM('mGroups'); openAward(lastGroups[k], 'تعزيز 
 /* ======================= المؤقت ======================= */
 let tDown = 1, tTotal = 300, tLeft = 300, tElapsed = 0, tRun = false, tLast = 0, tInt, tLastBeep = -1;
 const PRE = [[30,'٣٠ ث'],[60,'١ د'],[120,'٢ د'],[180,'٣ د'],[300,'٥ د'],[600,'١٠ د'],[900,'١٥ د']];
-function openTimer(){ $('tTickC').checked = S.tTick; $('tVoiceC').checked = S.tVoice; $('presets').innerHTML = PRE.map(([s,l]) => `<button class="chip ${s === tTotal ? 'on' : ''}" onclick="setT(${s})">${l}</button>`).join(''); tDraw(); openM('timer'); }
+function openTimer(){ $('tTickC').checked = S.tTick; $('presets').innerHTML = PRE.map(([s,l]) => `<button class="chip ${s === tTotal ? 'on' : ''}" onclick="setT(${s})">${l}</button>`).join(''); tDraw(); openM('timer'); }
 function tMode(m){ tDown = m; $('tm1').classList.toggle('on', m === 1); $('tm0').classList.toggle('on', m === 0); $('tPresets').style.display = m ? '' : 'none'; tReset(); }
 function setT(s){ tTotal = s; tReset(); openTimer(); }
 function setCustom(){ const s = Math.max(0, +$('tMin').value || 0) * 60 + Math.min(59, Math.max(0, +$('tSec').value || 0)); if (s > 0) setT(s); }
@@ -703,7 +701,7 @@ function tDraw(){
   $('tGo').innerHTML = tRun ? '⏸️ إيقاف مؤقت' : '▶️ ابدئي';
 }
 const NUMW = ['','واحد','اثنان','ثلاثة','أربعة','خمسة','ستة','سبعة','ثمانية','تسعة','عشرة'];
-function tSay(t){ if (S.tVoice) speak(t, { rate:1 }); }
+function tSay(t){ /* بدون نطق */ }
 function minsWord(n){ return n === 1 ? 'دقيقة واحدة' : n === 2 ? 'دقيقتان' : n <= 10 ? `${n} دقائق` : `${n} دقيقة`; }
 function tToggle(){
   if (tDown && tLeft <= 0) tReset();
@@ -726,8 +724,7 @@ function tTick(){
       if (sec <= 10) { tone(660, .09, 0, 'square', .09); if (S.tVoice) speak(NUMW[sec], { rate:1.15 }); }
       else if (S.tTick) tickSnd(sec % 2 === 0);
       if (sec > 10 && tTotal > sec) {
-        if (sec % 60 === 0) tSay(`بقي ${minsWord(sec / 60)}`);
-        else if (sec === 30) tSay('بقيت ثلاثون ثانية');
+        if (sec % 60 === 0 || sec === 30) { tone(988,.18,0,'triangle',.14); tone(1318,.25,.15,'triangle',.12); }
       }
     }
     if (tLeft <= 0) {
