@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>لوحة التعزيز | الدراسات الاجتماعية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f5f4fa; --surface:#ffffff; --line:#e9e6f2; --ink:#1e1537; --muted:#6f6888; --soft:#f8f7fc;
+  --pri:#6d28d9; --pri2:#ede9fe; --pink:#db2777; --pink2:#fce7f3; --gold:#d97706; --gold2:#fef3c7;
+  --teal:#0d9488; --teal2:#ccfbf1; --red:#dc2626; --red2:#fee2e2; --green:#059669; --green2:#d1fae5;
+  --r:18px; --sh:0 1px 2px rgba(30,21,55,.05),0 8px 24px -12px rgba(30,21,55,.15);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal',system-ui,sans-serif;background:var(--bg);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;cursor:pointer}
+input,select,textarea{font-family:inherit}
+h1,h2,h3,.rx{font-family:'Readex Pro','Tajawal',sans-serif}
+
+/* ===== الشريط العلوي ===== */
+.topbar{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30}
+.topbar .in{max-width:1440px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:12px;margin-inline-end:auto}
+.logo{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:24px;background:linear-gradient(135deg,var(--pri),var(--pink));box-shadow:0 8px 18px -8px var(--pri)}
+.brand h1{font-size:19px;font-weight:700}
+.brand p{font-size:13.5px;color:var(--muted);margin-top:2px}
+.sadu{height:5px;background:repeating-linear-gradient(45deg,var(--pri) 0 6px,var(--gold) 6px 12px,var(--pink) 12px 18px,var(--teal) 18px 24px)}
+
+.ibtn{border:1px solid var(--line);background:var(--surface);color:var(--ink);height:40px;padding:0 14px;border-radius:12px;font-weight:700;font-size:14.5px;display:inline-flex;align-items:center;gap:7px;transition:.15s}
+.ibtn:hover{background:var(--soft);border-color:#d9d3ea}
+.ibtn.pri{background:var(--pri);border-color:var(--pri);color:#fff}
+.ibtn.pri:hover{background:#5b21b6}
+.ibtn.on{background:var(--pri2);border-color:#c4b5fd;color:var(--pri)}
+
+/* ===== الفصول ===== */
+.classbar{max-width:1440px;margin:0 auto;padding:16px 22px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.seg{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);padding:4px;border-radius:14px;flex-wrap:wrap}
+.seg button{border:none;background:none;padding:8px 16px;border-radius:10px;font-weight:700;font-size:15px;color:var(--muted);transition:.15s}
+.seg button:hover{color:var(--ink);background:var(--soft)}
+.seg button.on{background:var(--pri);color:#fff;box-shadow:0 4px 12px -4px var(--pri)}
+.seg small{font-weight:500;opacity:.75;font-size:12px;margin-inline-start:3px}
+
+/* ===== الأدوات ===== */
+.tools{max-width:1440px;margin:0 auto;padding:14px 22px 0;display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.tool{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px;text-align:start;transition:.2s;box-shadow:var(--sh)}
+.tool:hover{transform:translateY(-2px);border-color:#d6cdee}
+.tool .ic{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:21px;flex-shrink:0}
+.tool b{display:block;font-size:15.5px;font-family:'Readex Pro'}
+.tool span{font-size:12.5px;color:var(--muted)}
+.tool.active{border-color:var(--pri);background:var(--pri2)}
+
+/* ===== التخطيط ===== */
+.layout{max-width:1440px;margin:0 auto;padding:16px 22px 40px;display:grid;grid-template-columns:1fr 320px;gap:18px;align-items:start}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--sh)}
+.ph{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.ph h2{font-size:17px;font-weight:600}
+.ph .sub{color:var(--muted);font-size:13px;font-weight:500}
+.search{height:40px;border:1px solid var(--line);border-radius:12px;padding:0 14px;font-size:14.5px;outline:none;min-width:200px;background:var(--soft);color:var(--ink)}
+.search:focus{border-color:var(--pri);background:#fff}
+.side{display:flex;flex-direction:column;gap:18px;position:sticky;top:96px}
+
+/* ===== شبكة الطالبات ===== */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:14px;padding:18px}
+.st{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 10px 12px;text-align:center;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;user-select:none}
+.st:hover{transform:translateY(-4px);box-shadow:0 14px 30px -14px rgba(109,40,217,.45);border-color:#d6cdee}
+.st.sel{border:2px solid var(--pri);background:var(--pri2)}
+.st.sel::after{content:"✓";position:absolute;top:8px;right:10px;width:22px;height:22px;border-radius:50%;background:var(--pri);color:#fff;font-size:13px;display:grid;place-items:center;font-weight:800}
+.st.bump{animation:bump .55s}
+@keyframes bump{40%{transform:scale(1.1)}}
+.av{width:68px;height:68px;margin:0 auto;border-radius:50%;display:grid;place-items:center;font-size:34px;position:relative}
+.pts{position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);min-width:34px;height:24px;padding:0 8px;border-radius:12px;background:var(--ink);color:#fff;font-size:13px;font-weight:800;display:grid;place-items:center;border:2px solid #fff}
+.pts.neg{background:var(--red)}
+.medal{position:absolute;top:8px;left:10px;font-size:22px}
+.st .nm{margin-top:14px;font-weight:700;font-size:15px;line-height:1.45;min-height:44px;display:flex;align-items:center;justify-content:center}
+.st .lv{font-size:12px;color:var(--muted);font-weight:600;margin-top:2px}
+.bar{height:6px;border-radius:6px;background:#f0edf7;overflow:hidden;margin:8px 6px 0}
+.bar i{display:block;height:100%;border-radius:6px;background:linear-gradient(90deg,var(--teal),var(--pri),var(--pink));transition:width .5s}
+.st .ph2{font-size:12.5px;font-weight:700;color:var(--pink);margin-top:8px;min-height:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.empty{text-align:center;padding:60px 20px;color:var(--muted);line-height:2;grid-column:1/-1}
+.empty .big{font-size:54px}
+
+/* ===== الجانب ===== */
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;padding:18px 14px 16px}
+.pod{flex:1;text-align:center}
+.pod .pa{width:52px;height:52px;border-radius:50%;margin:0 auto 6px;display:grid;place-items:center;font-size:26px}
+.pod .pn{font-size:13px;font-weight:700;line-height:1.35;min-height:36px}
+.pod .pb{margin-top:6px;border-radius:12px 12px 4px 4px;color:#fff;font-weight:800;display:grid;place-items:center;font-size:20px}
+.pod.p1 .pb{height:86px;background:linear-gradient(180deg,#f59e0b,#d97706)}
+.pod.p2 .pb{height:62px;background:linear-gradient(180deg,#a8a3b8,#7d7791)}
+.pod.p3 .pb{height:46px;background:linear-gradient(180deg,#e0a370,#b7703a)}
+.pod .pb small{display:block;font-size:11px;font-weight:600;opacity:.9}
+.goal{padding:16px 18px}
+.goal .gt{display:flex;justify-content:space-between;font-weight:700;font-size:14px}
+.goal .gbar{height:14px;border-radius:9px;background:#f0edf7;margin:10px 0 8px;overflow:hidden}
+.goal .gbar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold),var(--pink));border-radius:9px;transition:width .6s}
+.goal .rw{font-size:13.5px;color:var(--muted)}
+.goal .rw b{color:var(--gold)}
+.feed{list-style:none;padding:6px 0;max-height:300px;overflow:auto}
+.feed li{display:flex;align-items:center;gap:10px;padding:9px 18px;font-size:13.5px}
+.feed li+li{border-top:1px dashed var(--line)}
+.feed .fp{font-weight:800;min-width:34px;text-align:center;border-radius:8px;padding:2px 6px;font-size:12.5px}
+.feed .fp.g{background:var(--green2);color:var(--green)}.feed .fp.b{background:var(--red2);color:var(--red)}
+.feed .ft{color:var(--muted);font-size:11.5px;margin-inline-start:auto;white-space:nowrap}
+.feed .none{color:var(--muted);justify-content:center;padding:18px}
+
+/* ===== النوافذ ===== */
+.modal{position:fixed;inset:0;background:rgba(20,12,40,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:70;padding:16px}
+.modal.on{display:flex;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.box{background:var(--surface);border-radius:22px;width:100%;max-width:640px;max-height:92vh;overflow:auto;box-shadow:0 30px 80px -20px rgba(0,0,0,.5);animation:pop .25s cubic-bezier(.2,1.4,.4,1)}
+.box.wide{max-width:1000px}
+@keyframes pop{from{transform:scale(.92);opacity:0}}
+.bh{display:flex;align-items:center;gap:12px;padding:16px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--surface);z-index:2}
+.bh h3{font-size:18px;font-weight:600;margin-inline-end:auto}
+.x{width:36px;height:36px;border-radius:10px;border:1px solid var(--line);background:var(--soft);font-size:20px;color:var(--muted)}
+.bb{padding:18px 20px}
+.lbl{font-weight:700;font-size:14px;margin:12px 0 6px;display:block}
+.inp{width:100%;height:42px;border:1px solid var(--line);border-radius:12px;padding:0 12px;font-size:15px;outline:none;background:var(--soft);color:var(--ink)}
+textarea.inp{height:170px;padding:10px 12px;line-height:1.8;resize:vertical}
+.inp:focus{border-color:var(--pri);background:#fff}
+.note{font-size:13px;color:var(--muted);line-height:1.8;margin-top:6px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.msg{margin-top:10px;font-weight:700;font-size:14px}.msg.ok{color:var(--green)}.msg.bad{color:var(--red)}
+.sec{border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.sec h4{font-family:'Readex Pro';font-size:15.5px;font-weight:600;margin-bottom:4px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:12px;min-width:48px;height:42px;padding:0 14px;font-weight:800;font-size:16px;color:var(--ink);transition:.15s}
+.chip:hover{border-color:#c4b5fd}
+.chip.on{background:var(--pri);border-color:var(--pri);color:#fff}
+
+/* نافذة التعزيز */
+.who{display:flex;align-items:center;gap:12px;margin-inline-end:auto}
+.who .av{width:46px;height:46px;font-size:24px;margin:0}
+.who b{font-family:'Readex Pro';font-size:17px;display:block}
+.who span{font-size:13px;color:var(--muted)}
+.ktabs{display:flex;gap:6px;background:var(--soft);padding:4px;border-radius:12px;margin-bottom:16px}
+.ktabs button{flex:1;border:none;background:none;height:38px;border-radius:9px;font-weight:700;font-size:14.5px;color:var(--muted)}
+.ktabs button.on{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.skills{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px}
+.sk{border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:14px 8px 12px;text-align:center;transition:.15s;position:relative}
+.sk:hover{transform:translateY(-3px);border-color:var(--c);box-shadow:0 10px 20px -12px var(--c)}
+.sk .e{font-size:30px;width:56px;height:56px;border-radius:50%;margin:0 auto 8px;display:grid;place-items:center;background:var(--c2)}
+.sk b{display:block;font-size:14px}
+.sk .p{position:absolute;top:8px;left:8px;font-size:12px;font-weight:800;color:#fff;background:var(--c);border-radius:8px;padding:1px 7px}
+
+/* الاختيار العشوائي */
+.slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:14px;margin-top:18px}
+.slot{border:2px dashed var(--line);border-radius:20px;padding:22px 10px;text-align:center;min-height:170px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:var(--soft)}
+.slot .av{width:72px;height:72px;font-size:38px}
+.slot b{font-family:'Readex Pro';font-size:clamp(17px,2vw,22px);line-height:1.4}
+.slot.spin b{color:var(--muted)}
+.slot.done{border-style:solid;border-color:var(--pri);background:linear-gradient(180deg,#fff,var(--pri2));animation:pop .4s cubic-bezier(.2,1.6,.4,1)}
+
+/* المجموعات */
+.groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:18px}
+.grp{border-radius:18px;border:1px solid var(--line);overflow:hidden;background:#fff;animation:pop .35s}
+.grp .gh{padding:12px 14px;color:#fff;display:flex;align-items:center;gap:8px}
+.grp .gh b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Readex Pro';font-size:16px;margin-inline-end:auto}
+.grp .gh button{white-space:nowrap;border:none;background:rgba(255,255,255,.25);color:#fff;border-radius:9px;padding:5px 10px;font-weight:700;font-size:13px}
+.grp ol{list-style-type:arabic-indic;padding:10px 34px 14px 14px;line-height:2;font-weight:600;font-size:15px}
+
+/* المؤقت */
+#timer .box{max-width:760px}
+.tview{text-align:center;padding:10px 0 4px}
+.ring{position:relative;width:min(70vw,340px);aspect-ratio:1;margin:0 auto}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .digits{position:absolute;inset:0;display:grid;place-items:center;font-family:'Readex Pro';font-weight:700;font-size:clamp(48px,11vw,92px);letter-spacing:2px;direction:ltr}
+.ring .lbl2{position:absolute;bottom:24%;left:0;right:0;text-align:center;color:var(--muted);font-weight:700;font-size:15px}
+.ring.warn .digits{color:var(--red);animation:pulse 1s infinite}
+.ring.end .digits{color:var(--pink)}
+@keyframes pulse{50%{transform:scale(1.06)}}
+.tctl{display:flex;justify-content:center;gap:10px;margin-top:18px;flex-wrap:wrap}
+.big{height:52px;padding:0 28px;font-size:17px;border-radius:14px}
+.custom{display:flex;align-items:center;gap:8px;justify-content:center;margin-top:12px}
+.custom input{width:72px;text-align:center}
+
+/* الرسالة المنبثقة */
+#toast{position:fixed;left:50%;top:44%;transform:translate(-50%,-50%) scale(.5);opacity:0;pointer-events:none;z-index:90;background:#fff;border-radius:26px;padding:24px 34px;text-align:center;min-width:min(90vw,400px);box-shadow:0 30px 80px -20px rgba(109,40,217,.55);border:1px solid var(--line);transition:.35s cubic-bezier(.2,1.6,.4,1)}
+#toast.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+#toast .av{width:76px;height:76px;font-size:40px;margin:-62px auto 8px;border:5px solid #fff;box-shadow:0 8px 20px -8px rgba(0,0,0,.3)}
+#toast .tn{font-family:'Readex Pro';font-size:clamp(20px,3.4vw,28px);font-weight:700}
+#toast .tp{font-size:clamp(19px,3vw,26px);font-weight:800;color:var(--pink);margin-top:4px}
+#toast .tb{display:inline-block;margin-top:10px;padding:5px 14px;border-radius:999px;font-weight:800;font-size:15px}
+#toast .tb.g{background:var(--green2);color:var(--green)}#toast .tb.b{background:var(--red2);color:var(--red)}
+#toast .tl{margin-top:8px;font-weight:800;color:var(--gold);font-size:17px}
+canvas#fx{position:fixed;inset:0;pointer-events:none;z-index:95}
+
+/* وضع العرض */
+body.show .hide-show{display:none!important}
+body.show .grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr))}
+body.show .st .nm{font-size:17px}
+body.show .layout,body.show .tools,body.show .classbar,body.show .topbar .in{max-width:none}
+
+@media (max-width:1000px){.layout{grid-template-columns:1fr}.side{position:static}}
+@media (max-width:560px){
+  .topbar .in,.classbar,.tools,.layout{padding-inline:10px}
+  .grid{grid-template-columns:repeat(2,1fr);gap:10px;padding:12px}
+  .tools{grid-template-columns:repeat(2,1fr)}
+  .tool span{display:none}
+  .search{min-width:0;width:100%}
+}
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+
+<div class="topbar">
+  <div class="sadu"></div>
+  <div class="in">
+    <div class="brand">
+      <div class="logo">⭐</div>
+      <div><h1>لوحة نجمات الدراسات الاجتماعية</h1><p>المعلمة / وداد محمد الكحيلي</p></div>
+    </div>
+    <button class="ibtn hide-show" id="sndBtn" onclick="toggleSound()"></button>
+    <button class="ibtn hide-show" onclick="openSettings()">⚙️ الإعدادات</button>
+    <button class="ibtn pri" onclick="toggleFull()">📺 عرض على الشاشة</button>
+  </div>
+</div>
+
+<div class="classbar"><div class="seg" id="seg"></div></div>
+
+<div class="tools">
+  <button class="tool" onclick="openPicker()"><div class="ic" style="background:var(--pri2)">🎯</div><div><b>اختيار عشوائي</b><span>من طالبة إلى ٦ طالبات</span></div></button>
+  <button class="tool" onclick="openGroups()"><div class="ic" style="background:var(--teal2)">👥</div><div><b>تقسيم مجموعات</b><span>بالعدد الذي تختارينه</span></div></button>
+  <button class="tool" onclick="openTimer()"><div class="ic" style="background:var(--gold2)">⏱️</div><div><b>المؤقت</b><span>تنازلي وتصاعدي</span></div></button>
+  <button class="tool" onclick="awardAll()"><div class="ic" style="background:var(--pink2)">🏫</div><div><b>تعزيز الفصل</b><span>نقاط لجميع الطالبات</span></div></button>
+  <button class="tool" id="multiBtn" onclick="toggleMulti()"><div class="ic" style="background:var(--green2)">☑️</div><div><b id="multiT">تحديد متعدد</b><span id="multiS">عزّزي عدة طالبات معًا</span></div></button>
+</div>
+
+<div class="layout">
+  <section class="panel">
+    <div class="ph">
+      <div><h2 id="clsTitle"></h2><div class="sub" id="clsSub"></div></div>
+      <div class="row hide-show" style="margin:0">
+        <input class="search" id="q" placeholder="🔍 ابحثي عن طالبة" oninput="renderGrid()">
+        <button class="ibtn" id="sortBtn" onclick="toggleSort()"></button>
+      </div>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <aside class="side">
+    <div class="panel">
+      <div class="ph"><h2>👑 نجمات الأسبوع</h2></div>
+      <div id="podium"></div>
+    </div>
+    <div class="panel">
+      <div class="ph"><h2>🎯 هدف الفصل</h2></div>
+      <div class="goal" id="goal"></div>
+    </div>
+    <div class="panel hide-show">
+      <div class="ph"><h2>🕘 آخر التعزيزات</h2></div>
+      <ul class="feed" id="feed"></ul>
+    </div>
+  </aside>
+</div>
+
+<div id="toast"><div class="av" id="tA"></div><div class="tn" id="tN"></div><div class="tp" id="tP"></div><div class="tb" id="tB"></div><div class="tl" id="tL"></div></div>
+
+<!-- ===== نافذة التعزيز ===== -->
+<div class="modal" id="mAward"><div class="box">
+  <div class="bh"><div class="who" id="awWho"></div><button class="x" onclick="closeM('mAward')">×</button></div>
+  <div class="bb">
+    <div class="ktabs"><button id="kt1" class="on" onclick="skTab(1)">🌟 إيجابي</button><button id="kt0" onclick="skTab(0)">🔧 يحتاج تحسين</button></div>
+    <div class="skills" id="skills"></div>
+  </div>
+</div></div>
+
+<!-- ===== الاختيار العشوائي ===== -->
+<div class="modal" id="mPick"><div class="box wide">
+  <div class="bh"><h3>🎯 الاختيار العشوائي</h3><button class="x" onclick="closeM('mPick')">×</button></div>
+  <div class="bb">
+    <div class="row" style="margin:0;justify-content:space-between">
+      <div><span class="lbl" style="margin:0 0 8px">عدد الطالبات</span><div class="chips" id="pickN"></div></div>
+      <label style="display:flex;gap:8px;align-items:center;font-weight:700;font-size:14px"><input type="checkbox" id="noRep" checked style="width:18px;height:18px;accent-color:var(--pri)"> بدون تكرار من اختيرت سابقًا</label>
+    </div>
+    <div class="slots" id="slots"></div>
+    <div class="row" style="justify-content:center;margin-top:20px">
+      <button class="ibtn pri big" id="pickGo" onclick="doPick()">🎲 اختاري الآن</button>
+      <button class="ibtn big" id="pickAw" onclick="awardPicked()" style="display:none">⭐ تعزيز المختارات</button>
+    </div>
+    <div class="note" id="pickNote" style="text-align:center"></div>
+  </div>
+</div></div>
+
+<!-- ===== المجموعات ===== -->
+<div class="modal" id="mGroups"><div class="box wide">
+  <div class="bh"><h3>👥 تقسيم المجموعات</h3><button class="x" onclick="closeM('mGroups')">×</button></div>
+  <div class="bb">
+    <div class="ktabs" style="max-width:420px"><button id="gm1" class="on" onclick="gMode(1)">حسب عدد المجموعات</button><button id="gm0" onclick="gMode(0)">حسب عدد الطالبات بالمجموعة</button></div>
+    <div class="row" style="margin:0">
+      <span class="lbl" style="margin:0" id="gLbl">عدد المجموعات:</span>
+      <button class="chip" onclick="gStep(-1)">−</button>
+      <input class="inp" id="gNum" type="number" min="2" value="4" style="width:80px;text-align:center;font-weight:800">
+      <button class="chip" onclick="gStep(1)">+</button>
+      <button class="ibtn pri big" style="margin-inline-start:auto" onclick="makeGroups()">🔀 قسّمي عشوائيًا</button>
+    </div>
+    <div class="note" id="gNote"></div>
+    <div class="groups" id="groups"></div>
+  </div>
+</div></div>
+
+<!-- ===== المؤقت ===== -->
+<div class="modal" id="timer"><div class="box">
+  <div class="bh"><h3>⏱️ المؤقت</h3><button class="x" onclick="closeM('timer')">×</button></div>
+  <div class="bb">
+    <div class="ktabs" style="max-width:340px;margin:0 auto 14px"><button id="tm1" class="on" onclick="tMode(1)">⏳ عد تنازلي</button><button id="tm0" onclick="tMode(0)">⏱️ عد تصاعدي</button></div>
+    <div id="tPresets">
+      <div class="chips" style="justify-content:center" id="presets"></div>
+      <div class="custom"><input class="inp" id="tMin" type="number" min="0" max="99" value="5"><b>دقيقة</b><input class="inp" id="tSec" type="number" min="0" max="59" value="0"><b>ثانية</b><button class="ibtn" onclick="setCustom()">تعيين</button></div>
+    </div>
+    <div class="tview">
+      <div class="ring" id="ring">
+        <svg viewBox="0 0 200 200"><circle cx="100" cy="100" r="88" fill="none" stroke="#f0edf7" stroke-width="14"/><circle id="arc" cx="100" cy="100" r="88" fill="none" stroke="url(#gr)" stroke-width="14" stroke-linecap="round" stroke-dasharray="552.9" stroke-dashoffset="0"/><defs><linearGradient id="gr"><stop offset="0" stop-color="#0d9488"/><stop offset=".5" stop-color="#6d28d9"/><stop offset="1" stop-color="#db2777"/></linearGradient></defs></svg>
+        <div class="digits" id="digits">05:00</div>
+        <div class="lbl2" id="tState">جاهز</div>
+      </div>
+    </div>
+    <div class="tctl">
+      <button class="ibtn pri big" id="tGo" onclick="tToggle()">▶️ ابدئي</button>
+      <button class="ibtn big" onclick="tReset()">↺ إعادة</button>
+    </div>
+  </div>
+</div></div>
+
+<!-- ===== الإعدادات ===== -->
+<div class="modal" id="mSet"><div class="box">
+  <div class="bh"><h3>⚙️ الإعدادات</h3><button class="x" onclick="closeM('mSet')">×</button></div>
+  <div class="bb">
+    <div class="sec">
+      <h4>⬇️ جلب الأسماء من منصتي</h4>
+      <div class="note">ادخلي ببريد وكلمة مرور حساب المعلمة في المنصة. تُحفظ الأسماء في هذا الجهاز ولا تُحفظ كلمة المرور. يحتاج إنترنت.</div>
+      <label class="lbl">البريد الإلكتروني</label><input class="inp" id="em" type="email" dir="ltr" autocomplete="username">
+      <label class="lbl">كلمة المرور</label><input class="inp" id="pw" type="password" dir="ltr" autocomplete="current-password">
+      <div class="row"><button class="ibtn pri" onclick="importSite()">جلب الأسماء</button></div>
+      <div class="msg" id="impMsg"></div>
+    </div>
+    <div class="sec">
+      <h4>📄 استيراد ملف الدرجات من المنصة (بدون كلمة مرور)</h4>
+      <div class="note">من المنصة: لوحة المعلمة ← التقارير ← اختاري «الكل» في الفصل ← «تصدير الدرجات (CSV)». ثم اختاري الملف هنا، وتتوزع الطالبات على فصولهن تلقائيًا.</div>
+      <div class="row"><label class="ibtn pri" style="cursor:pointer">📂 اختيار ملف grades.csv<input type="file" accept=".csv,text/csv" style="display:none" onchange="importCSV(this)"></label></div>
+      <div class="msg" id="csvMsg"></div>
+    </div>
+    <div class="sec">
+      <h4>✍️ لصق الأسماء يدويًا</h4>
+      <label class="lbl">الفصل</label><select class="inp" id="pc" onchange="fillPaste()"></select>
+      <label class="lbl">الأسماء (اسم في كل سطر)</label><textarea class="inp" id="pt" placeholder="نورة محمد العتيبي&#10;سارة عبدالله القحطاني"></textarea>
+      <div class="note">الطالبة الموجودة تحتفظ بنقاطها، والاسم المحذوف من القائمة يُحذف من اللوحة.</div>
+      <div class="row"><button class="ibtn pri" onclick="savePaste()">حفظ أسماء الفصل</button></div>
+      <div class="msg" id="pMsg"></div>
+    </div>
+    <div class="sec">
+      <h4>🎯 هدف الفصل الحالي</h4>
+      <div class="row" style="margin-top:6px"><label class="lbl" style="margin:0">عدد النقاط المطلوبة</label><input class="inp" id="gTarget" type="number" min="10" style="width:110px"></div>
+      <label class="lbl">المكافأة عند تحقيق الهدف</label><input class="inp" id="gReward">
+      <div class="row"><button class="ibtn pri" onclick="saveGoal()">حفظ الهدف</button></div>
+      <div class="msg" id="gMsg"></div>
+    </div>
+    <div class="sec" style="border-color:#fecaca">
+      <h4>🔄 تصفير الأسبوع</h4>
+      <div class="note">تُصفَّر النقاط وسجل التعزيزات، وتبقى الأسماء.</div>
+      <div class="row"><button class="ibtn" id="r1" onclick="askReset('cur',this)">تصفير الفصل الحالي</button><button class="ibtn" id="r2" onclick="askReset('all',this)">تصفير جميع الفصول</button></div>
+    </div>
+  </div>
+</div></div>
+
+<script>
+/* ======================= الثوابت ======================= */
+const CLASSES = {1:'رابع ١',2:'رابع ٢',3:'خامس ١',4:'خامس ٢',5:'خامس ٣',6:'سادس ١',7:'سادس ٢'};
+const SITE = { url:'https://dqhzvghuocaxtchmqhul.supabase.co', key:'sb_publishable_c18je76xJ2Ut1pTw1-8Jbw_JsQaUuO5' };
+const KEY = 'wedad_reinforce_board_v2', OLD = 'wedad_reinforce_board_v1';
+
+const POS = [
+  {e:'🙋‍♀️',t:'مشاركة فعّالة',p:1},{e:'💡',t:'إجابة مميزة',p:2},{e:'🤝',t:'مساعدة زميلة',p:1},
+  {e:'👭',t:'عمل جماعي',p:1},{e:'📚',t:'واجب متقن',p:2},{e:'🤫',t:'نظام وهدوء',p:1},
+  {e:'🎨',t:'إبداع',p:3},{e:'📈',t:'تحسّن ملحوظ',p:2},{e:'🗺️',t:'قراءة الخريطة',p:2},
+  {e:'📜',t:'معلومة تاريخية',p:2},{e:'🇸🇦',t:'حب الوطن',p:2},{e:'🏆',t:'إنجاز رائع',p:5}
+];
+const NEG = [
+  {e:'📕',t:'نسيان الكتاب',p:-1},{e:'💬',t:'حديث جانبي',p:-1},{e:'⏰',t:'تأخر الواجب',p:-1},
+  {e:'🙉',t:'عدم الانتباه',p:-1},{e:'🧹',t:'عدم الترتيب',p:-1}
+];
+const PHRASES = [
+  'أحسنتِ يا مبدعة 🌟','فخورة فيكِ!','عقلك نور 💡','بطلة الدراسات 🏆','استمري يا متألقة','إجابتك ذهب ✨',
+  'تستاهلين نجمة وأكثر','ما شاء الله عليكِ 🌷','تميّزك يلفت النظر','رائعة كعادتك 💐','شطورة وذكية','قدوة لزميلاتك',
+  'نجمة الفصل اليوم ⭐','إبداعك ما له حدود 🎨','تفكيرك عميق وجميل','ذكية ومتفوقة 🎓','أنتِ مصدر فخر 💜',
+  'مشاركتك أضاءت الحصة ☀️','مؤرخة المستقبل 📜','خريطتك في القمة 🗺️','جغرافية بارعة 🌍','تحفظين تاريخ وطنك يا بطلة 🇸🇦',
+  'بنت الوطن المبدعة 💚','تعرفين المملكة شبرًا شبرًا','مستكشفة التضاريس 🏔️','مواطنة واعية ومثقفة','بوصلتك دائمًا صحيحة 🧭',
+  'رؤية ٢٠٣٠ تفتخر فيكِ 🌟','حافظة الحضارة والتراث 🏺','عالمة آثار صغيرة 🔍','مستواكِ يرتفع كل يوم 📈',
+  'محاولتك رائعة، كمّلي! 💪','كل يوم أحسن من اللي قبله','تقدّمك واضح وجميل 🌱','لا تستسلمين أبدًا 💫',
+  'خطوة بخطوة توصلين للقمة 🪜','اجتهادك يستاهل التصفيق 👏','شجاعتك في المشاركة تميّزك','تعبك ما راح هدر 🌼','أنتِ قدها وقدود!'
+];
+const IMPROVE = ['نقدر نكون أفضل 💪','أثق إنك بتتحسنين 🌱','المرة الجاية أحلى إن شاء الله','خلّينا نرجع للتألق ✨'];
+const LEVELS = [
+  {n:0,t:'بداية الرحلة',m:''},{n:10,t:'وسام برونزي',m:'🥉'},{n:25,t:'وسام فضي',m:'🥈'},
+  {n:50,t:'وسام ذهبي',m:'🥇'},{n:100,t:'تاج الملكة',m:'👑'}
+];
+const AVS = ['🦋','🌸','🌷','🌻','🦄','🐰','🦊','🐼','🐧','🐝','🍓','🌙','🐱','🦜','🐬','🌼','🍒','🐞','🦚','🌺','🐨','🍀','🐳','🌈'];
+const AVC = ['#fce7f3','#ede9fe','#fef3c7','#ccfbf1','#e0f2fe','#dcfce7','#ffedd5','#f3e8ff'];
+const TEAMS = [
+  {n:'فريق النجوم',e:'⭐',c:'#6d28d9'},{n:'فريق الصقور',e:'🦅',c:'#0d9488'},{n:'فريق الورود',e:'🌹',c:'#db2777'},
+  {n:'فريق النخيل',e:'🌴',c:'#059669'},{n:'فريق الألماس',e:'💎',c:'#0284c7'},{n:'فريق القمر',e:'🌙',c:'#4338ca'},
+  {n:'فريق البوصلة',e:'🧭',c:'#d97706'},{n:'فريق الخزامى',e:'💜',c:'#9333ea'},{n:'فريق الشمس',e:'☀️',c:'#ea580c'},
+  {n:'فريق اللؤلؤ',e:'🐚',c:'#be185d'},{n:'فريق الواحة',e:'🏝️',c:'#0f766e'},{n:'فريق القلعة',e:'🏰',c:'#7c2d12'}
+];
+
+/* ======================= أدوات ======================= */
+const $ = id => document.getElementById(id);
+const ar = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const hash = s => { let h = 0; for (const ch of s) h = (h * 31 + ch.codePointAt(0)) >>> 0; return h; };
+const avHTML = (name, cls = '') => `<div class="av ${cls}" style="background:${AVC[hash(name) % AVC.length]}">${AVS[hash(name + '*') % AVS.length]}</div>`;
+const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const lvl = p => [...LEVELS].reverse().find(l => p >= l.n) || LEVELS[0];
+const nextLvl = p => LEVELS.find(l => Math.max(0, p) < l.n);
+const ptsWord = n => { n = Math.abs(n); return n === 1 ? 'نقطة' : n === 2 ? 'نقطتان' : ar(n) + (n <= 10 ? ' نقاط' : ' نقطة'); };
+
+/* ======================= الحفظ ======================= */
+let S = { cur:1, sort:'name', sound:true, lastPhrase:'', cls:{}, log:{}, goal:{}, picked:{} };
+try {
+  const raw = localStorage.getItem(KEY);
+  if (raw) S = Object.assign(S, JSON.parse(raw));
+  else { const o = localStorage.getItem(OLD); if (o) { const d = JSON.parse(o); for (const c in d.cls || {}) S.cls[c] = d.cls[c].map(s => ({name:s.name, pts:s.stars || 0, phrase:s.phrase || ''})); S.cur = d.cur || 1; } }
+} catch(e) {}
+for (const c in CLASSES) {
+  if (!Array.isArray(S.cls[c])) S.cls[c] = [];
+  if (!Array.isArray(S.log[c])) S.log[c] = [];
+  if (!S.goal[c]) S.goal[c] = { target:200, reward:'حصة نشاط ممتعة 🎉' };
+  if (!Array.isArray(S.picked[c])) S.picked[c] = [];
+}
+function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} }
+const L = () => S.cls[S.cur];
+
+/* ======================= الصوت ======================= */
+let AC;
+function tone(f, d = .15, t = 0, type = 'sine', v = .18){
+  if (!S.sound) return;
+  try {
+    AC = AC || new (window.AudioContext || window.webkitAudioContext)();
+    const o = AC.createOscillator(), g = AC.createGain(), s = AC.currentTime + t;
+    o.type = type; o.frequency.value = f; g.gain.setValueAtTime(v, s); g.gain.exponentialRampToValueAtTime(.001, s + d);
+    o.connect(g).connect(AC.destination); o.start(s); o.stop(s + d);
+  } catch(e) {}
+}
+const chime = () => { tone(784,.18); tone(988,.18,.1); tone(1318,.35,.2); };
+const levelUp = () => [523,659,784,1046,1318].forEach((f,i) => tone(f,.25,i*.09,'triangle'));
+const sad = () => { tone(330,.2,0,'triangle',.12); tone(262,.3,.15,'triangle',.12); };
+function toggleSound(){ S.sound = !S.sound; save(); $('sndBtn').innerHTML = S.sound ? '🔊 الصوت' : '🔇 الصوت'; }
+
+/* ======================= العرض ======================= */
+let multi = false, sel = new Set();
+function render(){
+  $('seg').innerHTML = Object.entries(CLASSES).map(([k,v]) => `<button class="${+k === +S.cur ? 'on' : ''}" onclick="setCls(${k})">${v}<small>(${ar(S.cls[k].length)})</small></button>`).join('');
+  $('sndBtn').innerHTML = S.sound ? '🔊 الصوت' : '🔇 الصوت';
+  $('sortBtn').innerHTML = S.sort === 'pts' ? '🏅 حسب النقاط' : '🔤 أبجديًا';
+  renderGrid(); renderSide();
+}
+function renderGrid(){
+  const tot = L().reduce((a,s) => a + s.pts, 0);
+  $('clsTitle').textContent = 'فصل ' + CLASSES[S.cur];
+  $('clsSub').textContent = `${ar(L().length)} طالبة · مجموع النقاط ${ar(tot)}`;
+  const q = ($('q').value || '').trim();
+  let list = L().map((s,i) => ({...s, i}));
+  if (q) list = list.filter(s => s.name.includes(q));
+  list.sort(S.sort === 'pts' ? (a,b) => b.pts - a.pts || a.name.localeCompare(b.name,'ar') : (a,b) => a.name.localeCompare(b.name,'ar'));
+  const g = $('grid');
+  if (!L().length) { g.innerHTML = `<div class="empty"><div class="big">🌸</div>لا توجد أسماء في فصل ${CLASSES[S.cur]} بعد.<br><button class="ibtn pri" onclick="openSettings()">إضافة أسماء الطالبات</button></div>`; return; }
+  if (!list.length) { g.innerHTML = `<div class="empty">لا توجد طالبة بهذا الاسم 🔍</div>`; return; }
+  g.innerHTML = list.map(s => {
+    const lv = lvl(s.pts), nx = nextLvl(s.pts);
+    const pct = nx ? Math.max(0, Math.round((s.pts - lv.n) / (nx.n - lv.n) * 100)) : 100;
+    return `<div class="st ${sel.has(s.i) ? 'sel' : ''}" id="st${s.i}" onclick="tapStudent(${s.i})">
+      ${lv.m ? `<div class="medal" title="${lv.t}">${lv.m}</div>` : ''}
+      <div style="position:relative;width:68px;margin:0 auto">${avHTML(s.name)}<div class="pts ${s.pts < 0 ? 'neg' : ''}">${ar(s.pts)}</div></div>
+      <div class="nm">${esc(s.name)}</div>
+      <div class="lv">${s.pts < 0 ? 'نحتاج نتحسّن 🌱' : lv.t}${nx && s.pts >= 0 ? ` · باقي ${ar(nx.n - s.pts)}` : ''}</div>
+      <div class="bar"><i style="width:${pct}%"></i></div>
+      <div class="ph2">${esc(s.phrase || '')}</div>
+    </div>`;
+  }).join('');
+}
+function renderSide(){
+  const top = [...L()].filter(s => s.pts > 0).sort((a,b) => b.pts - a.pts).slice(0,3);
+  if (!top.length) $('podium').innerHTML = `<div class="note" style="text-align:center;padding:24px">من ستكون نجمة هذا الأسبوع؟ ✨</div>`;
+  else {
+    const order = [top[1], top[0], top[2]], cls = ['p2','p1','p3'], rank = ['٢','١','٣'];
+    $('podium').innerHTML = `<div class="podium">${order.map((s,k) => s ? `<div class="pod ${cls[k]}">${avHTML(s.name,'pa')}<div class="pn">${esc(s.name)}</div><div class="pb">${rank[k]}<small>${ar(s.pts)} نقطة</small></div></div>` : '<div class="pod"></div>').join('')}</div>`;
+  }
+  const tot = Math.max(0, L().reduce((a,s) => a + s.pts, 0)), G = S.goal[S.cur], pct = Math.min(100, Math.round(tot / G.target * 100));
+  $('goal').innerHTML = `<div class="gt"><span>${ar(tot)} / ${ar(G.target)} نقطة</span><span>${ar(pct)}٪</span></div><div class="gbar"><i style="width:${pct}%"></i></div><div class="rw">${pct >= 100 ? '🎉 تحقق الهدف! المكافأة: ' : '🎁 المكافأة: '}<b>${esc(G.reward)}</b></div>`;
+  const lg = S.log[S.cur].slice(0,12);
+  $('feed').innerHTML = lg.length ? lg.map(x => `<li><span class="fp ${x.p > 0 ? 'g' : 'b'}">${x.p > 0 ? '+' : ''}${ar(x.p)}</span><span><b>${esc(x.n)}</b> · ${esc(x.b)}</span><span class="ft">${ago(x.t)}</span></li>`).join('') : `<li class="none">لا توجد تعزيزات بعد</li>`;
+}
+function ago(t){
+  const m = Math.floor((Date.now() - t) / 60000);
+  if (m < 1) return 'الآن'; if (m < 60) return `قبل ${ar(m)} د`;
+  const h = Math.floor(m / 60); if (h < 24) return `قبل ${ar(h)} س`; return `قبل ${ar(Math.floor(h / 24))} يوم`;
+}
+function setCls(k){ S.cur = k; save(); sel.clear(); $('q').value = ''; $('groups').innerHTML = ''; render(); }
+function toggleSort(){ S.sort = S.sort === 'pts' ? 'name' : 'pts'; save(); renderGrid(); }
+setInterval(renderSide, 60000);
+
+/* ======================= التعزيز ======================= */
+let targets = [], kTab = 1;
+function tapStudent(i){
+  if (multi) { sel.has(i) ? sel.delete(i) : sel.add(i); updMulti(); renderGrid(); return; }
+  openAward([i]);
+}
+function toggleMulti(){
+  if (multi && sel.size) { openAward([...sel]); return; }
+  multi = !multi; sel.clear(); updMulti(); renderGrid();
+}
+function updMulti(){
+  $('multiBtn').classList.toggle('active', multi);
+  $('multiT').textContent = !multi ? 'تحديد متعدد' : sel.size ? `تعزيز المحددات (${ar(sel.size)})` : 'اختاري الطالبات…';
+  $('multiS').textContent = !multi ? 'عزّزي عدة طالبات معًا' : 'اضغطي هنا بعد التحديد';
+}
+function awardAll(){ if (!L().length) return openSettings(); openAward(L().map((_,i) => i), 'الفصل كاملاً'); }
+function openAward(idx, label){
+  targets = idx; skTab(1);
+  const who = idx.length === 1 ? L()[idx[0]] : null;
+  $('awWho').innerHTML = who
+    ? `${avHTML(who.name)}<div><b>${esc(who.name)}</b><span>${ar(who.pts)} نقطة · ${lvl(who.pts).t}</span></div>`
+    : `<div class="av" style="background:var(--pri2)">👥</div><div><b>${label || 'تعزيز ' + ar(idx.length) + ' طالبات'}</b><span>تُضاف النقاط لكل طالبة</span></div>`;
+  openM('mAward');
+}
+function skTab(k){
+  kTab = k; $('kt1').classList.toggle('on', k === 1); $('kt0').classList.toggle('on', k === 0);
+  const arr = k ? POS : NEG, c = k ? ['#059669','#d1fae5'] : ['#dc2626','#fee2e2'];
+  $('skills').innerHTML = arr.map((b,j) => `<button class="sk" style="--c:${c[0]};--c2:${c[1]}" onclick="give(${k},${j})"><span class="p">${b.p > 0 ? '+' : ''}${ar(b.p)}</span><div class="e">${b.e}</div><b>${b.t}</b></button>`).join('');
+}
+function randPhrase(){ let p; do { p = PHRASES[Math.floor(Math.random() * PHRASES.length)]; } while (p === S.lastPhrase && PHRASES.length > 1); S.lastPhrase = p; return p; }
+function give(k, j){
+  const b = (k ? POS : NEG)[j], list = L(); let up = null;
+  const phrase = b.p > 0 ? randPhrase() : IMPROVE[Math.floor(Math.random() * IMPROVE.length)];
+  for (const i of targets) {
+    const s = list[i], before = lvl(s.pts);
+    s.pts += b.p; if (b.p > 0) s.phrase = phrase;
+    const after = lvl(s.pts); if (b.p > 0 && after.n > before.n) up = after;
+  }
+  const name = targets.length === 1 ? list[targets[0]].name : targets.length === list.length ? 'الفصل كاملاً' : `${ar(targets.length)} طالبات`;
+  S.log[S.cur].unshift({ n:name, b:b.t, p:b.p, t:Date.now() }); S.log[S.cur] = S.log[S.cur].slice(0, 60);
+  save(); closeM('mAward');
+  if (multi) { multi = false; sel.clear(); updMulti(); }
+  render();
+  targets.forEach(i => { const el = $('st' + i); if (el) el.classList.add('bump'); });
+  if (b.p > 0) {
+    const el = targets.length === 1 ? $('st' + targets[0]) : null, r = el ? el.getBoundingClientRect() : null;
+    confetti(r ? r.left + r.width / 2 : innerWidth / 2, r ? r.top + 40 : innerHeight / 2.5, up ? 220 : targets.length > 1 ? 160 : 90);
+    up ? levelUp() : chime();
+  } else sad();
+  showToast(targets.length === 1 ? list[targets[0]].name : null, name, phrase, b, up);
+}
+let tT;
+function showToast(nm, name, phrase, b, up){
+  $('tA').outerHTML = nm ? avHTML(nm).replace('class="av ', 'id="tA" class="av ') : `<div id="tA" class="av" style="background:var(--pri2)">👥</div>`;
+  $('tN').textContent = name; $('tP').textContent = phrase;
+  $('tB').className = 'tb ' + (b.p > 0 ? 'g' : 'b'); $('tB').textContent = `${b.e} ${b.t} ${b.p > 0 ? '+' : '−'}${ptsWord(b.p)}`;
+  $('tL').textContent = up ? `🎉 مبروك! وصلتِ إلى ${up.t} ${up.m}` : '';
+  const t = $('toast'); t.classList.add('on'); clearTimeout(tT); tT = setTimeout(() => t.classList.remove('on'), up ? 3000 : 2200);
+}
+
+/* ======================= الاختيار العشوائي ======================= */
+let pickN = 1, lastPicked = [];
+function openPicker(){
+  if (!L().length) return openSettings();
+  $('pickN').innerHTML = [1,2,3,4,5,6].map(n => `<button class="chip ${n === pickN ? 'on' : ''}" onclick="setPickN(${n})">${ar(n)}</button>`).join('');
+  drawSlots(); $('pickAw').style.display = 'none'; updPickNote(); openM('mPick');
+}
+function setPickN(n){ pickN = n; openPicker(); }
+function drawSlots(){ $('slots').innerHTML = Array.from({length:pickN}, (_,k) => `<div class="slot" id="sl${k}"><div class="av" style="background:#fff">❔</div><b>؟</b></div>`).join(''); }
+function updPickNote(){
+  const left = L().length - S.picked[S.cur].filter(n => L().some(s => s.name === n)).length;
+  $('pickNote').innerHTML = $('noRep').checked ? `بقي ${ar(left)} من ${ar(L().length)} لم تُختَر بعد · <a href="#" onclick="S.picked[S.cur]=[];save();updPickNote();return false">بدء دورة جديدة</a>` : '';
+}
+$('noRep').addEventListener('change', updPickNote);
+let picking = false;
+function doPick(){
+  if (picking) return;
+  const all = L().map((s,i) => i);
+  let pool = all;
+  if ($('noRep').checked) { pool = all.filter(i => !S.picked[S.cur].includes(L()[i].name)); if (pool.length < pickN) { S.picked[S.cur] = []; pool = all; } }
+  const n = Math.min(pickN, pool.length), res = shuffle(pool).slice(0, n);
+  picking = true; drawSlots(); $('pickAw').style.display = 'none';
+  for (let k = n; k < pickN; k++) $('sl' + k).innerHTML = '<b style="color:var(--muted)">—</b>';
+  res.forEach((idx, k) => {
+    const el = $('sl' + k); el.classList.add('spin');
+    let delay = 50, elapsed = 0; const stopAt = 1400 + k * 450;
+    (function spin(){
+      const r = L()[Math.floor(Math.random() * L().length)];
+      el.innerHTML = `${avHTML(r.name)}<b>${esc(r.name)}</b>`; tone(500 + Math.random() * 400, .04, 0, 'square', .04);
+      elapsed += delay; delay *= 1.09;
+      if (elapsed < stopAt) return setTimeout(spin, delay);
+      const s = L()[idx]; el.classList.remove('spin'); el.classList.add('done');
+      el.innerHTML = `${avHTML(s.name)}<b>${esc(s.name)}</b>`; chime();
+      const r2 = el.getBoundingClientRect(); confetti(r2.left + r2.width / 2, r2.top + r2.height / 2, 70);
+      if (k === n - 1) { picking = false; lastPicked = res; $('pickAw').style.display = ''; }
+    })();
+  });
+  if ($('noRep').checked) { S.picked[S.cur].push(...res.map(i => L()[i].name)); save(); }
+  setTimeout(updPickNote, 100);
+}
+function awardPicked(){ closeM('mPick'); openAward(lastPicked); }
+
+/* ======================= المجموعات ======================= */
+let gByCount = 1;
+function openGroups(){ if (!L().length) return openSettings(); gMode(gByCount); openM('mGroups'); }
+function gMode(m){
+  gByCount = m; $('gm1').classList.toggle('on', m === 1); $('gm0').classList.toggle('on', m === 0);
+  $('gLbl').textContent = m ? 'عدد المجموعات:' : 'عدد الطالبات في كل مجموعة:';
+  $('gNum').value = m ? 4 : 4; gHint();
+}
+function gStep(d){ $('gNum').value = Math.max(1, (+$('gNum').value || 1) + d); gHint(); }
+$('gNum').addEventListener('input', gHint);
+function gCount(){ const n = L().length, v = Math.max(1, +$('gNum').value || 1); return Math.min(n, gByCount ? v : Math.ceil(n / v)); }
+function gHint(){
+  const n = L().length, g = gCount(), lo = Math.floor(n / g), hi = Math.ceil(n / g);
+  $('gNote').textContent = `${ar(n)} طالبة ← ${ar(g)} مجموعات، في كل مجموعة ${lo === hi ? ar(lo) : ar(lo) + ' أو ' + ar(hi)} طالبات`;
+}
+let lastGroups = [];
+function makeGroups(){
+  const g = gCount(), order = shuffle(L().map((_,i) => i)), teams = shuffle(TEAMS);
+  lastGroups = Array.from({length:g}, () => []);
+  order.forEach((idx, k) => lastGroups[k % g].push(idx));
+  $('groups').innerHTML = lastGroups.map((m, k) => {
+    const T = teams[k % teams.length], nm = k < teams.length ? T.n : `${T.n} ${ar(Math.floor(k / teams.length) + 1)}`;
+    return `<div class="grp" style="animation-delay:${k * 60}ms"><div class="gh" style="background:${T.c}"><span style="font-size:22px">${T.e}</span><b>${nm}</b><button onclick="awardGroup(${k})">⭐ تعزيز</button></div><ol>${m.map(i => `<li>${esc(L()[i].name)}</li>`).join('')}</ol></div>`;
+  }).join('');
+  chime(); confetti(innerWidth / 2, innerHeight / 3, 120);
+}
+function awardGroup(k){ closeM('mGroups'); openAward(lastGroups[k], 'تعزيز المجموعة'); }
+
+/* ======================= المؤقت ======================= */
+let tDown = 1, tTotal = 300, tLeft = 300, tElapsed = 0, tRun = false, tLast = 0, tInt, tLastBeep = -1;
+const PRE = [[30,'٣٠ ث'],[60,'١ د'],[120,'٢ د'],[180,'٣ د'],[300,'٥ د'],[600,'١٠ د'],[900,'١٥ د']];
+function openTimer(){ $('presets').innerHTML = PRE.map(([s,l]) => `<button class="chip ${s === tTotal ? 'on' : ''}" onclick="setT(${s})">${l}</button>`).join(''); tDraw(); openM('timer'); }
+function tMode(m){ tDown = m; $('tm1').classList.toggle('on', m === 1); $('tm0').classList.toggle('on', m === 0); $('tPresets').style.display = m ? '' : 'none'; tReset(); }
+function setT(s){ tTotal = s; tReset(); openTimer(); }
+function setCustom(){ const s = Math.max(0, +$('tMin').value || 0) * 60 + Math.min(59, Math.max(0, +$('tSec').value || 0)); if (s > 0) setT(s); }
+function fmt(s){ s = Math.max(0, Math.ceil(s)); const m = Math.floor(s / 60), x = s % 60; return ar(String(m).padStart(2,'0') + ':' + String(x).padStart(2,'0')); }
+function tDraw(){
+  const ring = $('ring'), C = 552.9;
+  if (tDown) {
+    $('digits').textContent = fmt(tLeft);
+    $('arc').style.strokeDashoffset = C * (1 - tLeft / tTotal);
+    ring.classList.toggle('warn', tRun && tLeft <= 10 && tLeft > 0);
+    ring.classList.toggle('end', tLeft <= 0);
+  } else {
+    $('digits').textContent = fmt(Math.floor(tElapsed));
+    $('arc').style.strokeDashoffset = C * (1 - (tElapsed % 60) / 60);
+    ring.classList.remove('warn','end');
+  }
+  $('tState').textContent = tDown && tLeft <= 0 ? '⏰ انتهى الوقت!' : tRun ? (tDown ? 'الوقت يمضي…' : 'العدّ مستمر…') : (tDown ? (tLeft < tTotal ? 'متوقف مؤقتًا' : 'جاهز') : (tElapsed ? 'متوقف مؤقتًا' : 'جاهز'));
+  $('tGo').innerHTML = tRun ? '⏸️ إيقاف مؤقت' : '▶️ ابدئي';
+}
+function tToggle(){
+  if (tDown && tLeft <= 0) tReset();
+  tRun = !tRun;
+  if (tRun) { tLast = performance.now(); tInt = setInterval(tTick, 100); tone(880,.1); }
+  else clearInterval(tInt);
+  tDraw();
+}
+function tTick(){
+  const now = performance.now(), dt = (now - tLast) / 1000; tLast = now;
+  if (tDown) {
+    tLeft -= dt;
+    const sec = Math.ceil(tLeft);
+    if (sec <= 10 && sec > 0 && sec !== tLastBeep) { tLastBeep = sec; tone(660, .08, 0, 'square', .08); }
+    if (tLeft <= 0) {
+      tLeft = 0; tRun = false; clearInterval(tInt);
+      [0,.35,.7,1.05].forEach(t => { tone(880,.25,t,'square',.15); tone(1175,.25,t+.12,'square',.12); });
+      confetti(innerWidth / 2, innerHeight / 2.5, 200);
+    }
+  } else tElapsed += dt;
+  tDraw();
+}
+function tReset(){ tRun = false; clearInterval(tInt); tLeft = tTotal; tElapsed = 0; tLastBeep = -1; tDraw(); }
+
+/* ======================= القصاصات ======================= */
+const cv = $('fx'), cx = cv.getContext('2d'); let P = [], running = false;
+function fit(){ cv.width = innerWidth * devicePixelRatio; cv.height = innerHeight * devicePixelRatio; cx.setTransform(devicePixelRatio,0,0,devicePixelRatio,0,0); }
+addEventListener('resize', fit); fit();
+const COLS = ['#db2777','#6d28d9','#d97706','#0d9488','#fbbf24','#f472b6','#a78bfa'];
+function confetti(x, y, n){
+  for (let k = 0; k < n; k++) { const a = Math.random() * Math.PI * 2, v = 4 + Math.random() * 8;
+    P.push({x, y, vx:Math.cos(a) * v, vy:Math.sin(a) * v - 5, r:4 + Math.random() * 5, c:COLS[k % COLS.length], rot:Math.random() * 6, vr:(Math.random() - .5) * .4, life:90 + Math.random() * 50, star:Math.random() < .25}); }
+  if (!running) { running = true; requestAnimationFrame(tick); }
+}
+function drawStar(r){ cx.beginPath(); for (let j = 0; j < 10; j++) { const rr = j % 2 ? r * .45 : r, a = j * Math.PI / 5 - Math.PI / 2; cx.lineTo(Math.cos(a) * rr, Math.sin(a) * rr); } cx.closePath(); cx.fill(); }
+function tick(){
+  cx.clearRect(0, 0, innerWidth, innerHeight); P = P.filter(p => p.life > 0);
+  for (const p of P) { p.vy += .22; p.vx *= .985; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life--;
+    cx.save(); cx.globalAlpha = Math.min(1, p.life / 40); cx.translate(p.x, p.y); cx.rotate(p.rot); cx.fillStyle = p.c;
+    p.star ? drawStar(p.r * 1.4) : cx.fillRect(-p.r / 2, -p.r / 4, p.r, p.r / 2); cx.restore(); }
+  if (P.length) requestAnimationFrame(tick); else { running = false; cx.clearRect(0, 0, innerWidth, innerHeight); }
+}
+
+/* ======================= ملء الشاشة ======================= */
+function toggleFull(){
+  const d = document;
+  if (!d.fullscreenElement && !d.webkitFullscreenElement) { const el = d.documentElement; (el.requestFullscreen || el.webkitRequestFullscreen || (() => {})).call(el); d.body.classList.add('show'); }
+  else (d.exitFullscreen || d.webkitExitFullscreen).call(d);
+}
+['fullscreenchange','webkitfullscreenchange'].forEach(ev => document.addEventListener(ev, () => { if (!document.fullscreenElement && !document.webkitFullscreenElement) document.body.classList.remove('show'); }));
+
+/* ======================= النوافذ ======================= */
+function openM(id){ $(id).classList.add('on'); }
+function closeM(id){ $(id).classList.remove('on'); }
+document.querySelectorAll('.modal').forEach(m => m.addEventListener('mousedown', e => { if (e.target === m) m.classList.remove('on'); }));
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal.on').forEach(m => m.classList.remove('on')); });
+
+/* ======================= الإعدادات ======================= */
+function openSettings(){
+  $('pc').innerHTML = Object.entries(CLASSES).map(([k,v]) => `<option value="${k}" ${+k === +S.cur ? 'selected' : ''}>${v}</option>`).join('');
+  fillPaste(); ['pMsg','impMsg','gMsg'].forEach(i => $(i).textContent = '');
+  $('gTarget').value = S.goal[S.cur].target; $('gReward').value = S.goal[S.cur].reward;
+  ['r1','r2'].forEach(i => { $(i).dataset.ok = ''; $(i).style.cssText = ''; });
+  $('r1').textContent = 'تصفير الفصل الحالي'; $('r2').textContent = 'تصفير جميع الفصول';
+  openM('mSet');
+}
+function fillPaste(){ $('pt').value = S.cls[$('pc').value].map(s => s.name).join('\n'); }
+function mergeNames(c, names){
+  const old = new Map(S.cls[c].map(s => [s.name, s])), seen = new Set(), out = [];
+  for (let n of names) { n = n.replace(/\s+/g, ' ').trim(); if (!n || seen.has(n)) continue; seen.add(n); out.push(old.get(n) || {name:n, pts:0, phrase:''}); }
+  S.cls[c] = out;
+}
+function savePaste(){
+  const c = $('pc').value; mergeNames(c, $('pt').value.split(/\r?\n|،|,/)); S.cur = +c; save(); render();
+  $('pMsg').className = 'msg ok'; $('pMsg').textContent = `✔️ تم حفظ ${ar(S.cls[c].length)} طالبة في ${CLASSES[c]}`;
+}
+function saveGoal(){
+  S.goal[S.cur] = { target:Math.max(10, +$('gTarget').value || 200), reward:$('gReward').value.trim() || 'مكافأة للفصل 🎉' }; save(); render();
+  $('gMsg').className = 'msg ok'; $('gMsg').textContent = '✔️ تم حفظ هدف ' + CLASSES[S.cur];
+}
+function askReset(which, btn){
+  if (!btn.dataset.ok) { btn.dataset.ok = '1'; btn.textContent = '⚠️ اضغطي مرة ثانية للتأكيد'; btn.style.cssText = 'background:var(--red);color:#fff;border-color:var(--red)'; return; }
+  const list = which === 'all' ? Object.keys(CLASSES) : [S.cur];
+  for (const c of list) { S.cls[c].forEach(s => { s.pts = 0; s.phrase = ''; }); S.log[c] = []; S.picked[c] = []; }
+  save(); render(); closeM('mSet');
+}
+function parseCSV(t){
+  const rows = [], re = /("([^"]|"")*"|[^,\r\n]*)(,|\r?\n|$)/g; let row = [], m;
+  t = t.replace(/^﻿/, '');
+  while ((m = re.exec(t)) && m[0] !== '') {
+    let v = m[1]; if (v.startsWith('"')) v = v.slice(1, -1).replace(/""/g, '"');
+    row.push(v.trim()); if (m[3] !== ',') { rows.push(row); row = []; }
+  }
+  if (row.length) rows.push(row);
+  return rows.filter(r => r.some(x => x));
+}
+function importCSV(inp){
+  const f = inp.files[0], m = $('csvMsg'); if (!f) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try {
+      const rows = parseCSV(rd.result), h = rows[0] || [];
+      const ci = h.findIndex(x => x.includes('الفصل')), ni = h.findIndex(x => x.includes('الطالبة') || x.includes('الاسم'));
+      if (ci < 0 || ni < 0) { m.className = 'msg bad'; m.textContent = 'الملف لا يحتوي عمودي «الفصل» و«الطالبة»'; return; }
+      const byName = Object.fromEntries(Object.entries(CLASSES).map(([k,v]) => [v.replace(/\s+/g,''), k]));
+      const buckets = {}; let n = 0;
+      for (const r of rows.slice(1)) {
+        const c = byName[(r[ci] || '').replace(/\s+/g,'')], nm = r[ni];
+        if (!c || !nm) continue; (buckets[c] = buckets[c] || []).push(nm); n++;
+      }
+      if (!n) { m.className = 'msg bad'; m.textContent = 'لم أجد أسماء في الملف'; return; }
+      for (const c in buckets) mergeNames(c, buckets[c]);
+      save(); render(); fillPaste();
+      m.className = 'msg ok'; m.textContent = `✔️ تم استيراد ${ar(n)} طالبة في ${ar(Object.keys(buckets).length)} فصول`;
+    } catch(e) { m.className = 'msg bad'; m.textContent = 'تعذّرت قراءة الملف'; }
+    inp.value = '';
+  };
+  rd.readAsText(f, 'utf-8');
+}
+function loadSupabase(){
+  return new Promise((res, rej) => { if (window.supabase) return res(); const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'; s.onload = res; s.onerror = () => rej(new Error('net')); document.head.appendChild(s); });
+}
+async function importSite(){
+  const m = $('impMsg'), em = $('em').value.trim(), pw = $('pw').value;
+  if (!em || !pw) { m.className = 'msg bad'; m.textContent = 'اكتبي البريد وكلمة المرور'; return; }
+  m.className = 'msg'; m.textContent = '⏳ جاري الجلب...';
+  try {
+    await loadSupabase();
+    const sb = window.supabase.createClient(SITE.url, SITE.key, { auth:{ persistSession:false, autoRefreshToken:false, storageKey:'wedad-board-auth' } });
+    const a = await sb.auth.signInWithPassword({ email:em, password:pw });
+    if (a.error) {
+      const em2 = String(a.error.message || '');
+      m.className = 'msg bad';
+      const netErr = a.error.name === 'AuthRetryableFetchError' || !a.error.status || /fetch|network|load failed/i.test(em2);
+      m.textContent = netErr ? '⚠️ المتصفح منع الاتصال بالمنصة. نزّلي ملف اللوحة وافتحيه في Chrome أو Safari مباشرة (وليس داخل معاينة Claude)، أو استخدمي استيراد ملف CSV بالأسفل.'
+        : /confirm/i.test(em2) ? 'البريد غير مؤكَّد في المنصة'
+        : /invalid/i.test(em2) ? 'البريد أو كلمة المرور غير صحيحة'
+        : 'تعذّر الدخول: ' + em2;
+      return;
+    }
+    const all = [];
+    for (let from = 0; ; from += 1000) { const r = await sb.from('students').select('name,cls,num').order('cls').order('num').range(from, from + 999); if (r.error) throw r.error; all.push(...r.data); if (r.data.length < 1000) break; }
+    await sb.auth.signOut();
+    if (!all.length) { m.className = 'msg bad'; m.textContent = 'لم أجد أسماء طالبات في المنصة'; return; }
+    for (const c in CLASSES) { const names = all.filter(s => String(s.cls) === String(c)).map(s => s.name); if (names.length) mergeNames(c, names); }
+    $('pw').value = ''; save(); render(); fillPaste();
+    m.className = 'msg ok'; m.textContent = `✔️ تم جلب ${ar(all.length)} طالبة وتوزيعهن على الفصول`;
+  } catch(e) { m.className = 'msg bad'; m.textContent = e && e.message === 'net' ? 'تعذّر الاتصال، تأكدي من الإنترنت' : 'حدث خطأ أثناء الجلب، حاولي مرة أخرى'; }
+}
+
+render();
+</script>
+</body>
+</html>
