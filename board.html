@@ -332,7 +332,7 @@ body.show .layout,body.show .tools,body.show .classbar,body.show .topbar .in{max
   <div class="bb">
     <div class="sec">
       <h4>⬇️ جلب الأسماء من منصتي</h4>
-      <div class="note">ادخلي ببريد وكلمة مرور حساب المعلمة في المنصة. تُحفظ الأسماء في هذا الجهاز ولا تُحفظ كلمة المرور. يحتاج إنترنت.</div>
+      <div class="note">إذا كنتِ داخلة المنصة كمعلمة على نفس المتصفح، اضغطي «جلب الأسماء» مباشرة بدون كتابة شيء. وإلا اكتبي بريد وكلمة مرور حساب المعلمة. يحتاج إنترنت.</div>
       <label class="lbl">البريد الإلكتروني</label><input class="inp" id="em" type="email" dir="ltr" autocomplete="username">
       <label class="lbl">كلمة المرور</label><input class="inp" id="pw" type="password" dir="ltr" autocomplete="current-password">
       <div class="row"><button class="ibtn pri" onclick="importSite()">جلب الأسماء</button></div>
@@ -779,30 +779,37 @@ function loadSupabase(){
 }
 async function importSite(){
   const m = $('impMsg'), em = $('em').value.trim(), pw = $('pw').value;
-  if (!em || !pw) { m.className = 'msg bad'; m.textContent = 'اكتبي البريد وكلمة المرور'; return; }
   m.className = 'msg'; m.textContent = '⏳ جاري الجلب...';
+  let step = 'تحميل المكتبة';
   try {
     await loadSupabase();
-    const sb = window.supabase.createClient(SITE.url, SITE.key, { auth:{ persistSession:false, autoRefreshToken:false, storageKey:'wedad-board-auth' } });
-    const a = await sb.auth.signInWithPassword({ email:em, password:pw });
-    if (a.error) {
-      const em2 = String(a.error.message || '');
-      m.className = 'msg bad';
-      const netErr = a.error.name === 'AuthRetryableFetchError' || !a.error.status || /fetch|network|load failed/i.test(em2);
-      m.textContent = netErr ? '⚠️ المتصفح منع الاتصال بالمنصة. نزّلي ملف اللوحة وافتحيه في Chrome أو Safari مباشرة (وليس داخل معاينة Claude)، أو استخدمي استيراد ملف CSV بالأسفل.'
-        : /confirm/i.test(em2) ? 'البريد غير مؤكَّد في المنصة'
-        : /invalid/i.test(em2) ? 'البريد أو كلمة المرور غير صحيحة'
-        : 'تعذّر الدخول: ' + em2;
-      return;
+    step = 'الاتصال';
+    // نفس إعدادات المنصة: يستخدم جلسة المعلمة المفتوحة في المنصة إن وُجدت
+    const sb = window.supabase.createClient(SITE.url, SITE.key);
+    let had = false;
+    try { const g = await sb.auth.getSession(); had = !!(g.data && g.data.session); } catch(e) {}
+    if (!had) {
+      if (!em || !pw) { m.className = 'msg bad'; m.textContent = 'لم أجد دخولك في المنصة على هذا المتصفح. اكتبي البريد وكلمة المرور، أو ادخلي المنصة كمعلمة أولًا ثم ارجعي هنا.'; return; }
+      step = 'تسجيل الدخول';
+      const a = await sb.auth.signInWithPassword({ email:em, password:pw });
+      if (a.error) {
+        const em2 = String(a.error.message || '');
+        m.className = 'msg bad';
+        m.textContent = /invalid/i.test(em2) ? 'البريد أو كلمة المرور غير صحيحة' : /confirm/i.test(em2) ? 'البريد غير مؤكَّد في المنصة' : `تعذّر الدخول (${a.error.name || ''} ${a.error.status || ''}): ${em2}`;
+        return;
+      }
     }
+    step = 'قراءة الأسماء';
     const all = [];
     for (let from = 0; ; from += 1000) { const r = await sb.from('students').select('name,cls,num').order('cls').order('num').range(from, from + 999); if (r.error) throw r.error; all.push(...r.data); if (r.data.length < 1000) break; }
-    await sb.auth.signOut();
     if (!all.length) { m.className = 'msg bad'; m.textContent = 'لم أجد أسماء طالبات في المنصة'; return; }
     for (const c in CLASSES) { const names = all.filter(s => String(s.cls) === String(c)).map(s => s.name); if (names.length) mergeNames(c, names); }
     $('pw').value = ''; save(); render(); fillPaste();
     m.className = 'msg ok'; m.textContent = `✔️ تم جلب ${ar(all.length)} طالبة وتوزيعهن على الفصول`;
-  } catch(e) { m.className = 'msg bad'; m.textContent = e && e.message === 'net' ? 'تعذّر الاتصال، تأكدي من الإنترنت' : 'حدث خطأ أثناء الجلب، حاولي مرة أخرى'; }
+  } catch(e) {
+    m.className = 'msg bad';
+    m.textContent = e && e.message === 'net' ? 'تعذّر تحميل مكتبة الاتصال، تأكدي من الإنترنت' : `حدث خطأ في خطوة «${step}»: ${(e && (e.message || e.code)) || e}`;
+  }
 }
 
 render();
