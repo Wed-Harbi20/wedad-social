@@ -67,6 +67,18 @@ h1,h2,h3,.rx{font-family:'Readex Pro','Tajawal',sans-serif}
 .st{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 10px 12px;text-align:center;cursor:pointer;transition:transform .2s,box-shadow .2s,border-color .2s;user-select:none}
 .st:hover{transform:translateY(-4px);box-shadow:0 14px 30px -14px rgba(109,40,217,.45);border-color:#d6cdee}
 .st.sel{border:2px solid var(--pri);background:var(--pri2)}
+.st.abs{opacity:.45;filter:grayscale(.9)}
+.st.abs .absb{display:block}
+.absb{display:none;position:absolute;top:8px;right:10px;background:var(--red2);color:var(--red);font-size:11.5px;font-weight:800;border-radius:8px;padding:2px 8px}
+.att{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;margin-top:14px}
+.ab{display:flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:14px;padding:8px 10px;background:#fff;text-align:start;font-weight:700;font-size:14.5px;transition:.15s}
+.ab .av{width:38px;height:38px;font-size:20px;margin:0;flex-shrink:0}
+.ab .stt{margin-inline-start:auto;font-size:12px;font-weight:800;border-radius:8px;padding:3px 9px;background:var(--green2);color:var(--green);white-space:nowrap}
+.ab.off{background:var(--red2);border-color:#fecaca}
+.ab.off .av{filter:grayscale(1);opacity:.6}
+.ab.off .stt{background:var(--red);color:#fff}
+.attsum{display:flex;gap:10px;flex-wrap:wrap}
+.attsum span{font-weight:800;border-radius:10px;padding:6px 12px;font-size:14px}
 .st.sel::after{content:"✓";position:absolute;top:8px;right:10px;width:22px;height:22px;border-radius:50%;background:var(--pri);color:#fff;font-size:13px;display:grid;place-items:center;font-weight:800}
 .st.bump{animation:bump .55s}
 @keyframes bump{40%{transform:scale(1.1)}}
@@ -227,6 +239,7 @@ body.show .layout,body.show .tools,body.show .classbar,body.show .topbar .in{max
   <button class="tool" onclick="openGroups()"><div class="ic" style="background:var(--teal2)">👥</div><div><b>تقسيم مجموعات</b><span>بالعدد الذي تختارينه</span></div></button>
   <button class="tool" onclick="openTimer()"><div class="ic" style="background:var(--gold2)">⏱️</div><div><b>المؤقت</b><span>تنازلي وتصاعدي</span></div></button>
   <button class="tool" onclick="awardAll()"><div class="ic" style="background:var(--pink2)">🏫</div><div><b>تعزيز الفصل</b><span>نقاط لجميع الطالبات</span></div></button>
+  <button class="tool" onclick="openAtt()"><div class="ic" style="background:var(--red2)">📋</div><div><b>التحضير</b><span id="attS">تسجيل الغائبات اليوم</span></div></button>
   <button class="tool" id="multiBtn" onclick="toggleMulti()"><div class="ic" style="background:var(--green2)">☑️</div><div><b id="multiT">تحديد متعدد</b><span id="multiS">عزّزي عدة طالبات معًا</span></div></button>
 </div>
 
@@ -266,6 +279,19 @@ body.show .layout,body.show .tools,body.show .classbar,body.show .topbar .in{max
   <div class="bb">
     <div class="ktabs"><button id="kt1" class="on" onclick="skTab(1)">🌟 إيجابي</button><button id="kt0" onclick="skTab(0)">🔧 يحتاج تحسين</button></div>
     <div class="skills" id="skills"></div>
+  </div>
+</div></div>
+
+<!-- ===== التحضير ===== -->
+<div class="modal" id="mAtt"><div class="box wide">
+  <div class="bh"><h3 id="attT">📋 التحضير</h3><button class="x" onclick="closeM('mAtt')">×</button></div>
+  <div class="bb">
+    <div class="row" style="margin:0;justify-content:space-between">
+      <div class="attsum" id="attSum"></div>
+      <div class="row" style="margin:0"><button class="ibtn" onclick="attAll()">✅ الكل حاضرات</button><button class="ibtn pri" onclick="closeM('mAtt')">تم</button></div>
+    </div>
+    <div class="note">اضغطي على الطالبة الغائبة. الغائبات لا يدخلن في الاختيار العشوائي ولا المجموعات ولا تعزيز الفصل. يتجدد التحضير تلقائيًا كل يوم.</div>
+    <div class="att" id="attList"></div>
   </div>
 </div></div>
 
@@ -443,6 +469,21 @@ for (const c in CLASSES) {
   if (!S.goal[c]) S.goal[c] = { target:200, reward:'حصة نشاط ممتعة 🎉' };
   if (!Array.isArray(S.picked[c])) S.picked[c] = [];
 }
+if (!S.att) S.att = {};
+const today = () => { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); };
+function absSet(c = S.cur){ const a = S.att[c]; return new Set(a && a.d === today() ? a.n : []); }
+const isAbs = (i, A) => (A || absSet()).has(L()[i].name);
+const presentIdx = () => { const A = absSet(); return L().map((_,i) => i).filter(i => !A.has(L()[i].name)); };
+function setAbs(names){ S.att[S.cur] = { d:today(), n:[...names] }; save(); }
+function openAtt(){ if (!L().length) return openSettings(); drawAtt(); openM('mAtt'); }
+function drawAtt(){
+  const A = absSet(), list = [...L()].sort((a,b) => a.name.localeCompare(b.name,'ar'));
+  $('attT').textContent = `📋 تحضير ${CLASSES[S.cur]} · ${new Date().toLocaleDateString('ar-SA', { weekday:'long', day:'numeric', month:'long' })}`;
+  $('attSum').innerHTML = `<span style="background:var(--green2);color:var(--green)">حاضرات ${ar(L().length - A.size)}</span><span style="background:var(--red2);color:var(--red)">غائبات ${ar(A.size)}</span>`;
+  $('attList').innerHTML = list.map(s => { const k = L().indexOf(s); return `<button class="ab ${A.has(s.name) ? 'off' : ''}" onclick="togAbs(${k})">${avHTML(s.name)}<span>${esc(s.name)}</span><span class="stt">${A.has(s.name) ? 'غائبة' : 'حاضرة'}</span></button>`; }).join('');
+}
+function togAbs(i){ const A = absSet(), n = L()[i].name; A.has(n) ? A.delete(n) : A.add(n); setAbs(A); drawAtt(); render(); }
+function attAll(){ setAbs([]); drawAtt(); render(); }
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} }
 const L = () => S.cls[S.cur];
 
@@ -511,8 +552,11 @@ function render(){
 function renderGrid(){
   const tot = L().reduce((a,s) => a + s.pts, 0);
   $('clsTitle').textContent = 'فصل ' + CLASSES[S.cur];
-  $('clsSub').textContent = `${ar(L().length)} طالبة · مجموع النقاط ${ar(tot)}`;
+  const nA = absSet().size;
+  $('clsSub').textContent = `${ar(L().length)} طالبة${nA ? ` · غائبات اليوم ${ar(nA)}` : ''} · مجموع النقاط ${ar(tot)}`;
+  $('attS').textContent = L().length ? `الحاضرات ${ar(L().length - nA)} من ${ar(L().length)}` : 'تسجيل الغائبات اليوم';
   const q = ($('q').value || '').trim();
+  const A = absSet();
   let list = L().map((s,i) => ({...s, i}));
   if (q) list = list.filter(s => s.name.includes(q));
   list.sort(S.sort === 'pts' ? (a,b) => b.pts - a.pts || a.name.localeCompare(b.name,'ar') : (a,b) => a.name.localeCompare(b.name,'ar'));
@@ -522,7 +566,7 @@ function renderGrid(){
   g.innerHTML = list.map(s => {
     const lv = lvl(s.pts), nx = nextLvl(s.pts);
     const pct = nx ? Math.max(0, Math.round((s.pts - lv.n) / (nx.n - lv.n) * 100)) : 100;
-    return `<div class="st ${sel.has(s.i) ? 'sel' : ''}" id="st${s.i}" onclick="tapStudent(${s.i})">
+    return `<div class="st ${sel.has(s.i) ? 'sel' : ''} ${A.has(s.name) ? 'abs' : ''}" id="st${s.i}" onclick="tapStudent(${s.i})"><span class="absb">غائبة</span>
       ${lv.m ? `<div class="medal" title="${lv.t}">${lv.m}</div>` : ''}
       <div style="position:relative;width:68px;margin:0 auto">${avHTML(s.name)}<div class="pts ${s.pts < 0 ? 'neg' : ''}">${ar(s.pts)}</div></div>
       <div class="nm">${esc(s.name)}</div>
@@ -568,7 +612,7 @@ function updMulti(){
   $('multiT').textContent = !multi ? 'تحديد متعدد' : sel.size ? `تعزيز المحددات (${ar(sel.size)})` : 'اختاري الطالبات…';
   $('multiS').textContent = !multi ? 'عزّزي عدة طالبات معًا' : 'اضغطي هنا بعد التحديد';
 }
-function awardAll(){ if (!L().length) return openSettings(); openAward(L().map((_,i) => i), 'الفصل كاملاً'); }
+function awardAll(){ if (!L().length) return openSettings(); const P = presentIdx(); if (!P.length) return openAtt(); openAward(P, P.length === L().length ? 'الفصل كاملاً' : `الحاضرات (${ar(P.length)})`); }
 function openAward(idx, label){
   targets = idx; skTab(1);
   const who = idx.length === 1 ? L()[idx[0]] : null;
@@ -591,7 +635,7 @@ function give(k, j){
     s.pts += b.p; if (b.p > 0) s.phrase = phrase;
     const after = lvl(s.pts); if (b.p > 0 && after.n > before.n) up = after;
   }
-  const name = targets.length === 1 ? list[targets[0]].name : targets.length === list.length ? 'الفصل كاملاً' : `${ar(targets.length)} طالبات`;
+  const name = targets.length === 1 ? list[targets[0]].name : targets.length === presentIdx().length && targets.length > 1 ? 'الفصل كاملاً' : `${ar(targets.length)} طالبات`;
   S.log[S.cur].unshift({ n:name, b:b.t, p:b.p, t:Date.now() }); S.log[S.cur] = S.log[S.cur].slice(0, 60);
   save(); closeM('mAward');
   if (multi) { multi = false; sel.clear(); updMulti(); }
@@ -628,14 +672,15 @@ function openPicker(){
 function setPickN(n){ pickN = n; openPicker(); }
 function drawSlots(){ $('slots').innerHTML = Array.from({length:pickN}, (_,k) => `<div class="slot" id="sl${k}"><div class="av" style="background:#fff">❔</div><b>؟</b></div>`).join(''); }
 function updPickNote(){
-  const left = L().length - S.picked[S.cur].filter(n => L().some(s => s.name === n)).length;
-  $('pickNote').innerHTML = $('noRep').checked ? `بقي ${ar(left)} من ${ar(L().length)} لم تُختَر بعد · <a href="#" onclick="S.picked[S.cur]=[];save();updPickNote();return false">بدء دورة جديدة</a>` : '';
+  const P = presentIdx(), nA = L().length - P.length, left = P.filter(i => !S.picked[S.cur].includes(L()[i].name)).length;
+  $('pickNote').innerHTML = (nA ? `الاختيار من الحاضرات فقط (${ar(P.length)}) · ` : '') + ($('noRep').checked ? `بقي ${ar(left)} من ${ar(P.length)} لم تُختَر بعد · <a href="#" onclick="S.picked[S.cur]=[];save();updPickNote();return false">بدء دورة جديدة</a>` : '');
 }
 $('noRep').addEventListener('change', updPickNote);
 let picking = false;
 function doPick(){
   if (picking) return;
-  const all = L().map((s,i) => i);
+  const all = presentIdx();
+  if (!all.length) { $('pickNote').textContent = 'لا توجد طالبات حاضرات، افتحي التحضير'; return; }
   let pool = all;
   if ($('noRep').checked) { pool = all.filter(i => !S.picked[S.cur].includes(L()[i].name)); if (pool.length < pickN) { S.picked[S.cur] = []; pool = all; } }
   const n = Math.min(pickN, pool.length), res = shuffle(pool).slice(0, n);
@@ -645,7 +690,7 @@ function doPick(){
     const el = $('sl' + k); el.classList.add('spin');
     let delay = 50, elapsed = 0; const stopAt = 1400 + k * 450;
     (function spin(){
-      const r = L()[Math.floor(Math.random() * L().length)];
+      const r = L()[all[Math.floor(Math.random() * all.length)]];
       el.innerHTML = `${avHTML(r.name)}<b>${esc(r.name)}</b>`; tone(500 + Math.random() * 400, .04, 0, 'square', .04);
       elapsed += delay; delay *= 1.09;
       if (elapsed < stopAt) return setTimeout(spin, delay);
@@ -662,7 +707,7 @@ function awardPicked(){ closeM('mPick'); openAward(lastPicked); }
 
 /* ======================= المجموعات ======================= */
 let gByCount = 1;
-function openGroups(){ if (!L().length) return openSettings(); gMode(gByCount); openM('mGroups'); }
+function openGroups(){ if (!L().length) return openSettings(); if (!presentIdx().length) return openAtt(); gMode(gByCount); openM('mGroups'); }
 function gMode(m){
   gByCount = m; $('gm1').classList.toggle('on', m === 1); $('gm0').classList.toggle('on', m === 0);
   $('gLbl').textContent = m ? 'عدد المجموعات:' : 'عدد الطالبات في كل مجموعة:';
@@ -670,14 +715,15 @@ function gMode(m){
 }
 function gStep(d){ $('gNum').value = Math.max(1, (+$('gNum').value || 1) + d); gHint(); }
 $('gNum').addEventListener('input', gHint);
-function gCount(){ const n = L().length, v = Math.max(1, +$('gNum').value || 1); return Math.min(n, gByCount ? v : Math.ceil(n / v)); }
+function gCount(){ const n = presentIdx().length, v = Math.max(1, +$('gNum').value || 1); return Math.min(n, gByCount ? v : Math.ceil(n / v)); }
 function gHint(){
-  const n = L().length, g = gCount(), lo = Math.floor(n / g), hi = Math.ceil(n / g);
-  $('gNote').textContent = `${ar(n)} طالبة ← ${ar(g)} مجموعات، في كل مجموعة ${lo === hi ? ar(lo) : ar(lo) + ' أو ' + ar(hi)} طالبات`;
+  const n = presentIdx().length, g = gCount(), lo = Math.floor(n / g), hi = Math.ceil(n / g);
+  $('gNote').textContent = `${ar(n)} طالبة${L().length > n ? ' حاضرة' : ''} ← ${ar(g)} مجموعات، في كل مجموعة ${lo === hi ? ar(lo) : ar(lo) + ' أو ' + ar(hi)} طالبات`;
 }
 let lastGroups = [];
 function makeGroups(){
-  const g = gCount(), order = shuffle(L().map((_,i) => i)), teams = shuffle(TEAMS);
+  if (!presentIdx().length) return;
+  const g = gCount(), order = shuffle(presentIdx()), teams = shuffle(TEAMS);
   lastGroups = Array.from({length:g}, () => []);
   order.forEach((idx, k) => lastGroups[k % g].push(idx));
   $('groups').innerHTML = lastGroups.map((m, k) => {
