@@ -67,7 +67,7 @@ th,td{padding:8px;border-bottom:1px solid var(--bd);text-align:right;white-space
 .lb-n{min-width:30px;text-align:center;font-size:1.25rem;font-weight:700}
 .lb-nm{flex:1}
 .lb-r b{color:#0f5c63}
-.reg .rb{padding:12px}
+.nl{cursor:pointer;text-decoration:underline dotted;color:inherit}.nl:hover{color:#0f5c63}.tag{background:var(--bg);border:1px solid var(--bd);border-radius:99px;padding:4px 12px;font-size:.85rem}.reg .rb{padding:12px}
 .reg .sc{max-height:75vh;overflow:auto}.reg th{position:sticky;top:0;z-index:3;box-shadow:0 2px 0 var(--rg)}.reg td:nth-child(2){position:sticky;right:0;z-index:1;background:var(--rb)}
 .reg table{font-size:1rem}.reg th{background:var(--rb2);color:var(--rr);border:1px solid var(--rg);font-weight:700}
 .reg td{border:1px solid var(--rg)}.reg tr:nth-child(even) td{background:var(--rb2)}
@@ -665,7 +665,7 @@ function boardTab() {
   return `<div class="card"><h2>🏆 أعلى النقاط</h2><p class="mu">النقاط = مجموع الدرجات التي حصلت عليها الطالبة في الأعمال. تُعرض أعلى ١٠ في كل صف (وتشمل المتعادلات).</p></div>` +
     STG.map(([st, nm]) => {
       const L = topOfStage(st, 10);
-      return `<div class="card"><h2>${nm}</h2>${L.length ? `<div class="lb">${L.map(x => `<div class="lb-r"><span class="lb-n">${MEDAL(x.rk) || x.rk}</span><span class="lb-nm">${esc(x.s.name)} <small class="mu">${CN[x.s.cls]}</small></span><b>${fmtN(x.p.sc)}</b></div>`).join('')}</div>` : '<p class="mu">لا توجد نقاط مرصودة بعد.</p>'}</div>`;
+      return `<div class="card"><h2>${nm}</h2>${L.length ? `<div class="lb">${L.map(x => `<div class="lb-r"><span class="lb-n">${MEDAL(x.rk) || x.rk}</span><span class="lb-nm">${nmLink(x.s)} <small class="mu">${CN[x.s.cls]}</small></span><b>${fmtN(x.p.sc)}</b></div>`).join('')}</div>` : '<p class="mu">لا توجد نقاط مرصودة بعد.</p>'}</div>`;
     }).join('');
 }
 
@@ -723,7 +723,7 @@ function gradesTab() {
 <p class="mu">اكتبي الدرجة وتُحفظ تلقائياً. لتعبئة عمود كامل: اكتبي الدرجة في «للكل» ثم اضغطي ⬇ (أو اتركيها فارغة لنسخ درجة أول طالبة). <label><input type="checkbox" ${fo ? 'checked' : ''} onchange="fo=this.checked"> استبدال الدرجات الموجودة</label></p>
 <div class="sc"><table><tr><th>م</th><th>الطالبة</th>${D.works.map(w => `<th>${esc(w.title)}<br><span class="mu">من ${w.max_score}</span></th>`).join('')}</tr>
 <tr><td></td><td></td>${D.works.map(w => `<td><input class="gi" id="f_${w.id}" placeholder="للكل"> <button onclick="fillCol('${w.id}')">⬇</button> <button class="d" title="حذف درجات العمود" onclick="clearCol('${w.id}')">🗑</button> <button class="g" title="عبارات تعزيز تلقائية حسب الدرجة" onclick="autoNotes('${w.id}')">💬</button></td>`).join('')}</tr>
-${L.map((s, i) => `<tr><td>${i + 1}</td><td>${esc(s.name)} <span style="cursor:pointer" title="إنجازات الطالبة" onclick="showAch('${s.id}')">📜</span></td>${D.works.map(w => { const g = G(s.id, w.id); return `<td><input class="gi" type="number" min="0" max="${w.max_score}" step="0.5" value="${g.score ?? ''}" onchange="setG('${s.id}','${w.id}',this)"> <span onclick="noteDlg('${s.id}','${w.id}')" style="cursor:pointer" title="${esc(g.note || '')}">${g.note ? '📝' : '✏️'}</span></td>`; }).join('')}</tr>`).join('')}</table></div></div></div>`;
+${L.map((s, i) => `<tr><td>${i + 1}</td><td>${nmLink(s)} <span style="cursor:pointer" title="ملف الطالبة" onclick="showAch('${s.id}')">📂</span></td>${D.works.map(w => { const g = G(s.id, w.id); return `<td><input class="gi" type="number" min="0" max="${w.max_score}" step="0.5" value="${g.score ?? ''}" onchange="setG('${s.id}','${w.id}',this)"> <span onclick="noteDlg('${s.id}','${w.id}')" style="cursor:pointer" title="${esc(g.note || '')}">${g.note ? '📝' : '✏️'}</span></td>`; }).join('')}</tr>`).join('')}</table></div></div></div>`;
 }
 async function saveRows(rows) {
   const r = await sb.from('grades').upsert(rows, { onConflict: 'student_id,work_id' });
@@ -793,16 +793,41 @@ function autoNotes(wid) {
 }
 
 /* ---------- إنجازات الطالبة (عرض للمعلمة) ---------- */
+const ratingOf = p => p >= 90 ? 'ممتاز' : p >= 80 ? 'جيد جداً' : p >= 70 ? 'جيد' : p >= 60 ? 'مقبول' : 'يحتاج إلى تحسين';
+const nmLink = s => `<a class="nl" onclick="showAch('${s.id}')" title="فتح ملف الطالبة">${esc(s.name)}</a>`;
+let SO = null;
 async function showAch(id) {
-  const s = D.students.find(x => x.id === id); if (!s) return;
-  const o = document.createElement('div');
+  const list = fs(); const s = D.students.find(x => x.id === id); if (!s) return;
+  if (SO) SO.remove();
+  const o = SO = document.createElement('div');
   o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9;overflow:auto;padding:16px';
-  o.innerHTML = '<div class="card" style="max-width:720px;margin:0 auto"><div class="top"><h2 style="margin:0"></h2><button class="g">إغلاق</button></div><div class="ag"><p class="mu">جارٍ التحميل…</p></div></div>';
+  const i = list.findIndex(x => x.id === id), prev = i > 0 ? list[i - 1] : null, next = i >= 0 && i < list.length - 1 ? list[i + 1] : null;
+  const sm = sum(id), st = D.works.map(w => { const g = G(id, w.id); const p = g.score != null ? g.score / w.max_score * 100 : null; return `<tr><td>${esc(w.title)}</td><td>${g.score != null ? fmtN(g.score) + ' / ' + w.max_score : '—'}</td><td>${p != null ? `<span class="${rcls(ratingOf(p))}">${ratingOf(p)}</span>` : ''}</td><td class="mu">${esc(g.note || '')}</td></tr>`; }).join('');
+  o.innerHTML = `<div class="card" style="max-width:760px;margin:0 auto">
+<div class="top"><h2 style="margin:0"></h2><button class="g" id="sx">إغلاق</button></div>
+<div class="row"><button class="g" id="sp" ${prev ? '' : 'disabled'}>▶ السابقة</button><span class="mu">${i >= 0 ? (i + 1) + ' من ' + list.length : ''} · ${CN[s.cls]}</span><button class="g" id="sn" ${next ? '' : 'disabled'}>التالية ◀</button></div>
+<div class="row"><span class="tag">النقاط: <b>${fmtN(sm.sc)}</b> من ${fmtN(sm.mx)}</span><span class="tag">الإنجاز: <b>${sm.prog}%</b></span><span class="tag">مرصود: <b>${sm.done}</b> · متبقٍ: <b>${sm.left}</b></span></div>
+<h3>الدرجات</h3><div class="sc"><table><tr><th>العمل</th><th>الدرجة</th><th>التقدير</th><th>ملاحظة</th></tr>${st}</table></div>
+<h3>🎖️ الشهادات والبطاقات</h3><div class="aws"><p class="mu">جارٍ التحميل…</p></div>
+<h3>📜 إنجازات الطالبة</h3><div class="ag"><p class="mu">جارٍ التحميل…</p></div></div>`;
   document.body.appendChild(o);
-  o.querySelector('h2').textContent = '📜 إنجازات ' + s.name;
-  o.querySelector('button').onclick = () => o.remove();
-  const box = o.querySelector('.ag');
-  const r = await sb.from('achievements').select('*').eq('student_id', id).order('created_at', { ascending: false });
+  o.querySelector('h2').textContent = s.name;
+  o.querySelector('#sx').onclick = () => { o.remove(); SO = null; };
+  if (prev) o.querySelector('#sp').onclick = () => showAch(prev.id);
+  if (next) o.querySelector('#sn').onclick = () => showAch(next.id);
+  o.scrollTop = 0;
+  const box = o.querySelector('.ag'), ab = o.querySelector('.aws');
+  const [r, aw] = await Promise.all([
+    sb.from('achievements').select('*').eq('student_id', id).order('created_at', { ascending: false }),
+    sb.from('awards').select('*').eq('student_id', id).order('created_at', { ascending: false })]);
+  if (!o.isConnected) return;
+  if (aw.error) ab.innerHTML = '<p class="mu">لا توجد بيانات</p>';
+  else {
+    ab.innerHTML = aw.data.length ? '<div class="aw-grid sk"></div>' : '<p class="mu">لم تُهدَ شيئاً بعد</p>';
+    const g = ab.querySelector('.aw-grid');
+    aw.data.forEach(a => { const t = document.createElement('div'); t.className = 'aw-t'; t.innerHTML = dHtml(a.kind, a.design, s.name, a.reason, a.created_at) + '<small>' + esc(dOf(a.kind, a.design).t) + '</small>'; g.appendChild(t); });
+    fitCerts();
+  }
   if (r.error) { box.innerHTML = '<p class="mu">تعذّر تحميل الإنجازات</p>'; return; }
   box.innerHTML = r.data.length ? '' : '<p class="mu">لم ترفع هذه الطالبة إنجازات بعد</p>';
   r.data.forEach(a => {
@@ -820,7 +845,7 @@ async function showAch(id) {
 /* ---------- الطالبات ---------- */
 function studentsTab() {
   return `<div class="card"><h2>الطالبات</h2>${clsSel()}<div class="row"><input id="ns" placeholder="اسم الطالبة"><input id="ni" placeholder="رقم الطالبة"><select id="nc">${CL.map(c => `<option value="${c}">${CN[c]}</option>`).join('')}</select><button onclick="addS()">إضافة</button></div>
-<div class="sc"><table><tr><th>م</th><th>الرقم</th><th>الاسم</th><th>الفصل</th><th></th></tr>${fs().map((s, i) => `<tr><td>${i + 1}</td><td>${esc(s.num)}</td><td>${esc(s.name)} <span style="cursor:pointer" title="إنجازات الطالبة" onclick="showAch('${s.id}')">📜</span></td><td>${CN[s.cls]}</td><td><button class="g" title="إعادة كلمة المرور إلى 1111" onclick="resetPw('${s.id}')">🔑 إعادة</button> <button class="d" onclick="delS('${s.id}')">حذف</button></td></tr>`).join('')}</table></div></div>`;
+<div class="sc"><table><tr><th>م</th><th>الرقم</th><th>الاسم</th><th>الفصل</th><th></th></tr>${fs().map((s, i) => `<tr><td>${i + 1}</td><td>${esc(s.num)}</td><td>${nmLink(s)} <span style="cursor:pointer" title="ملف الطالبة" onclick="showAch('${s.id}')">📂</span></td><td>${CN[s.cls]}</td><td><button class="g" title="إعادة كلمة المرور إلى 1111" onclick="resetPw('${s.id}')">🔑 إعادة</button> <button class="d" onclick="delS('${s.id}')">حذف</button></td></tr>`).join('')}</table></div></div>`;
 }
 async function addS() {
   const name = $('ns').value.trim(), num = $('ni').value.trim(), cls = +$('nc').value;
