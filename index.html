@@ -61,6 +61,12 @@ th,td{padding:8px;border-bottom:1px solid var(--bd);text-align:right;white-space
 .aw-t .sg{position:absolute;top:8px;left:8px;z-index:2;background:#e8b94a;color:#4a2e1a;border-radius:99px;padding:2px 8px;font-size:.72rem;font-weight:700}
 #pr{display:none}.sheet{display:grid;grid-template-columns:repeat(2,372px);gap:16px;justify-content:center;padding:14px 0}
 @media print{body.prn>*:not(#pr){display:none!important}body.prn #pr{display:block!important}body.prn{background:#fff!important}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+.lb{display:flex;flex-direction:column;gap:6px;margin:8px 0}
+.lb-r{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--bd)}
+.lb-r.me{background:#fff4d6;border-color:#d9a63a}
+.lb-n{min-width:30px;text-align:center;font-size:1.25rem;font-weight:700}
+.lb-nm{flex:1}
+.lb-r b{color:#0f5c63}
 .reg .rb{padding:12px}
 .reg .sc{max-height:75vh;overflow:auto}.reg th{position:sticky;top:0;z-index:3;box-shadow:0 2px 0 var(--rg)}.reg td:nth-child(2){position:sticky;right:0;z-index:1;background:var(--rb)}
 .reg table{font-size:1rem}.reg th{background:var(--rb2);color:var(--rr);border:1px solid var(--rg);font-weight:700}
@@ -295,13 +301,14 @@ function chpwS() {
    صفحة الطالبة
    ===================================================================== */
 async function loadStudent() {
-  const [h, c, a, aw] = await Promise.all([
+  const [h, c, a, aw, lb] = await Promise.all([
     sb.rpc('student_home', { p_token: me.token }),
     sb.rpc('chat_get', { p_token: me.token }),
     sb.rpc('ach_list', { p_token: me.token }),
-    sb.rpc('awards_list', { p_token: me.token })]);
+    sb.rpc('awards_list', { p_token: me.token }),
+    sb.rpc('leaderboard', { p_token: me.token })]);
   if (h.error || !h.data || h.data.error) { localStorage.removeItem('stu'); return false; }
-  SV = { home: h.data, chat: (c.data && !c.data.error) ? c.data : null, ach: (a.data && !a.data.error) ? a.data : [], awards: (aw && Array.isArray(aw.data)) ? aw.data : [] };
+  SV = { home: h.data, chat: (c.data && !c.data.error) ? c.data : null, ach: (a.data && !a.data.error) ? a.data : [], awards: (aw && Array.isArray(aw.data)) ? aw.data : [], lb: (lb && lb.data && !lb.data.error) ? lb.data : null };
   return true;
 }
 const bIcon = t => /كتاب/.test(t) ? '📚' : /أوراق|اوراق/.test(t) ? '📝' : /مشاركة/.test(t) ? '🙋‍♀️' : /أدائية|تصميم/.test(t) ? '🎨' : /اختبار/.test(t) ? '🏆' : '🏅';
@@ -373,6 +380,7 @@ function studentV() {
   return `<div class="top"><h1>أهلاً ${esc(h.name)} <span class="tag">${esc(CN[h.cls] || '')}</span></h1><div>${TG} <button class="g" onclick="chpwS()">🔑 كلمة المرور</button> <button class="g" onclick="out()">خروج</button></div></div>
 <div class="stats"><div class="st" style="grid-column:1/-1"><span>نسبة تقدمك</span><b>${pr}</b><div style="height:10px;background:var(--bd);border-radius:99px;overflow:hidden;margin-top:6px"><div style="width:${h.done ? h.progress : 0}%;height:100%;background:var(--pr)"></div></div>${h.done ? '' : '<span>لم تُرصد أعمال بعد</span>'}</div><div class="stx"><b>${h.done}</b><span>أعمال مصحّحة</span></div><div class="st"><b>${h.left}</b><span>متبقية</span></div></div>
 ${badgesHtml(h.works)}
+${boardCard()}
 ${awardsCard()}
 ${chatBoxS()}
 <div class="card"><h2>إعلانات</h2>${h.announcements.map(a => `<div class="an">${esc(a.body)}<div class="mu">${dt(a.at)}</div></div>`).join('') || '<p class="mu">لا توجد إعلانات</p>'}</div>
@@ -494,7 +502,7 @@ function sum(sid) {
   return { sc, mx, pct: wd ? Math.round(wn / wd * 100) : 0, prog: wt ? Math.round(wn / wt * 100) : 0, done, left: D.works.length - done };
 }
 function teacherV() {
-  const T = [['chat', '💬 الدردشة'], ['grades', 'رصد الدرجات'], ['students', 'الطالبات'], ['works', 'الأعمال'], ['reports', 'التقارير'], ['awards', '🎖️ الشهادات'], ['ann', 'الإعلانات']];
+  const T = [['chat', '💬 الدردشة'], ['grades', 'رصد الدرجات'], ['students', 'الطالبات'], ['works', 'الأعمال'], ['reports', 'التقارير'], ['board', '🏆 المتصدرات'], ['awards', '🎖️ الشهادات'], ['ann', 'الإعلانات']];
   return `<div class="top"><h1>لوحة المعلمة</h1><div>${TG} <button class="g" onclick="chpw()">تغيير كلمة المرور</button> <button class="g" onclick="out()">خروج</button></div></div>
 <div class="tabs">${T.map(t => `<button class="${tab === t[0] ? '' : 'g'}" onclick="goTab('${t[0]}')">${t[1]}</button>`).join('')}</div>${tabV()}`;
 }
@@ -506,6 +514,7 @@ function tabV() {
   if (tab === 'works') return worksTab();
   if (tab === 'reports') return reportsTab();
   if (tab === 'awards') return awardsTab();
+  if (tab === 'board') return boardTab();
   return annTab();
 }
 
@@ -634,6 +643,30 @@ function delAward(id) {
     if (r.error) return alert('تعذّر الحذف');
     D.awards = D.awards.filter(a => a.id !== id); app();
   });
+}
+
+/* ---------- لوحة المتصدرات ---------- */
+const stageOf = c => +c <= 2 ? 4 : +c <= 5 ? 5 : 6;
+const MEDAL = r => r === 1 ? '🥇' : r === 2 ? '🥈' : r === 3 ? '🥉' : '';
+const fmtN = n => { n = Math.round((+n || 0) * 10) / 10; return String(n); };
+function boardCard() {
+  const b = SV && SV.lb; if (!b) return '';
+  const rows = (b.top || []).map(x => `<div class="lb-r ${x.me ? 'me' : ''}"><span class="lb-n">${MEDAL(x.rank) || x.rank}</span><span class="lb-nm">${esc(x.name)}${x.me ? ' (أنتِ)' : ''}</span><b>${fmtN(x.pts)}</b></div>`).join('');
+  const mine = (b.my_rank && +b.my_pts > 0) ? `<p class="mu" style="margin-bottom:0">ترتيبكِ: <b>${b.my_rank}</b> من ${b.total} · نقاطكِ: <b>${fmtN(b.my_pts)}</b></p>` : '';
+  return `<div class="card"><h2>🏆 المتصدرات في ${stName(b.stage)}</h2>${rows ? `<div class="lb">${rows}</div>` : '<p class="mu">لم تُرصد نقاط بعد، كوني أول المتصدرات!</p>'}${mine}</div>`;
+}
+function topOfStage(st, n) {
+  const L = D.students.filter(s => stageOf(s.cls) === st).map(s => ({ s, p: sum(s.id) })).filter(x => x.p.sc > 0);
+  L.sort((a, b) => b.p.sc - a.p.sc || a.s.name.localeCompare(b.s.name, 'ar'));
+  let rk = 0, last = null;
+  return L.map((x, i) => { if (x.p.sc !== last) { rk = i + 1; last = x.p.sc; } return Object.assign({ rk }, x); }).filter(x => x.rk <= n);
+}
+function boardTab() {
+  return `<div class="card"><h2>🏆 أعلى النقاط</h2><p class="mu">النقاط = مجموع الدرجات التي حصلت عليها الطالبة في الأعمال. تُعرض أعلى ١٠ في كل صف (وتشمل المتعادلات).</p></div>` +
+    STG.map(([st, nm]) => {
+      const L = topOfStage(st, 10);
+      return `<div class="card"><h2>${nm}</h2>${L.length ? `<div class="lb">${L.map(x => `<div class="lb-r"><span class="lb-n">${MEDAL(x.rk) || x.rk}</span><span class="lb-nm">${esc(x.s.name)} <small class="mu">${CN[x.s.cls]}</small></span><b>${fmtN(x.p.sc)}</b></div>`).join('')}</div>` : '<p class="mu">لا توجد نقاط مرصودة بعد.</p>'}</div>`;
+    }).join('');
 }
 
 /* ---------- الدردشة (المعلمة) ---------- */
