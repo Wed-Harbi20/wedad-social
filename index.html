@@ -157,7 +157,7 @@ let tab = 'chat', fc = 'all', cs = 4, fo = false;
 function dlg(text, def, ok, pass) {
   const o = document.createElement('div');
   o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9;padding:16px';
-  o.innerHTML = `<div class="card" style="max-width:380px;width:100%;margin:0"><p>${esc(text)}</p>${def === null ? '' : `<input id="dv" type="${pass ? 'password' : 'text'}" value="${esc(def)}" style="width:100%;margin-bottom:10px">`}<div class="row" style="margin:0"><button id="dok">موافق</button><button class="g" id="dno">إلغاء</button></div></div>`;
+  o.innerHTML = `<div class="card" style="max-width:380px;width:100%;margin:0"><p>${esc(text)}</p>${def === null ? '' : `<input id="dv" type="text" name="dlgv" value="${esc(def)}" style="width:100%;margin-bottom:10px${pass ? ';-webkit-text-security:disc;text-security:disc' : ''}" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other">`}<div class="row" style="margin:0"><button id="dok">موافق</button><button class="g" id="dno">إلغاء</button></div></div>`;
   document.body.appendChild(o);
   const d = $('dv'); if (d) d.focus();
   $('dno').onclick = () => o.remove();
@@ -243,12 +243,12 @@ function loginV() {
   const tgw = `<div class="tgw">${TG}</div>`;
   if (!sb) return hero + `<div class="card login"><p class="t-bad">الموقع غير مربوط بقاعدة البيانات بعد.</p><p class="mu">افتحي ملف index.html وضعي رابط مشروع Supabase والمفتاح العام في أول الملف (CFG).</p></div>` + img;
   return hero + `<div class="card login">${tm_ ? `<p class="mu" style="margin-top:0">دخول المعلمة</p>
-<div class="row"><input id="em" type="text" inputmode="email" placeholder="البريد الإلكتروني" style="width:100%;-webkit-text-security:disc;text-security:disc" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"><button class="g" type="button" title="إظهار/إخفاء" onclick="const e=$('em');const h=e.style.webkitTextSecurity==='none';e.style.webkitTextSecurity=h?'disc':'none';e.style.textSecurity=h?'disc':'none'">👁</button></div>
-<div class="row"><input id="pw" type="password" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')loginT()" style="width:100%" autocomplete="current-password"></div>
+<div class="row"><input id="em" type="text" inputmode="email" placeholder="البريد الإلكتروني" style="width:100%;-webkit-text-security:disc;text-security:disc" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" name="tem" data-lpignore="true" data-1p-ignore="true" data-form-type="other"><button class="g" type="button" title="إظهار/إخفاء" onclick="const e=$('em');const h=e.style.webkitTextSecurity==='none';e.style.webkitTextSecurity=h?'disc':'none';e.style.textSecurity=h?'disc':'none'">👁</button></div>
+<div class="row"><input id="pw" type="text" name="tpw" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')loginT()" style="width:100%;-webkit-text-security:disc;text-security:disc" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"></div>
 <button onclick="loginT()" style="width:100%" ${busy ? 'disabled' : ''}>دخول</button><p class="t-bad">${esc(msg)}</p>
 <button class="g" onclick="tm_=false;roleSet(false);msg='';app()">🎓 دخول الطالبات</button>` : `<p class="mu" style="margin-top:0">اكتبي اسمك كما في كشف الفصل ثم كلمة المرور.</p>
-<div class="row"><input id="u" placeholder="اسم الطالبة بالعربية" style="width:100%" autocomplete="username"></div>
-<div class="row"><input id="pwS" type="password" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')loginS()" style="width:100%" autocomplete="current-password"></div>
+<div class="row"><input id="u" type="text" name="sname" placeholder="اسم الطالبة بالعربية" style="width:100%" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"></div>
+<div class="row"><input id="pwS" type="text" name="spw" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')loginS()" style="width:100%;-webkit-text-security:disc;text-security:disc" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"></div>
 <button onclick="loginS()" style="width:100%" ${busy ? 'disabled' : ''}>دخول</button><p class="t-bad">${esc(msg)}</p>
 <button class="g" onclick="tm_=true;roleSet(true);msg='';app()">👩‍🏫 دخول المعلمة</button>`}</div>` + img;
 }
