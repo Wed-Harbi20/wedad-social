@@ -233,7 +233,7 @@ function riyadhYMD() {
 }
 function themeNow(ymd) {
   const q = ((typeof location!=='undefined'?location.search:'').match(/[?&]theme=([a-z0-9]+)/) || [])[1];
-  if (thPrev) { if (thPrev === 'off') return null; const g = THEMES.find(x => x.id === thPrev); if (g) return g; }
+  if (thPrev) { if (thPrev === 'off') return null; if (thPrev === 'auto') { const d0 = ymd || riyadhYMD(); return THEMES.find(x => d0 >= x.from && d0 <= x.to) || null; } const g = THEMES.find(x => x.id === thPrev); if (g) return g; }
   if (q === 'off') return null;
   if (q) { const f = THEMES.find(x => x.id === q); if (f) return f; }
   const d = ymd || riyadhYMD();
@@ -269,7 +269,7 @@ function thParts(id) {
 function thPicker() {
   if (!(me ? me.t : roleGet())) return '';
   const L = [['sem2', 'الفصل الثاني'], ['ramadan', 'رمضان'], ['founding', 'التأسيس'], ['eid', 'العيد'], ['flag', 'يوم العلم'], ['off', 'بدون']];
-  return '<div class="w thpv"><small>👩‍🏫 معاينة المناسبات (تظهر لك فقط)</small>' + L.map(x => `<button class="${thPrev === x[0] ? 'on' : ''}" onclick="thPrev='${x[0]}';thHide=false;app()">${x[1]}</button>`).join('') + `<button class="${thPrev ? '' : 'on'}" onclick="thPrev=null;thHide=false;app()">تلقائي</button></div>`;
+  return '<div class="w thpv"><small>👩‍🏫 معاينة المناسبات (تظهر لك فقط)</small>' + L.map(x => `<button class="${thPrev === x[0] ? 'on' : ''}" onclick="thPrev='${x[0]}';thHide=false;app()">${x[1]}</button>`).join('') + `<button class="${thPrev && thPrev !== 'auto' ? '' : 'on'}" onclick="thPrev='auto';thHide=false;app()">تلقائي</button></div>`;
 }
 function thFlagSide() {
   const N = 56;
@@ -338,7 +338,7 @@ function loginV() {
 <div class="row"><input id="u" type="text" readonly onfocus="this.removeAttribute('readonly')" name="sname" placeholder="اسم الطالبة بالعربية" style="width:100%" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"></div>
 <div class="row"><input id="pwS" type="text" readonly onfocus="this.removeAttribute('readonly')" name="spw" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')loginS()" style="width:100%;-webkit-text-security:disc;text-security:disc" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"></div>
 <button onclick="loginS()" style="width:100%" ${busy ? 'disabled' : ''}>دخول</button><p class="t-bad">${esc(msg)}</p>
-<button class="g" onclick="tm_=true;roleSet(true);msg='';app()">👩‍🏫 دخول المعلمة</button>`}</div><p class="mu" style="text-align:center;font-size:.7rem;opacity:.6">إصدار ٢٠٢٦.١١.١٣-هـ</p>` + img;
+<button class="g" onclick="tm_=true;roleSet(true);msg='';app()">👩‍🏫 دخول المعلمة</button>`}</div><p class="mu" style="text-align:center;font-size:.7rem;opacity:.6">إصدار ٢٠٢٦.١١.١٣-و</p>` + img;
 }
 async function loginS() {
   const u = ($('u').value || '').trim(), p = ($('pwS').value || '').trim(); if (!u || busy) return;
