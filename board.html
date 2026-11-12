@@ -95,6 +95,28 @@ h1,h2,h3,.rx{font-family:'Readex Pro','Tajawal',sans-serif}
 .empty .big{font-size:54px}
 
 /* ===== الجانب ===== */
+.stars3{max-width:1440px;margin:0 auto;padding:16px 22px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.s3{position:relative;border-radius:20px;padding:16px 18px;color:#fff;overflow:hidden;cursor:pointer;transition:.2s;box-shadow:var(--sh);min-height:118px}
+.s3:hover{transform:translateY(-2px)}
+.s3.g4{background:linear-gradient(135deg,#7c3aed,#db2777)}.s3.g5{background:linear-gradient(135deg,#0d9488,#0284c7)}.s3.g6{background:linear-gradient(135deg,#d97706,#dc2626)}
+.s3.on{outline:4px solid #fff;outline-offset:-8px}
+.s3::after{content:"👑";position:absolute;left:-6px;bottom:-14px;font-size:84px;opacity:.16}
+.s3 .sl{font-family:'Readex Pro';font-size:14px;font-weight:600;opacity:.92}
+.s3 .sw{display:flex;align-items:center;gap:12px;margin-top:10px}
+.s3 .av{width:54px;height:54px;font-size:28px;margin:0;border:3px solid rgba(255,255,255,.7)}
+.s3 .sn{font-family:'Readex Pro';font-size:clamp(16px,1.7vw,21px);font-weight:700;line-height:1.35}
+.s3 .sc{font-size:13px;font-weight:700;opacity:.92;margin-top:2px}
+.s3 .sp{margin-inline-start:auto;background:rgba(255,255,255,.22);border-radius:14px;padding:6px 12px;text-align:center;font-weight:800;font-size:22px;line-height:1.1}
+.s3 .sp small{display:block;font-size:11px;font-weight:600}
+.s3 .se{opacity:.9;font-weight:600;margin-top:14px}
+.race{padding:14px 18px 16px}
+.race .rr{margin-bottom:12px}
+.race .rt{display:flex;justify-content:space-between;font-weight:700;font-size:14px}
+.race .rt.me{color:var(--pri)}
+.race .rb{height:12px;border-radius:8px;background:#f0edf7;margin-top:6px;overflow:hidden}
+.race .rb i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,var(--teal),var(--pri));transition:width .6s}
+.pod .pc{font-size:11.5px;color:var(--muted);font-weight:700}
+@media (max-width:760px){.stars3{grid-template-columns:1fr;padding-inline:10px}}
 .podium{display:flex;align-items:flex-end;justify-content:center;gap:8px;padding:18px 14px 16px}
 .pod{flex:1;text-align:center}
 .pod .pa{width:52px;height:52px;border-radius:50%;margin:0 auto 6px;display:grid;place-items:center;font-size:26px}
@@ -243,6 +265,8 @@ body.show .layout,body.show .tools,body.show .classbar,body.show .topbar .in{max
   <button class="tool" id="multiBtn" onclick="toggleMulti()"><div class="ic" style="background:var(--green2)">☑️</div><div><b id="multiT">تحديد متعدد</b><span id="multiS">عزّزي عدة طالبات معًا</span></div></button>
 </div>
 
+<div class="stars3" id="stars3"></div>
+
 <div class="layout">
   <section class="panel">
     <div class="ph">
@@ -257,8 +281,12 @@ body.show .layout,body.show .tools,body.show .classbar,body.show .topbar .in{max
 
   <aside class="side">
     <div class="panel">
-      <div class="ph"><h2>👑 نجمات الأسبوع</h2></div>
+      <div class="ph"><h2 id="podT">👑 نجمات الصف</h2></div>
       <div id="podium"></div>
+    </div>
+    <div class="panel">
+      <div class="ph"><h2 id="raceT">🏁 تنافس الفصول</h2></div>
+      <div class="race" id="race"></div>
     </div>
     <div class="panel">
       <div class="ph"><h2>🎯 هدف الفصل</h2></div>
@@ -576,12 +604,34 @@ function renderGrid(){
     </div>`;
   }).join('');
 }
+const STAGES = { 4:{t:'الرابع', c:[1,2]}, 5:{t:'الخامس', c:[3,4,5]}, 6:{t:'السادس', c:[6,7]} };
+const stageOf = c => +c <= 2 ? 4 : +c <= 5 ? 5 : 6;
+const stageStudents = g => STAGES[g].c.flatMap(c => S.cls[c].map(s => ({...s, c})));
+function renderStars3(){
+  const cur = stageOf(S.cur);
+  $('stars3').innerHTML = Object.entries(STAGES).map(([g, st]) => {
+    const all = stageStudents(g), max = Math.max(0, ...all.map(s => s.pts)), top = max > 0 ? all.filter(s => s.pts === max) : [];
+    const lead = top[0];
+    return `<div class="s3 g${g} ${+g === cur ? 'on' : ''}" onclick="setCls(${st.c[0]})">
+      <div class="sl">👑 نجمة الصف ${st.t}</div>
+      ${lead ? `<div class="sw">${avHTML(lead.name)}<div><div class="sn">${top.map(s => esc(s.name)).join('، ')}</div><div class="sc">${top.length > 1 ? 'تعادل بين ' + ar(top.length) + ' طالبات' : 'فصل ' + CLASSES[lead.c]}</div></div><div class="sp">${ar(max)}<small>نقطة</small></div></div>`
+             : `<div class="se">${all.length ? 'المنافسة لم تبدأ بعد… من ستكون الأولى؟ ✨' : 'لا توجد أسماء بعد'}</div>`}
+    </div>`;
+  }).join('');
+}
 function renderSide(){
-  const top = [...L()].filter(s => s.pts > 0).sort((a,b) => b.pts - a.pts).slice(0,3);
+  renderStars3();
+  const g = stageOf(S.cur), st = STAGES[g];
+  $('podT').textContent = `👑 نجمات الصف ${st.t}`;
+  $('raceT').textContent = `🏁 تنافس فصول الصف ${st.t}`;
+  const totals = st.c.map(c => ({ c, t:Math.max(0, S.cls[c].reduce((a,s) => a + s.pts, 0)) })).sort((a,b) => b.t - a.t);
+  const mx = Math.max(1, ...totals.map(x => x.t)), med = ['🥇','🥈','🥉'];
+  $('race').innerHTML = totals.map((x,k) => `<div class="rr"><div class="rt ${+x.c === +S.cur ? 'me' : ''}"><span>${x.t ? med[k] || '' : ''} ${CLASSES[x.c]}</span><span>${ar(x.t)} نقطة</span></div><div class="rb"><i style="width:${Math.round(x.t / mx * 100)}%"></i></div></div>`).join('');
+  const top = stageStudents(g).filter(s => s.pts > 0).sort((a,b) => b.pts - a.pts).slice(0,3);
   if (!top.length) $('podium').innerHTML = `<div class="note" style="text-align:center;padding:24px">من ستكون نجمة هذا الأسبوع؟ ✨</div>`;
   else {
     const order = [top[1], top[0], top[2]], cls = ['p2','p1','p3'], rank = ['٢','١','٣'];
-    $('podium').innerHTML = `<div class="podium">${order.map((s,k) => s ? `<div class="pod ${cls[k]}">${avHTML(s.name,'pa')}<div class="pn">${esc(s.name)}</div><div class="pb">${rank[k]}<small>${ar(s.pts)} نقطة</small></div></div>` : '<div class="pod"></div>').join('')}</div>`;
+    $('podium').innerHTML = `<div class="podium">${order.map((s,k) => s ? `<div class="pod ${cls[k]}">${avHTML(s.name,'pa')}<div class="pn">${esc(s.name)}</div><div class="pc">${CLASSES[s.c]}</div><div class="pb">${rank[k]}<small>${ar(s.pts)} نقطة</small></div></div>` : '<div class="pod"></div>').join('')}</div>`;
   }
   const tot = Math.max(0, L().reduce((a,s) => a + s.pts, 0)), G = S.goal[S.cur], pct = Math.min(100, Math.round(tot / G.target * 100));
   $('goal').innerHTML = `<div class="gt"><span>${ar(tot)} / ${ar(G.target)} نقطة</span><span>${ar(pct)}٪</span></div><div class="gbar"><i style="width:${pct}%"></i></div><div class="rw">${pct >= 100 ? '🎉 تحقق الهدف! المكافأة: ' : '🎁 المكافأة: '}<b>${esc(G.reward)}</b></div>`;
