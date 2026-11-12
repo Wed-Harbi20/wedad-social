@@ -51,6 +51,36 @@ th,td{padding:8px;border-bottom:1px solid var(--bd);text-align:right;white-space
 @keyframes celin{from{opacity:0;transform:translate(-50%,-30px) scale(.8)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
 @keyframes celout{to{opacity:0;transform:translate(-50%,-20px)}}
 @media(prefers-reduced-motion:reduce){.coin .ci,.coin .fc::after,.coin .bk::after,.b.on .coin,.hb.on .coin,.cel{animation:none}}
+.cs{position:relative;width:100%;overflow:hidden;border-radius:6px}
+.cert{position:absolute;top:0;right:0;width:1000px;height:700px;transform-origin:top right;box-sizing:border-box;padding:22px;background:radial-gradient(circle at 50% 38%,#fffdf6,var(--p));color:#3a2a14;font-family:Amiri,Tajawal,serif;text-align:center;direction:rtl}
+.cb1{height:100%;border:7px solid var(--a);padding:8px;box-sizing:border-box}
+.cb2{height:100%;border:2px solid var(--b);box-sizing:border-box;position:relative;padding:14px 56px;display:flex;flex-direction:column;align-items:center;justify-content:space-between}
+.cn{position:absolute;font-style:normal;color:var(--a);font-size:34px;line-height:1}.c1{top:6px;right:12px}.c2{top:6px;left:12px}.c3{bottom:6px;right:12px}.c4{bottom:6px;left:12px}
+.c-bis{font-size:30px;color:var(--a);line-height:1}
+.c-tt{font-size:62px;font-weight:700;color:var(--a);line-height:1.05}
+.c-sub{font-size:25px;color:#6b5a3e;line-height:1}
+.c-med{width:74px;height:74px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:40px;background:radial-gradient(circle at 32% 26%,#fff,var(--b) 62%,var(--a));box-shadow:0 4px 10px rgba(0,0,0,.25),inset 0 0 0 4px rgba(255,255,255,.55)}
+.c-to{font-size:23px;line-height:1}
+.c-nm{font-size:54px;font-weight:700;color:#2a1c08;border-bottom:3px double var(--b);padding:0 40px 2px;min-width:420px;line-height:1.15}
+.c-cl{font-size:21px;color:#6b5a3e;line-height:1}
+.c-rs{font-size:26px;line-height:1.5;max-width:780px}
+.c-ft{width:100%;display:flex;justify-content:space-between;align-items:flex-end}
+.c-ft small{display:block;font-size:17px;color:#6b5a3e}.c-ft b{font-size:23px}
+.c-ft>div:first-child{text-align:right;min-width:230px}.c-ft>div:last-child{text-align:left;min-width:230px}
+.c-seal{width:84px;height:84px;border-radius:50%;border:4px double var(--a);display:flex;align-items:center;justify-content:center;font-size:40px;background:var(--p)}
+.aw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:12px;margin:10px 0}
+.aw-grid.sk{grid-template-columns:repeat(auto-fill,minmax(130px,1fr))}
+.aw-t{position:relative;border:2px solid var(--bd);border-radius:12px;padding:6px;cursor:pointer;background:var(--bg);text-align:center}
+.aw-grid.sk .aw-t{display:flex;flex-direction:column;align-items:center;padding:10px 4px}
+.aw-t.sel{border-color:#b08a3e;box-shadow:0 0 0 3px rgba(176,138,62,.4)}
+.aw-t small{display:block;margin-top:4px;font-size:.8rem}
+.aw-t .sg{position:absolute;top:8px;left:8px;z-index:2;background:#e8b94a;color:#4a2e1a;border-radius:99px;padding:2px 8px;font-size:.72rem;font-weight:700}
+.stk{width:120px;height:120px;border-radius:50%;background:radial-gradient(circle at 30% 24%,#fff,var(--s1) 72%);border:5px solid var(--s2);box-shadow:0 0 0 3px #fff,0 4px 9px rgba(0,0,0,.3);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-family:Tajawal,sans-serif;box-sizing:border-box}
+.stk .si{font-size:44px;line-height:1}.stk .stx{font-size:14px;font-weight:700;color:var(--s2);margin-top:4px;padding:0 8px;line-height:1.2}
+.stk.big{width:200px;height:200px}.stk.big .si{font-size:76px}.stk.big .stx{font-size:22px}
+.stk-row{display:flex;flex-wrap:wrap;gap:14px;margin-top:12px;justify-content:center}
+#pr{display:none}.sheet{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:30px;justify-items:center}.sheet .stk.big{width:200px;height:200px}
+@media print{body.prn>*:not(#pr){display:none!important}body.prn #pr{display:block!important}body.prn{background:#fff!important}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 .reg .rb{padding:12px}
 .reg .sc{max-height:75vh;overflow:auto}.reg th{position:sticky;top:0;z-index:3;box-shadow:0 2px 0 var(--rg)}.reg td:nth-child(2){position:sticky;right:0;z-index:1;background:var(--rb)}
 .reg table{font-size:1rem}.reg th{background:var(--rb2);color:var(--rr);border:1px solid var(--rg);font-weight:700}
@@ -115,7 +145,9 @@ const rcls = r => (r === 'ممتاز' || r === 'جيد جداً') ? 't-ok' : (r 
 
 /* ---------- الحالة العامة ---------- */
 let me = null;            // {t:1} معلمة | {t:0, token, sid, name, cls, stage} طالبة
-let tm_ = false;          // وضع دخول المعلمة
+const roleGet = () => { try { return localStorage.getItem('role') === 't' || /[?&]t(=|&|$)/.test(location.search); } catch (e) { return false; } };
+const roleSet = t => { try { localStorage.setItem('role', t ? 't' : 's'); } catch (e) { } };
+let tm_ = roleGet();          // وضع دخول المعلمة
 let msg = '', booting = true, busy = false;
 let SV = null;            // بيانات الطالبة {home, chat, ach}
 let D = null, GM = {}, TM = [];   // بيانات المعلمة
@@ -184,6 +216,7 @@ function app() {
   $('app').innerHTML = h;
   const b = $('cb'); if (b) b.scrollTop = b.scrollHeight;
   celebrateOnEntry();
+  fitCerts();
 }
 async function boot() {
   if (!sb) { booting = false; app(); return; }
@@ -213,11 +246,11 @@ function loginV() {
 <div class="row"><input id="em" type="text" inputmode="email" placeholder="البريد الإلكتروني" style="width:100%;-webkit-text-security:disc;text-security:disc" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false"><button class="g" type="button" title="إظهار/إخفاء" onclick="const e=$('em');const h=e.style.webkitTextSecurity==='none';e.style.webkitTextSecurity=h?'disc':'none';e.style.textSecurity=h?'disc':'none'">👁</button></div>
 <div class="row"><input id="pw" type="password" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')loginT()" style="width:100%" autocomplete="current-password"></div>
 <button onclick="loginT()" style="width:100%" ${busy ? 'disabled' : ''}>دخول</button><p class="t-bad">${esc(msg)}</p>
-<button class="g" onclick="tm_=false;msg='';app()">← دخول الطالبات</button>` : `<p class="mu" style="margin-top:0">اكتبي اسمك كما في كشف الفصل ثم كلمة المرور.</p>
+<button class="g" onclick="tm_=false;roleSet(false);msg='';app()">🎓 دخول الطالبات</button>` : `<p class="mu" style="margin-top:0">اكتبي اسمك كما في كشف الفصل ثم كلمة المرور.</p>
 <div class="row"><input id="u" placeholder="اسم الطالبة بالعربية" style="width:100%" autocomplete="username"></div>
 <div class="row"><input id="pwS" type="password" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')loginS()" style="width:100%" autocomplete="current-password"></div>
 <button onclick="loginS()" style="width:100%" ${busy ? 'disabled' : ''}>دخول</button><p class="t-bad">${esc(msg)}</p>
-<button class="g" onclick="tm_=true;msg='';app()">دخول المعلمة</button>`}</div>` + img;
+<button class="g" onclick="tm_=true;roleSet(true);msg='';app()">👩‍🏫 دخول المعلمة</button>`}</div>` + img;
 }
 async function loginS() {
   const u = ($('u').value || '').trim(), p = ($('pwS').value || '').trim(); if (!u || busy) return;
@@ -248,14 +281,14 @@ async function loginT() {
     else {
       const t = await sb.rpc('is_teacher');
       if (t.data !== true) { await sb.auth.signOut(); msg = 'هذا الحساب ليس حساب المعلمة'; }
-      else { me = { t: 1 }; tab = 'chat'; await loadTeacher(); }
+      else { me = { t: 1 }; roleSet(true); tab = 'chat'; await loadTeacher(); }
     }
   } catch (e) { msg = 'تعذّر الاتصال، حاولي مرة أخرى'; me = null; }
   busy = false; app();
 }
 async function out() {
   if (me && me.t) { try { await sb.auth.signOut(); } catch (e) { } }
-  localStorage.removeItem('stu'); me = null; SV = null; D = null; tm_ = false; msg = ''; CEL = false; app();
+  localStorage.removeItem('stu'); me = null; SV = null; D = null; tm_ = roleGet(); msg = ''; CEL = false; app();
 }
 function chpw() {
   dlg('كلمة المرور الجديدة (6 أحرف أو أرقام على الأقل):', '', async n => {
@@ -282,12 +315,13 @@ function chpwS() {
    صفحة الطالبة
    ===================================================================== */
 async function loadStudent() {
-  const [h, c, a] = await Promise.all([
+  const [h, c, a, aw] = await Promise.all([
     sb.rpc('student_home', { p_token: me.token }),
     sb.rpc('chat_get', { p_token: me.token }),
-    sb.rpc('ach_list', { p_token: me.token })]);
+    sb.rpc('ach_list', { p_token: me.token }),
+    sb.rpc('awards_list', { p_token: me.token })]);
   if (h.error || !h.data || h.data.error) { localStorage.removeItem('stu'); return false; }
-  SV = { home: h.data, chat: (c.data && !c.data.error) ? c.data : null, ach: (a.data && !a.data.error) ? a.data : [] };
+  SV = { home: h.data, chat: (c.data && !c.data.error) ? c.data : null, ach: (a.data && !a.data.error) ? a.data : [], awards: (aw && Array.isArray(aw.data)) ? aw.data : [] };
   return true;
 }
 const bIcon = t => /كتاب/.test(t) ? '📚' : /أوراق|اوراق/.test(t) ? '📝' : /مشاركة/.test(t) ? '🙋‍♀️' : /أدائية|تصميم/.test(t) ? '🎨' : /اختبار/.test(t) ? '🏆' : '🏅';
@@ -357,8 +391,9 @@ function studentV() {
   const h = SV.home;
   const pr = h.done ? h.progress + '%' : '—';
   return `<div class="top"><h1>أهلاً ${esc(h.name)} <span class="tag">${esc(CN[h.cls] || '')}</span></h1><div>${TG} <button class="g" onclick="chpwS()">🔑 كلمة المرور</button> <button class="g" onclick="out()">خروج</button></div></div>
-<div class="stats"><div class="st" style="grid-column:1/-1"><span>نسبة تقدمك</span><b>${pr}</b><div style="height:10px;background:var(--bd);border-radius:99px;overflow:hidden;margin-top:6px"><div style="width:${h.done ? h.progress : 0}%;height:100%;background:var(--pr)"></div></div>${h.done ? '' : '<span>لم تُرصد أعمال بعد</span>'}</div><div class="st"><b>${h.done}</b><span>أعمال مصحّحة</span></div><div class="st"><b>${h.left}</b><span>متبقية</span></div></div>
+<div class="stats"><div class="st" style="grid-column:1/-1"><span>نسبة تقدمك</span><b>${pr}</b><div style="height:10px;background:var(--bd);border-radius:99px;overflow:hidden;margin-top:6px"><div style="width:${h.done ? h.progress : 0}%;height:100%;background:var(--pr)"></div></div>${h.done ? '' : '<span>لم تُرصد أعمال بعد</span>'}</div><div class="stx"><b>${h.done}</b><span>أعمال مصحّحة</span></div><div class="st"><b>${h.left}</b><span>متبقية</span></div></div>
 ${badgesHtml(h.works)}
+${awardsCard()}
 ${chatBoxS()}
 <div class="card"><h2>إعلانات</h2>${h.announcements.map(a => `<div class="an">${esc(a.body)}<div class="mu">${dt(a.at)}</div></div>`).join('') || '<p class="mu">لا توجد إعلانات</p>'}</div>
 <div class="card reg"><div class="rh"><span>﷽</span><h2>سجل متابعتي</h2><span>${esc(CN[h.cls] || '')}</span></div><div class="rb"><div class="sc"><table><tr><th>العمل</th><th>الدرجة</th><th>الحالة</th><th>ملاحظة المعلمة</th></tr>
@@ -479,18 +514,151 @@ function sum(sid) {
   return { sc, mx, pct: wd ? Math.round(wn / wd * 100) : 0, prog: wt ? Math.round(wn / wt * 100) : 0, done, left: D.works.length - done };
 }
 function teacherV() {
-  const T = [['chat', '💬 الدردشة'], ['grades', 'رصد الدرجات'], ['students', 'الطالبات'], ['works', 'الأعمال'], ['reports', 'التقارير'], ['ann', 'الإعلانات']];
+  const T = [['chat', '💬 الدردشة'], ['grades', 'رصد الدرجات'], ['students', 'الطالبات'], ['works', 'الأعمال'], ['reports', 'التقارير'], ['awards', '🎖️ الشهادات'], ['ann', 'الإعلانات']];
   return `<div class="top"><h1>لوحة المعلمة</h1><div>${TG} <button class="g" onclick="chpw()">تغيير كلمة المرور</button> <button class="g" onclick="out()">خروج</button></div></div>
 <div class="tabs">${T.map(t => `<button class="${tab === t[0] ? '' : 'g'}" onclick="goTab('${t[0]}')">${t[1]}</button>`).join('')}</div>${tabV()}`;
 }
-async function goTab(t) { tab = t; if (t === 'chat') { await loadTeacherChat(); } app(); }
+async function goTab(t) { tab = t; if (t === 'chat') { await loadTeacherChat(); } if (t === 'awards') { await loadAwards(); } app(); }
 function tabV() {
   if (tab === 'chat') return chatTab();
   if (tab === 'grades') return gradesTab();
   if (tab === 'students') return studentsTab();
   if (tab === 'works') return worksTab();
   if (tab === 'reports') return reportsTab();
+  if (tab === 'awards') return awardsTab();
   return annTab();
+}
+
+/* ---------- الشهادات واستكرات التعزيز ---------- */
+const CERTS = [
+  { k: 'thanks', t: 'شهادة شكر وتقدير', sub: 'تقديراً وعرفاناً بجهودكِ', reason: 'لجهودها المميزة وحسن تعاونها في مادة الدراسات الاجتماعية', c: ['#a8780a', '#f0b429', '#fff6d9'], ic: '🌟' },
+  { k: 'excel', t: 'شهادة تفوّق', sub: 'تهنئة بالتفوّق الدراسي', reason: 'لتفوقها وحصولها على الدرجات العالية في مادة الدراسات الاجتماعية', c: ['#1d4f91', '#4a90e2', '#e8f2ff'], ic: '🏆' },
+  { k: 'part', t: 'شهادة مشاركة متميزة', sub: 'شكراً لمشاركتكِ الفاعلة', reason: 'لمشاركتها الفاعلة وتفاعلها الراقي داخل الحصة', c: ['#1d6b49', '#43b581', '#e6f7ee'], ic: '🙋‍♀️' },
+  { k: 'effort', t: 'شهادة اجتهاد ومثابرة', sub: 'نباركُ لكِ اجتهادكِ', reason: 'لاجتهادها ومثابرتها وتحسّن مستواها بشكل ملحوظ', c: ['#a64d12', '#ff924c', '#fff0e2'], ic: '📈' },
+  { k: 'create', t: 'شهادة إبداع', sub: 'لمسة إبداع مميزة', reason: 'لإبداعها في إنجاز المهمات الأدائية والتصميم', c: ['#8f2338', '#e8556d', '#ffecef'], ic: '🎨' },
+  { k: 'conduct', t: 'شهادة سلوك راقٍ', sub: 'أخلاقٌ تسبق العلم', reason: 'لحسن خلقها وسلوكها الراقي وتعاملها الطيب مع زميلاتها', c: ['#5a2a9a', '#9b5de5', '#f2eaff'], ic: '🌹' }
+];
+const STKS = [
+  { k: 'great', e: '👏', t: 'أحسنتِ', c: ['#fff3b0', '#a8780a'] },
+  { k: 'excel', e: '⭐', t: 'ممتازة', c: ['#ffe9a8', '#8a5a00'] },
+  { k: 'creative', e: '🎨', t: 'مبدعة', c: ['#ffd1dc', '#b83250'] },
+  { k: 'active', e: '🙋‍♀️', t: 'مشاركة فعّالة', c: ['#cfe8ff', '#1d4f91'] },
+  { k: 'hw', e: '📝', t: 'واجبكِ رائع', c: ['#c9f5dc', '#1d6b49'] },
+  { k: 'star', e: '🌟', t: 'نجمة الحصة', c: ['#fff3b0', '#a8780a'] },
+  { k: 'hero', e: '🏆', t: 'بطلة التحدي', c: ['#e6d4ff', '#5a2a9a'] },
+  { k: 'neat', e: '📚', t: 'مرتّبة ومنظّمة', c: ['#ffe0c2', '#a64d12'] },
+  { k: 'better', e: '📈', t: 'تحسّن ملحوظ', c: ['#d7f5ff', '#0f6a8a'] },
+  { k: 'thanks', e: '💛', t: 'شكراً لكِ', c: ['#fff0b8', '#9a6b00'] },
+  { k: 'proud', e: '🥇', t: 'فخورة بكِ', c: ['#ffe9a8', '#8a5a00'] },
+  { k: 'manners', e: '🌹', t: 'سلوك راقٍ', c: ['#ffd9e0', '#9d2a47'] }
+];
+const certOf = k => CERTS.find(c => c.k === k) || CERTS[0];
+const stkOf = k => STKS.find(s => s.k === k) || STKS[0];
+const hijri = iso => { try { return new Date(iso || Date.now()).toLocaleDateString('ar-SA-u-ca-islamic-umalqura', { day: 'numeric', month: 'long', year: 'numeric' }); } catch (e) { return ''; } };
+function certHtml(c, name, cls, reason, iso, pw) {
+  return `<div class="cs"${pw ? ` data-w="${pw}" style="width:${pw}px;height:${Math.round(pw * .7)}px"` : ''}><div class="cert" style="--a:${c.c[0]};--b:${c.c[1]};--p:${c.c[2]}"><div class="cb1"><div class="cb2">
+<i class="cn c1">✦</i><i class="cn c2">✦</i><i class="cn c3">✦</i><i class="cn c4">✦</i>
+<div class="c-bis">﷽</div><div class="c-tt">${esc(c.t)}</div><div class="c-sub">${esc(c.sub)}</div><div class="c-med">${c.ic}</div>
+<div class="c-to">تُمنح هذه الشهادة للطالبة</div><div class="c-nm">${esc(name)}</div><div class="c-cl">${esc(cls || '')}</div><div class="c-rs">${esc(reason)}</div>
+<div class="c-ft"><div><small>التاريخ</small><b>${esc(hijri(iso))}</b></div><div class="c-seal">${c.ic}</div><div><small>معلمة المادة</small><b>وداد محمد الكحيلي</b></div></div>
+</div></div></div></div>`;
+}
+const stkHtml = (s, big) => `<div class="stk${big ? ' big' : ''}" style="--s1:${s.c[0]};--s2:${s.c[1]}"><div class="si">${s.e}</div><div class="stx">${esc(s.t)}</div></div>`;
+function fitCerts() {
+  try {
+    document.querySelectorAll('.cs').forEach(e => {
+      const w = e.dataset.w ? +e.dataset.w : e.clientWidth, k = w / 1000; if (!k) return;
+      e.firstElementChild.style.transform = 'scale(' + k + ')'; e.style.height = Math.round(700 * k) + 'px';
+    });
+  } catch (e) { }
+}
+try { window.addEventListener('resize', fitCerts); } catch (e) { }
+function printAward(kind, design, name, cls, reason, iso) {
+  try {
+    const old = document.getElementById('pr'); if (old) old.remove();
+    const pr = document.createElement('div'); pr.id = 'pr';
+    pr.innerHTML = kind === 'cert' ? certHtml(certOf(design), name, cls, reason, iso, 1123)
+      : `<div class="sheet">${Array.from({ length: 12 }, () => stkHtml(stkOf(design), true)).join('')}</div>`;
+    document.body.appendChild(pr); fitCerts();
+    const st = document.createElement('style'); st.id = 'prs';
+    st.textContent = '@page{size:A4 ' + (kind === 'cert' ? 'landscape' : 'portrait') + ';margin:0}';
+    document.head.appendChild(st); document.body.classList.add('prn');
+    const clean = () => { document.body.classList.remove('prn'); const a = document.getElementById('pr'); if (a) a.remove(); const b = document.getElementById('prs'); if (b) b.remove(); window.onafterprint = null; };
+    window.onafterprint = clean; setTimeout(clean, 180000);
+    setTimeout(() => window.print(), 250);
+  } catch (e) { alert('تعذّرت الطباعة من هذا المتصفح'); }
+}
+function viewAward(id) {
+  const A = me && me.t ? (D.awards || []) : ((SV && SV.awards) || []); const a = A.find(x => x.id === id); if (!a) return;
+  const st = me.t ? D.students.find(s => s.id === a.student_id) : { name: SV.home.name, cls: SV.home.cls }; if (!st) return;
+  const reason = a.reason || certOf(a.design).reason;
+  const o = document.createElement('div');
+  o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:9;overflow:auto;padding:14px';
+  o.innerHTML = `<div class="card" style="max-width:900px;margin:0 auto">${a.kind === 'cert' ? certHtml(certOf(a.design), st.name, CN[st.cls], reason, a.created_at) : `<div style="display:flex;justify-content:center;padding:16px">${stkHtml(stkOf(a.design), true)}</div>`}<div class="row" style="margin-top:10px"><button id="vp">🖨 طباعة / حفظ PDF</button><button class="g" id="vc">إغلاق</button></div></div>`;
+  document.body.appendChild(o); fitCerts();
+  o.querySelector('#vc').onclick = () => o.remove();
+  o.querySelector('#vp').onclick = () => printAward(a.kind, a.design, st.name, CN[st.cls], reason, a.created_at);
+}
+function awardsCard() {
+  const A = (SV && SV.awards) || [], h = SV.home;
+  const certs = A.filter(a => a.kind === 'cert'), stk = A.filter(a => a.kind === 'sticker');
+  if (!A.length) return `<div class="card"><h2>🎖️ شهاداتي واستكراتي</h2><p class="mu">ستظهر هنا شهادات الشكر والاستكرات التي تهديكِ إياها معلمتكِ.</p></div>`;
+  return `<div class="card"><h2>🎖️ شهاداتي واستكراتي</h2><p class="mu">اضغطي على الشهادة لتكبيرها وطباعتها.</p>
+${certs.length ? `<div class="aw-grid">${certs.map(a => `<div class="aw-t" onclick="viewAward('${a.id}')">${certHtml(certOf(a.design), h.name, CN[h.cls], a.reason || certOf(a.design).reason, a.created_at)}<small>${esc(certOf(a.design).t)}</small></div>`).join('')}</div>` : ''}
+${stk.length ? `<div class="stk-row">${stk.map(a => `<div style="cursor:pointer" onclick="viewAward('${a.id}')">${stkHtml(stkOf(a.design))}</div>`).join('')}</div>` : ''}</div>`;
+}
+
+/* ---- تبويب المعلمة ---- */
+let AW = { sid: '', kind: 'cert', design: '', reason: null };
+async function loadAwards() {
+  const r = await sb.from('awards').select('*').order('created_at', { ascending: false }).limit(300);
+  D.awards = r.error ? [] : r.data; D.awardsErr = !!r.error;
+}
+function suggestFor(sid) {
+  if (!sid) return {};
+  const s = sum(sid), full = D.works.filter(w => { const g = G(sid, w.id); return g.score != null && +g.score >= +w.max_score; }).length;
+  return { cert: s.prog >= 90 ? 'excel' : full >= 1 ? 'thanks' : s.done ? 'effort' : 'part', stk: s.prog >= 90 ? 'star' : full >= 1 ? 'excel' : 'great' };
+}
+function awPick(k) { AW.design = k; AW.reason = null; app(); }
+function awKind(k) { AW.kind = k; AW.design = ''; AW.reason = null; app(); }
+function awardsTab() {
+  D.awards = D.awards || [];
+  const L = fs(); if (AW.sid && !L.some(s => s.id === AW.sid)) AW.sid = '';
+  const st = D.students.find(s => s.id === AW.sid), sg = suggestFor(AW.sid), isC = AW.kind === 'cert';
+  const list = isC ? CERTS : STKS;
+  if (!AW.design || !list.some(x => x.k === AW.design)) AW.design = (isC ? sg.cert : sg.stk) || list[0].k;
+  const name = st ? st.name : 'اسم الطالبة', cls = st ? CN[st.cls] : '';
+  const sgk = isC ? sg.cert : sg.stk, c = certOf(AW.design), reason = AW.reason == null ? c.reason : AW.reason;
+  const tile = d => `<div class="aw-t ${d.k === AW.design ? 'sel' : ''}" onclick="awPick('${d.k}')">${d.k === sgk ? '<span class="sg">💡 مقترح</span>' : ''}${isC ? certHtml(d, name, cls, d.reason, null) : stkHtml(d)}<small>${esc(isC ? d.t : d.t)}</small></div>`;
+  const rows = D.awards.slice(0, 80).map(a => { const s = D.students.find(x => x.id === a.student_id); return `<tr><td>${dt(a.created_at)}</td><td>${esc(s ? s.name : '')}</td><td>${a.kind === 'cert' ? '📜 ' + esc(certOf(a.design).t) : '⭐ ' + esc(stkOf(a.design).t)}</td><td><button class="g" onclick="viewAward('${a.id}')">عرض</button> <button class="d" onclick="delAward('${a.id}')">حذف</button></td></tr>`; }).join('');
+  return `<div class="card"><h2>🎖️ الشهادات واستكرات التعزيز</h2>${D.awardsErr ? '<p class="t-bad">لم تُجهَّز قاعدة البيانات لهذا القسم بعد: شغّلي ملف 04_awards.sql في Supabase.</p>' : ''}${clsSel()}
+<div class="row"><b>الطالبة:</b><select onchange="AW.sid=this.value;AW.design='';AW.reason=null;app()"><option value="">— اختاري الطالبة —</option>${L.map(s => `<option value="${s.id}" ${s.id === AW.sid ? 'selected' : ''}>${esc(s.name)}</option>`).join('')}</select></div>
+<div class="row"><button class="${isC ? '' : 'g'}" onclick="awKind('cert')">📜 شهادات شكر وتقدير</button><button class="${isC ? 'g' : ''}" onclick="awKind('sticker')">⭐ استكرات تعزيز</button></div>
+${st ? '<p class="mu">علامة «💡 مقترح» تُظهر ما يناسب مستوى الطالبة حسب درجاتها، ويمكنكِ اختيار غيره.</p>' : '<p class="mu">اختاري الطالبة ليظهر اسمها على التصاميم.</p>'}
+<div class="aw-grid ${isC ? '' : 'sk'}">${list.map(tile).join('')}</div></div>
+<div class="card"><h2>المعاينة</h2><div id="awp">${isC ? certHtml(c, name, cls, reason) : `<div style="display:flex;justify-content:center;padding:10px">${stkHtml(stkOf(AW.design), true)}</div>`}</div>
+${isC ? `<div class="row" style="margin-top:8px"><b>عبارة الشهادة:</b></div><textarea id="awr" rows="2" maxlength="110" style="width:100%;font:inherit" oninput="AW.reason=this.value;const e=document.querySelector('#awp .c-rs');if(e)e.textContent=this.value">${esc(reason)}</textarea>` : ''}
+<div class="row" style="margin-top:10px"><button onclick="giveAward()">🎁 إهداء للطالبة</button><button class="g" onclick="printCur()">🖨 طباعة / حفظ PDF</button></div></div>
+<div class="card"><h2>ما أُهدي للطالبات</h2>${rows ? `<div class="sc"><table><tr><th>التاريخ</th><th>الطالبة</th><th>الهدية</th><th></th></tr>${rows}</table></div>` : '<p class="mu">لم تُهدِ شيئاً بعد.</p>'}</div>`;
+}
+function curReason() { return AW.kind === 'cert' ? ((AW.reason == null ? certOf(AW.design).reason : AW.reason).trim().slice(0, 110)) : null; }
+async function giveAward() {
+  if (!AW.sid) return alert('اختاري الطالبة أولاً');
+  const r = await sb.from('awards').insert({ student_id: AW.sid, kind: AW.kind, design: AW.design, reason: curReason() }).select('*').single();
+  if (r.error) return alert('تعذّر الإهداء، تأكدي من تشغيل ملف 04_awards.sql في Supabase');
+  (D.awards = D.awards || []).unshift(r.data); toast('تم الإهداء، ستراها الطالبة في صفحتها ✓'); app();
+}
+function printCur() {
+  const st = D.students.find(s => s.id === AW.sid);
+  if (!st) return alert('اختاري الطالبة أولاً ليظهر اسمها على التصميم');
+  printAward(AW.kind, AW.design, st.name, CN[st.cls], curReason() || certOf(AW.design).reason, null);
+}
+function delAward(id) {
+  dlg('حذف هذه الهدية من صفحة الطالبة؟', null, async () => {
+    const r = await sb.from('awards').delete().eq('id', id);
+    if (r.error) return alert('تعذّر الحذف');
+    D.awards = D.awards.filter(a => a.id !== id); app();
+  });
 }
 
 /* ---------- الدردشة (المعلمة) ---------- */
@@ -695,7 +863,7 @@ function reportsTab() {
   const r = fs().map(s => ({ n: s.name, ...sum(s.id) })).filter(x => x.done);
   const av = r.length ? Math.round(r.reduce((a, x) => a + x.pct, 0) / r.length) : 0;
   const mx = r.slice().sort((a, b) => b.pct - a.pct), weak = r.filter(x => x.pct < 60);
-  return `${clsSel()}<div class="stats"><div class="st"><b>${av}%</b><span>متوسط الأعمال المرصودة</span></div><div class="st"><b>${mx[0] ? mx[0].pct + '%' : '-'}</b><span>الأعلى ${mx[0] ? esc(mx[0].n) : ''}</span></div><div class="st"><b>${mx.length ? mx[mx.length - 1].pct + '%' : '-'}</b><span>الأقل ${mx.length ? esc(mx[mx.length - 1].n) : ''}</span></div></div>
+  return `${clsSel()}<div class="stats"><div class="stx"><b>${av}%</b><span>متوسط الأعمال المرصودة</span></div><div class="st"><b>${mx[0] ? mx[0].pct + '%' : '-'}</b><span>الأعلى ${mx[0] ? esc(mx[0].n) : ''}</span></div><div class="st"><b>${mx.length ? mx[mx.length - 1].pct + '%' : '-'}</b><span>الأقل ${mx.length ? esc(mx[mx.length - 1].n) : ''}</span></div></div>
 <div class="card"><h2>الطالبات المتعثرات (أقل من 60%)</h2>${weak.map(x => `<div class="an">${esc(x.n)} · ${x.pct}%</div>`).join('') || '<p class="mu">لا توجد حالياً</p>'}</div>
 <div class="card"><h2>متوسط كل فصل</h2>${CL.map(c => { const a = D.students.filter(s => s.cls === c).map(s => sum(s.id)).filter(x => x.done); return `<div class="an">${CN[c]} · ${a.length ? Math.round(a.reduce((t, x) => t + x.pct, 0) / a.length) + '%' : 'لا توجد درجات'}</div>`; }).join('')}</div>
 <div class="card"><h2>تصدير</h2><button onclick="exp()">تصدير الدرجات (CSV يفتح في Excel)</button></div>`;
