@@ -345,14 +345,15 @@ function loginV() {
   const tgw = `<div class="tgw">${TG}</div>`;
   if (!sb) return hero + `<div class="card login"><p class="t-bad">الموقع غير مربوط بقاعدة البيانات بعد.</p><p class="mu">افتحي ملف index.html وضعي رابط مشروع Supabase والمفتاح العام في أول الملف (CFG).</p></div>` + img;
   return hero + `<div class="card login">${tm_ ? `<p class="mu" style="margin-top:0">دخول المعلمة</p>
-<div class="row"><div class="eyew"><input id="em" type="text" readonly onfocus="this.removeAttribute('readonly')" placeholder="البريد الإلكتروني" style="width:100%;-webkit-text-security:disc;text-security:disc" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" name="tem" data-lpignore="true" data-1p-ignore="true" data-form-type="other"><button type="button" class="eyeb" tabindex="-1" aria-label="إظهار" onclick="eyeT('em',this)">${EYE_H}</button></div></div>
-<div class="row"><div class="eyew"><input id="pw" type="text" readonly onfocus="this.removeAttribute('readonly')" name="tpw" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')loginT()" style="width:100%;-webkit-text-security:disc;text-security:disc" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"><button type="button" class="eyeb" tabindex="-1" aria-label="إظهار" onclick="eyeT('pw',this)">${EYE_H}</button></div></div>
-<button onclick="loginT()" style="width:100%" ${busy ? 'disabled' : ''}>دخول</button><p class="t-bad">${esc(msg)}</p>
+<form id="tf" onsubmit="event.preventDefault();loginT();return false">
+<div class="row"><div class="eyew"><input id="em" type="text" name="username" inputmode="email" placeholder="البريد الإلكتروني" style="width:100%;-webkit-text-security:disc;text-security:disc" autocomplete="username" autocapitalize="none" autocorrect="off" spellcheck="false"><button type="button" class="eyeb" tabindex="-1" aria-label="إظهار" onclick="eyeT('em',this)">${EYE_H}</button></div></div>
+<div class="row"><div class="eyew"><input id="pw" type="password" name="password" data-pw="1" placeholder="كلمة المرور" style="width:100%" autocomplete="current-password" autocapitalize="none" autocorrect="off" spellcheck="false"><button type="button" class="eyeb" tabindex="-1" aria-label="إظهار" onclick="eyeT('pw',this)">${EYE_H}</button></div></div>
+<button type="submit" style="width:100%" ${busy ? 'disabled' : ''}>دخول</button></form><p class="t-bad">${esc(msg)}</p>
 <button class="g" onclick="tm_=false;roleSet(false);msg='';app()">🎓 دخول الطالبات</button>` : `<p class="mu" style="margin-top:0">اكتبي اسمك كما في كشف الفصل ثم كلمة المرور.</p>
 <div class="row"><input id="u" type="text" readonly onfocus="this.removeAttribute('readonly')" name="sname" placeholder="اسم الطالبة بالعربية" style="width:100%" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"></div>
 <div class="row"><div class="eyew"><input id="pwS" type="text" readonly onfocus="this.removeAttribute('readonly')" name="spw" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')loginS()" style="width:100%;-webkit-text-security:disc;text-security:disc" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"><button type="button" class="eyeb" tabindex="-1" aria-label="إظهار" onclick="eyeT('pwS',this)">${EYE_H}</button></div></div>
 <button onclick="loginS()" style="width:100%" ${busy ? 'disabled' : ''}>دخول</button><p class="t-bad">${esc(msg)}</p>
-<button class="g" onclick="tm_=true;roleSet(true);msg='';app()">👩‍🏫 دخول المعلمة</button>`}</div><p class="mu" style="text-align:center;font-size:.7rem;opacity:.6">إصدار ٢٠٢٦.١١.١٤-ب</p>` + img;
+<button class="g" onclick="tm_=true;roleSet(true);msg='';app()">👩‍🏫 دخول المعلمة</button>`}</div><p class="mu" style="text-align:center;font-size:.7rem;opacity:.6">إصدار ٢٠٢٦.١١.١٤-د</p>` + img;
 }
 async function loginS() {
   const u = ($('u').value || '').trim(), p = ($('pwS').value || '').trim(); if (!u || busy) return;
@@ -378,8 +379,9 @@ async function loginS() {
 const EYE_H = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c2.6-4.6 6-6.8 10-6.8s7.4 2.2 10 6.8c-2.6 4.6-6 6.8-10 6.8S4.6 16.6 2 12z"/><circle cx="12" cy="12" r="3.2"/><path d="M4 20L20 4"/></svg>', EYE_O = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12c2.6-4.6 6-6.8 10-6.8s7.4 2.2 10 6.8c-2.6 4.6-6 6.8-10 6.8S4.6 16.6 2 12z"/><circle cx="12" cy="12" r="3.2"/></svg>';
 function eyeT(id, b) {
   const i = $(id); if (!i) return;
-  const show = i.style.webkitTextSecurity !== 'none';
-  i.style.webkitTextSecurity = show ? 'none' : 'disc'; i.style.textSecurity = show ? 'none' : 'disc';
+  let show;
+  if (i.dataset.pw) { show = i.type === 'password'; i.type = show ? 'text' : 'password'; }
+  else { show = i.style.webkitTextSecurity !== 'none'; i.style.webkitTextSecurity = show ? 'none' : 'disc'; i.style.textSecurity = show ? 'none' : 'disc'; }
   b.innerHTML = show ? EYE_O : EYE_H; b.setAttribute('aria-label', show ? 'إخفاء' : 'إظهار');
 }
 async function loginT() {
@@ -855,10 +857,62 @@ const PH = {
 };
 const LN = { a: 'ممتاز', b: 'جيد جداً', c: 'جيد', d: 'مقبول', e: 'يحتاج إلى تحسين' };
 const lvl = p => p >= 90 ? 'a' : p >= 80 ? 'b' : p >= 70 ? 'c' : p >= 60 ? 'd' : 'e';
+/* ---------- رصد جماعي من قائمة أسماء (مثل أسماء من رفعن عملاً في بادلت) ---------- */
+const nrm = t => (t || '').replace(/[ً-ْـ​-‏‪-‮]/g, '').replace(/[أإآٱ]/g, 'ا').replace(/ى/g, 'ي').replace(/ة/g, 'ه').replace(/ؤ/g, 'و').replace(/ئ/g, 'ي').replace(/[-_]/g, ' ').replace(/\s+/g, ' ').trim();
+let BK = { wid: '', score: '', text: '', over: false, res: null };
+function matchName(q) {
+  const qn = nrm(q); if (qn.length < 3) return { st: 'none' };
+  const nk = qn.replace(/ /g, ''), toks = qn.split(' ');
+  const N = s => s.name_norm || nrm(s.name);
+  let c = D.students.filter(s => N(s).replace(/ /g, '') === nk);
+  if (!c.length && toks.length >= 2) c = D.students.filter(s => N(s).replace(/ /g, '').startsWith(nk));
+  if (!c.length && toks.length >= 2) c = D.students.filter(s => { const w = N(s).split(' '); return toks.every(t => w.includes(t)); });
+  return c.length === 1 ? { st: 'ok', s: c[0] } : c.length > 1 ? { st: 'amb', n: c.length } : { st: 'none' };
+}
+function bulkOpen() {
+  BK = { wid: (D.works[0] || {}).id || '', score: '', text: '', over: false, res: null };
+  bulkDraw();
+}
+function bulkDraw() {
+  let o = $('bko'); if (!o) { o = document.createElement('div'); o.id = 'bko'; o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9;padding:16px'; document.body.appendChild(o); }
+  const r = BK.res;
+  o.innerHTML = `<div class="card" style="max-width:560px;width:100%;margin:0;max-height:92vh;overflow:auto"><h2 style="margin-top:0">📥 رصد جماعي من قائمة أسماء</h2>
+<p class="mu">انسخي أسماء الطالبات اللواتي رفعن عملهن (من بادلت أو غيره) والصقيها هنا، اسمًا في كل سطر. يمكن لصق عمود من ملف Excel أو تصدير بادلت، وسأطابق الأسماء مع كشف طالباتك.</p>
+<div class="row"><select id="bkw" style="flex:1">${D.works.map(w => `<option value="${w.id}" ${w.id === BK.wid ? 'selected' : ''}>${esc(w.title)} (من ${w.max_score})</option>`).join('')}</select><input id="bks" class="gi" type="number" min="0" step="0.5" placeholder="الدرجة" value="${esc(BK.score)}" style="width:90px"></div>
+<textarea id="bkt" rows="7" style="width:100%;font:inherit" placeholder="مريم محمد&#10;سارة أحمد&#10;...">${esc(BK.text)}</textarea>
+<label class="mu"><input type="checkbox" id="bko2" ${BK.over ? 'checked' : ''}> استبدال الدرجة الموجودة (وإلا أرصد فقط لمن لا درجة لها)</label>
+<div class="row" style="margin-top:8px"><button id="bkm">🔍 مطابقة الأسماء</button><button class="g" id="bkc">إغلاق</button></div>
+${r ? `<p><b class="t-ok">✔ ${r.ok.length} مطابقة</b>${r.amb.length ? ` · <b class="t-bad">⚠ ${r.amb.length} أسماء مكررة</b>` : ''}${r.none.length ? ` · <b class="t-bad">✖ ${r.none.length} لم تُطابق</b>` : ''}</p>
+${r.ok.length ? `<div class="mu" style="max-height:140px;overflow:auto">${r.ok.map(x => esc(x.name) + ' (' + esc(CN[x.cls] || '') + ')').join('، ')}</div>` : ''}
+${r.amb.length ? `<p class="t-bad">أسماء تنطبق على أكثر من طالبة (أكملي اسمها): ${r.amb.map(esc).join('، ')}</p>` : ''}
+${r.none.length ? `<p class="t-bad">لم أجد: ${r.none.map(esc).join('، ')}</p>` : ''}
+${r.ok.length ? `<button id="bka" style="width:100%">✔ رصد الدرجة لـ ${r.ok.length} طالبة</button>` : ''}` : ''}</div>`;
+  const keep = () => { BK.wid = $('bkw').value; BK.score = $('bks').value; BK.text = $('bkt').value; BK.over = $('bko2').checked; };
+  $('bkc').onclick = () => o.remove();
+  $('bkm').onclick = () => {
+    keep();
+    const lines = BK.text.split(/[\n\r\t,،;؛]+/).map(x => x.trim()).filter(Boolean);
+    const seen = new Set(), res = { ok: [], amb: [], none: [] };
+    lines.forEach(q => { const m = matchName(q); if (m.st === 'ok') { if (!seen.has(m.s.id)) { seen.add(m.s.id); res.ok.push(m.s); } } else if (m.st === 'amb') res.amb.push(q); else res.none.push(q); });
+    BK.res = res; bulkDraw();
+  };
+  const a = $('bka');
+  if (a) a.onclick = async () => {
+    keep();
+    const W = D.works.find(x => x.id === BK.wid); if (!W) return;
+    if (BK.score === '') return alert('اكتبي الدرجة أولًا');
+    const v = Math.max(0, Math.min(+W.max_score, +BK.score));
+    const rows = BK.res.ok.filter(s => BK.over || G(s.id, W.id).score == null).map(s => { const x = { student_id: s.id, work_id: W.id, score: v }; if (noteIsAuto(s.id, W.id)) x.note = autoNoteFor(s.id, W.id, v, +W.max_score); return x; });
+    const skipped = BK.res.ok.length - rows.length;
+    if (!rows.length) return alert('كل هؤلاء الطالبات لديهن درجة سابقة. فعّلي «استبدال الدرجة الموجودة» إن أردتِ تغييرها.');
+    if (await saveRows(rows)) { o.remove(); toast('رُصدت الدرجة لـ ' + rows.length + ' طالبة' + (skipped ? ' (تجاوزتُ ' + skipped + ' لديهن درجة)' : '') + ' ✓'); app(); }
+  };
+}
 function gradesTab() {
+
   const L = fs();
   return `<div class="card reg"><div class="rh"><span>﷽</span><h2>سجل المتابعة</h2><span>${clsLabel()}</span></div><div class="rb">${clsSel()}
-<p class="mu">اكتبي الدرجة وتُحفظ تلقائياً. لتعبئة عمود كامل: اكتبي الدرجة في «للكل» ثم اضغطي ⬇ (أو اتركيها فارغة لنسخ درجة أول طالبة). <label><input type="checkbox" ${fo ? 'checked' : ''} onchange="fo=this.checked"> استبدال الدرجات الموجودة</label></p>
+<p><button onclick="bulkOpen()">📥 رصد جماعي من قائمة أسماء</button></p><p class="mu">اكتبي الدرجة وتُحفظ تلقائياً. لتعبئة عمود كامل: اكتبي الدرجة في «للكل» ثم اضغطي ⬇ (أو اتركيها فارغة لنسخ درجة أول طالبة). <label><input type="checkbox" ${fo ? 'checked' : ''} onchange="fo=this.checked"> استبدال الدرجات الموجودة</label></p>
 <div class="sc"><table><tr><th>م</th><th>الطالبة</th>${D.works.map(w => `<th>${esc(w.title)}<br><span class="mu">من ${w.max_score}</span></th>`).join('')}</tr>
 <tr><td></td><td></td>${D.works.map(w => `<td><input class="gi" id="f_${w.id}" placeholder="للكل"> <button onclick="fillCol('${w.id}')">⬇</button> <button class="d" title="حذف درجات العمود" onclick="clearCol('${w.id}')">🗑</button> <button class="g" title="عبارات تعزيز تلقائية حسب الدرجة" onclick="autoNotes('${w.id}')">💬</button></td>`).join('')}</tr>
 ${L.map((s, i) => `<tr><td>${i + 1}</td><td>${nmLink(s)} <span style="cursor:pointer" title="ملف الطالبة" onclick="showAch('${s.id}')">📂</span></td>${D.works.map(w => { const g = G(s.id, w.id); return `<td><input class="gi" type="number" min="0" max="${w.max_score}" step="0.5" value="${g.score ?? ''}" onchange="setG('${s.id}','${w.id}',this)"> <span onclick="noteDlg('${s.id}','${w.id}')" style="cursor:pointer" title="${esc(g.note || '')}">${g.note ? '📝' : '✏️'}</span></td>`; }).join('')}</tr>`).join('')}</table></div></div></div>`;
@@ -1010,7 +1064,7 @@ function delS(id) {
 /* ---------- الأعمال ---------- */
 function worksTab() {
   return `<div class="card"><h2>الأعمال</h2><div class="row"><input id="wt" placeholder="اسم العمل"><select id="wy"><option>واجب</option><option>اختبار قصير</option><option>اختبار نهائي</option><option>مشاركة</option><option>تصميم</option><option>مشروع</option></select><input id="wm" type="number" placeholder="الدرجة" style="width:90px"><input id="ww" type="number" placeholder="الوزن" style="width:80px"><input id="wd" type="date"><input id="wh" placeholder="الموعد هجري (اختياري)" style="width:170px"><button onclick="addW()">إضافة</button></div>
-<div class="sc"><table><tr><th>العمل</th><th>النوع</th><th>الدرجة</th><th>الوزن</th><th>الموعد</th><th></th></tr>${D.works.map(w => `<tr><td>${esc(w.title)}</td><td>${esc(w.kind)}</td><td>${w.max_score}</td><td>${w.weight}</td><td>${esc(w.due_hijri || w.due || '')}</td><td><button class="d" onclick="delW('${w.id}')">حذف</button></td></tr>`).join('')}</table></div>
+<div class="sc"><table><tr><th>العمل</th><th>النوع</th><th>الدرجة</th><th>الوزن</th><th>الموعد</th><th></th></tr>${D.works.map(w => `<tr><td>${esc(w.title)}</td><td>${esc(w.kind)}</td><td>${w.max_score}</td><td>${w.weight}</td><td>${esc(w.due_hijri || w.due || '')}</td><td style="white-space:nowrap"><button class="g" onclick="editW('${w.id}')">✏️ تعديل</button> <button class="d" onclick="delW('${w.id}')">حذف</button></td></tr>`).join('')}</table></div>
 <p class="mu">نسبة تقدم الطالبة تُحسب من مجموع أوزان الأعمال، فاجعلي مجموع الأوزان 100.</p></div>`;
 }
 async function addW() {
@@ -1020,6 +1074,33 @@ async function addW() {
   const r = await sb.from('works').insert({ title, kind: $('wy').value, max_score: max, weight, due: $('wd').value || null, due_hijri: $('wh').value.trim() || null, sort_order: so }).select().single();
   if (r.error) return alert('تعذّرت الإضافة');
   D.works.push(r.data); app();
+}
+function editW(id) {
+  const w = D.works.find(x => x.id === id); if (!w) return;
+  const kinds = ['واجب', 'اختبار قصير', 'اختبار نهائي', 'مشاركة', 'تصميم', 'مشروع'];
+  if (!kinds.includes(w.kind)) kinds.push(w.kind);
+  const o = document.createElement('div');
+  o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:9;padding:16px';
+  o.innerHTML = `<div class="card" style="max-width:440px;width:100%;margin:0;max-height:92vh;overflow:auto"><h2 style="margin-top:0">✏️ تعديل العمل</h2>
+<label class="mu">اسم العمل</label><input id="et" style="width:100%;margin-bottom:6px" value="${esc(w.title)}">
+<div class="row"><div style="flex:1"><label class="mu">النوع</label><select id="ey" style="width:100%">${kinds.map(k => `<option ${k === w.kind ? 'selected' : ''}>${esc(k)}</option>`).join('')}</select></div>
+<div style="width:90px"><label class="mu">الدرجة</label><input id="em2" type="number" min="1" step="0.5" style="width:100%" value="${w.max_score}"></div>
+<div style="width:90px"><label class="mu">الوزن</label><input id="ew" type="number" min="0" step="0.5" style="width:100%" value="${w.weight}"></div></div>
+<div class="row"><div style="flex:1"><label class="mu">الموعد</label><input id="ed" type="date" style="width:100%" value="${w.due || ''}"></div>
+<div style="flex:1"><label class="mu">الموعد هجري (اختياري)</label><input id="eh" style="width:100%" value="${esc(w.due_hijri || '')}"></div></div>
+<div class="row" style="margin-top:8px"><button id="eok">حفظ التعديل</button><button class="g" id="eno">إلغاء</button></div></div>`;
+  document.body.appendChild(o);
+  $('eno').onclick = () => o.remove();
+  $('eok').onclick = async () => {
+    const title = $('et').value.trim(), max = +$('em2').value, weight = +$('ew').value;
+    if (!title || !max) return alert('أدخلي اسم العمل والدرجة');
+    const top = Object.keys(GM).filter(k => k.endsWith('|' + id)).reduce((a, k) => Math.max(a, +(GM[k].score ?? 0)), 0);
+    if (max < top) return alert('لا يمكن جعل الدرجة ' + max + ' لأن هناك طالبة حصلت على ' + top + '. عدّلي أو احذفي تلك الدرجة أولًا.');
+    const patch = { title, kind: $('ey').value, max_score: max, weight: isNaN(weight) ? max : weight, due: $('ed').value || null, due_hijri: $('eh').value.trim() || null };
+    const r = await sb.from('works').update(patch).eq('id', id).select().single();
+    if (r.error) return alert('تعذّر حفظ التعديل');
+    Object.assign(w, r.data); o.remove(); toast('تم تعديل العمل ✓'); app();
+  };
 }
 function delW(id) {
   dlg('حذف العمل ودرجاته؟', null, async () => {
