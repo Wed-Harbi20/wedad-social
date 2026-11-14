@@ -432,7 +432,7 @@ async function loadStudent() {
     sb.rpc('chat_get', { p_token: me.token }),
     sb.rpc('ach_list', { p_token: me.token }),
     sb.rpc('awards_list', { p_token: me.token }),
-    sb.rpc('leaderboard', { p_token: me.token })]);
+    sb.rpc('board_leaderboard', { p_token: me.token })]);
   if (h.error || !h.data || h.data.error) { localStorage.removeItem('stu'); return false; }
   SV = { home: h.data, chat: (c.data && !c.data.error) ? c.data : null, ach: (a.data && !a.data.error) ? a.data : [], awards: (aw && Array.isArray(aw.data)) ? aw.data : [], lb: (lb && lb.data && !lb.data.error) ? lb.data : null };
   return true;
@@ -614,13 +614,14 @@ async function fetchAll(t, cols, orders) {
   return out;
 }
 async function loadTeacher() {
-  const [students, works, grades, ann, rooms] = await Promise.all([
+  const [students, works, grades, ann, rooms, bp] = await Promise.all([
     fetchAll('students', 'id,num,name,cls', ['cls', 'num']),
     fetchAll('works', '*', ['sort_order']),
     fetchAll('grades', 'student_id,work_id,score,note', ['student_id', 'work_id']),
     sb.from('announcements').select('*').order('id', { ascending: false }).then(r => { if (r.error) throw r.error; return r.data; }),
-    sb.from('chat_rooms').select('*').then(r => { if (r.error) throw r.error; return r.data; })]);
-  D = { students, works, ann, rooms: Object.fromEntries(rooms.map(r => [r.stage, r])) };
+    sb.from('chat_rooms').select('*').then(r => { if (r.error) throw r.error; return r.data; }),
+    sb.from('board_points').select('student_id,pts').then(r => r.error ? null : r.data)]);
+  D = { students, works, ann, rooms: Object.fromEntries(rooms.map(r => [r.stage, r])), bp: bp ? new Map(bp.map(x => [x.student_id, +x.pts || 0])) : null };
   GM = {}; grades.forEach(g => GM[g.student_id + '|' + g.work_id] = g);
   await loadTeacherChat();
 }
@@ -796,13 +797,14 @@ function boardCard() {
   return `<div class="card"><h2>🏆 المتصدرات في ${stName(b.stage)}</h2>${rows ? `<div class="lb">${rows}</div>` : '<p class="mu">لم تُرصد نقاط بعد، كوني أول المتصدرات!</p>'}${mine}</div>`;
 }
 function topOfStage(st, n) {
-  const L = D.students.filter(s => stageOf(s.cls) === st).map(s => ({ s, p: sum(s.id) })).filter(x => x.p.sc > 0);
+  const bp = D.bp || new Map();
+  const L = D.students.filter(s => stageOf(s.cls) === st).map(s => ({ s, p: { sc: bp.get(s.id) || 0 } })).filter(x => x.p.sc > 0);
   L.sort((a, b) => b.p.sc - a.p.sc || a.s.name.localeCompare(b.s.name, 'ar'));
   let rk = 0, last = null;
   return L.map((x, i) => { if (x.p.sc !== last) { rk = i + 1; last = x.p.sc; } return Object.assign({ rk }, x); }).filter(x => x.rk <= n);
 }
 function boardTab() {
-  return `<div class="card"><h2>🏆 أعلى النقاط</h2><p class="mu">النقاط = مجموع الدرجات التي حصلت عليها الطالبة في الأعمال. تُعرض أعلى ١٠ في كل صف (وتشمل المتعادلات).</p></div>` +
+  return `<div class="card"><h2>🏆 أعلى النقاط</h2><p class="mu">النقاط = نقاط لوحة التعزيز ⭐ (منفصلة عن الدرجات). تُعرض أعلى ١٠ في كل صف (وتشمل المتعادلات).</p>${D.bp ? '' : '<p class="t-bad">لم يُجهَّز هذا القسم بعد: شغّلي ملف 05_board_points.sql في Supabase.</p>'}</div>` +
     STG.map(([st, nm]) => {
       const L = topOfStage(st, 10);
       return `<div class="card"><h2>${nm}</h2>${L.length ? `<div class="lb">${L.map(x => `<div class="lb-r"><span class="lb-n">${MEDAL(x.rk) || x.rk}</span><span class="lb-nm">${nmLink(x.s)} <small class="mu">${CN[x.s.cls]}</small></span><b>${fmtN(x.p.sc)}</b></div>`).join('')}</div>` : '<p class="mu">لا توجد نقاط مرصودة بعد.</p>'}</div>`;

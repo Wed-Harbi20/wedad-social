@@ -6,7 +6,7 @@
 <title>لوحة التعزيز | الدراسات الاجتماعية</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;500;600;700&family=Tajawal:wght@400;500;700;800&family=Amiri:wght@400;700&family=Aref+Ruqaa:wght@400;700&family=Lalezar&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#f5f4fa; --surface:#ffffff; --line:#e9e6f2; --ink:#1e1537; --muted:#6f6888; --soft:#f8f7fc;
@@ -191,6 +191,15 @@ textarea.inp{height:170px;padding:10px 12px;line-height:1.8;resize:vertical}
 /* المجموعات */
 .groups{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:18px}
 .grp{border-radius:18px;border:1px solid var(--line);overflow:hidden;background:#fff;animation:pop .35s}
+.cs{position:relative;width:100%;overflow:hidden;border-radius:6px}
+.cert{position:absolute;top:0;right:0;transform-origin:top right;direction:rtl;overflow:hidden}
+.gift-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-top:10px}
+.gift-grid.cg{grid-template-columns:repeat(auto-fill,minmax(190px,1fr))}
+.gt{border:2px solid var(--line);border-radius:12px;padding:5px;cursor:pointer;background:#fff;text-align:center;position:relative}
+.gt.sel{border-color:#b08a3e;box-shadow:0 0 0 3px rgba(176,138,62,.35)}
+.gt small{display:block;font-size:12px;font-weight:700;margin-top:4px}
+.gt .sg{position:absolute;top:6px;left:6px;z-index:2;background:#e8b94a;color:#4a2e1a;border-radius:99px;padding:1px 8px;font-size:11px;font-weight:800}
+#mGift{z-index:88}
 .grp .gh{padding:12px 14px;color:#fff;display:flex;align-items:center;gap:8px}
 .grp .gh b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:'Readex Pro';font-size:16px;margin-inline-end:auto}
 .grp .gh button{white-space:nowrap;border:none;background:rgba(255,255,255,.25);color:#fff;border-radius:9px;padding:5px 10px;font-weight:700;font-size:13px}
@@ -346,7 +355,7 @@ body.show .layout,body.show .tools,body.show .classbar,body.show .topbar .in{max
 
   <aside class="side">
     <div class="panel">
-      <div class="ph"><h2 id="podT">👑 نجمات الصف</h2></div>
+      <div class="ph"><h2 id="podT">👑 نجمات الصف</h2><button class="ibtn hide-show" style="height:34px;font-size:13px;padding:0 10px" onclick="openCerts()">🎖️ شهادات الشكر</button></div>
       <div id="podium"></div>
     </div>
     <div class="panel">
@@ -386,6 +395,34 @@ body.show .layout,body.show .tools,body.show .classbar,body.show .topbar .in{max
   </div>
   <div class="qz-body" id="qzBody"></div>
 </div>
+
+<!-- ===== اقتراح هدية تلقائي ===== -->
+<div class="modal" id="mGift"><div class="box wide">
+  <div class="bh"><div class="who" id="gfWho"></div><span class="note" id="gfQ" style="margin:0"></span><button class="x" onclick="giftNo()">×</button></div>
+  <div class="bb">
+    <div style="font-family:'Readex Pro';font-size:19px;font-weight:600;text-align:center" id="gfAsk"></div>
+    <div class="row" style="justify-content:center;margin-top:12px">
+      <button class="ibtn pri big" id="gfYes" onclick="giftYes()">✅ نعم، أرسليها لحسابها</button>
+      <button class="ibtn big" onclick="giftNo()">لا</button>
+    </div>
+    <div class="msg" id="gfMsg" style="text-align:center"></div>
+    <div class="ktabs" style="max-width:420px;margin:14px auto 0"><button id="gfK1" onclick="giftKind('cert')">📜 شهادة</button><button id="gfK0" onclick="giftKind('sticker')">🏷 استكر تعزيز</button></div>
+    <div id="gfPrev" style="margin:12px auto 0"></div>
+    <div class="gift-grid" id="gfList"></div>
+    <label style="display:flex;gap:8px;align-items:center;justify-content:center;font-weight:700;font-size:13.5px;margin-top:10px;color:var(--muted)"><input type="checkbox" id="gfOff" style="width:16px;height:16px;accent-color:var(--pri)"> إيقاف هذه الاقتراحات اليوم</label>
+  </div>
+</div></div>
+
+<!-- ===== شهادات المتصدرات ===== -->
+<div class="modal" id="mCert"><div class="box">
+  <div class="bh"><h3>🎖️ شهادة شكر للمتصدرات</h3><button class="x" onclick="closeM('mCert')">×</button></div>
+  <div class="bb">
+    <div class="note" style="margin:0 0 12px">تُرسل «شهادة شكر» إلى حساب الطالبة الأعلى نقاطًا في كل صف (والمتعادلات معها)، فتظهر في «🎖️ شهاداتي» بصفحتها في المنصة، وفي تبويب الشهادات عندك. لا تُكرَّر للطالبة نفسها في اليوم نفسه.</div>
+    <div id="certList"></div>
+    <div class="row"><button class="ibtn pri" id="certGo" onclick="goCerts()">🎁 إرسال الشهادات</button><button class="ibtn" onclick="closeM('mCert')">إغلاق</button></div>
+    <div class="msg" id="certMsg"></div>
+  </div>
+</div></div>
 
 <!-- ===== التحضير ===== -->
 <div class="modal" id="mAtt"><div class="box wide">
@@ -487,6 +524,13 @@ body.show .layout,body.show .tools,body.show .classbar,body.show .topbar .in{max
       <div class="row"><button class="ibtn" onclick="loadPlatform(true).then(syncStatus)">🔄 تحديث الاتصال</button></div>
       <div class="msg" id="syncMsg"></div>
     </div>
+    <div class="sec" style="border-color:#fde68a">
+      <h4>🏆 المتصدرات في المنصة</h4>
+      <div class="note">مع كل تعزيز تُحدَّث نقاط الطالبة في «🏆 المتصدرات» بالمنصة (للمعلمة والطالبات). نقاط اللوحة منفصلة تمامًا عن الدرجات؛ ما يُضاف للدرجات هو درجة المشاركة فقط.</div>
+      <label style="display:flex;gap:8px;align-items:center;font-weight:700;margin-top:10px"><input type="checkbox" id="ptsC" onchange="S.syncPts=this.checked;save()" style="width:18px;height:18px;accent-color:var(--pri)"> تحديث المتصدرات تلقائيًا</label>
+      <div class="row"><button class="ibtn" onclick="syncAllPoints(this)">🔄 مزامنة كل النقاط الآن</button></div>
+      <div class="msg" id="ptsMsg"></div>
+    </div>
     <div class="sec">
       <h4>✍️ لصق الأسماء يدويًا</h4>
       <label class="lbl">الفصل</label><select class="inp" id="pc" onchange="fillPaste()"></select>
@@ -504,7 +548,8 @@ body.show .layout,body.show .tools,body.show .classbar,body.show .topbar .in{max
     </div>
     <div class="sec" style="border-color:#fecaca">
       <h4>🔄 تصفير الأسبوع</h4>
-      <div class="note">تُصفَّر النقاط وسجل التعزيزات، وتبقى الأسماء.</div>
+      <div class="note">تُصفَّر النقاط وسجل التعزيزات (وفي المنصة أيضًا)، وتبقى الأسماء.</div>
+      <label style="display:flex;gap:8px;align-items:center;font-weight:700;margin-top:10px"><input type="checkbox" id="certR" onchange="S.certReset=this.checked;save()" style="width:18px;height:18px;accent-color:var(--pri)"> 🎖️ إرسال شهادة شكر لمتصدرات الأسبوع قبل التصفير</label>
       <div class="row"><button class="ibtn" id="r1" onclick="askReset('cur',this)">تصفير الفصل الحالي</button><button class="ibtn" id="r2" onclick="askReset('all',this)">تصفير جميع الفصول</button></div>
     </div>
   </div>
@@ -862,7 +907,7 @@ const nextLvl = p => LEVELS.find(l => Math.max(0, p) < l.n);
 const ptsWord = n => { n = Math.abs(n); return n === 1 ? 'نقطة' : n === 2 ? 'نقطتان' : ar(n) + (n <= 10 ? ' نقاط' : ' نقطة'); };
 
 /* ======================= الحفظ ======================= */
-let S = { cur:1, sort:'name', sound:true, sync:true, syncWork:'', voice:true, tTick:true, tVoice:true, lastPhrase:'', cls:{}, log:{}, goal:{}, picked:{} };
+let S = { cur:1, sort:'name', sound:true, syncPts:true, certReset:true, sync:true, syncWork:'', voice:true, tTick:true, tVoice:true, lastPhrase:'', cls:{}, log:{}, goal:{}, picked:{} };
 try {
   const raw = localStorage.getItem(KEY);
   if (raw) S = Object.assign(S, JSON.parse(raw));
@@ -871,7 +916,8 @@ try {
 for (const c in CLASSES) {
   if (!Array.isArray(S.cls[c])) S.cls[c] = [];
   if (!Array.isArray(S.log[c])) S.log[c] = [];
-  if (!S.goal[c]) S.goal[c] = { target:200, reward:'حصة نشاط ممتعة 🎉' };
+  if (!S.goal[c]) S.goal[c] = { target:200, reward:'حصة دراسية ممتعة 🎉' };
+  if (/حصة نشاط ممتعة/.test(S.goal[c].reward)) S.goal[c].reward = S.goal[c].reward.replace('حصة نشاط ممتعة', 'حصة دراسية ممتعة');
   if (!Array.isArray(S.picked[c])) S.picked[c] = [];
 }
 if (!S.att) S.att = {};
@@ -1057,11 +1103,13 @@ function randPhrase(){ let p; do { p = PHRASES[Math.floor(Math.random() * PHRASE
 function give(k, j){
   const b = (k ? POS : NEG)[j], list = L(); let up = null;
   const phrase = b.p > 0 ? randPhrase() : IMPROVE[Math.floor(Math.random() * IMPROVE.length)];
+  const leadersBefore = new Set(topsOf(STAGES[stageOf(S.cur)].c).map(t => t.c + '|' + t.name)), ups = [];
   for (const i of targets) {
     const s = list[i], before = lvl(s.pts);
     s.pts += b.p; if (b.p > 0) s.phrase = phrase;
-    const after = lvl(s.pts); if (b.p > 0 && after.n > before.n) up = after;
+    const after = lvl(s.pts); if (b.p > 0 && after.n > before.n) { up = after; ups.push({ s, lv:after }); }
   }
+  if (b.p > 0) giftCheck(S.cur, targets, ups, leadersBefore);
   const name = targets.length === 1 ? list[targets[0]].name : targets.length === presentIdx().length && targets.length > 1 ? 'الفصل كاملاً' : `${ar(targets.length)} طالبات`;
   S.log[S.cur].unshift({ n:name, b:b.t, p:b.p, t:Date.now() }); S.log[S.cur] = S.log[S.cur].slice(0, 60);
   save(); closeM('mAward');
@@ -1078,7 +1126,7 @@ function give(k, j){
   } else { sad(); speak((targets.length === 1 ? firstName(list[targets[0]].name) + '، ' : '') + phrase, { delay:150, pitch:1 }); }
   showToast(targets.length === 1 ? list[targets[0]].name : null, name, phrase, b, up);
   $('tS').textContent = '';
-  if (b.p > 0 && S.sync) syncParticipation(targets.map(i => list[i].name), S.cur);
+  platformAfter(targets.map(i => list[i].name), S.cur, b.p > 0);
 }
 let tT;
 function showToast(nm, name, phrase, b, up){
@@ -1407,7 +1455,7 @@ function openSettings(){
   $('gTarget').value = S.goal[S.cur].target; $('gReward').value = S.goal[S.cur].reward;
   ['r1','r2'].forEach(i => { $(i).dataset.ok = ''; $(i).style.cssText = ''; });
   $('r1').textContent = 'تصفير الفصل الحالي'; $('r2').textContent = 'تصفير جميع الفصول';
-  $('syncC').checked = !!S.sync; syncStatus();
+  $('syncC').checked = !!S.sync; $('ptsC').checked = !!S.syncPts; $('certR').checked = S.certReset !== false; $('ptsMsg').textContent = ''; syncStatus();
   openM('mSet');
 }
 function fillPaste(){ $('pt').value = S.cls[$('pc').value].map(s => s.name).join('\n'); }
@@ -1424,11 +1472,19 @@ function saveGoal(){
   S.goal[S.cur] = { target:Math.max(10, +$('gTarget').value || 200), reward:$('gReward').value.trim() || 'مكافأة للفصل 🎉' }; save(); render();
   $('gMsg').className = 'msg ok'; $('gMsg').textContent = '✔️ تم حفظ هدف ' + CLASSES[S.cur];
 }
-function askReset(which, btn){
+async function askReset(which, btn){
   if (!btn.dataset.ok) { btn.dataset.ok = '1'; btn.textContent = '⚠️ اضغطي مرة ثانية للتأكيد'; btn.style.cssText = 'background:var(--red);color:#fff;border-color:var(--red)'; return; }
   const list = which === 'all' ? Object.keys(CLASSES) : [S.cur];
+  const plan = $('certR').checked ? certPlan(which === 'all' ? 'all' : S.cur) : [];
+  btn.textContent = '⏳ جاري…'; btn.disabled = true;
+  let note = '';
+  if (plan.length) { try { note = certMsg(await sendCerts(plan)); } catch(e) { note = '⚠️ لم تُرسل الشهادات: ' + (e.message === 'awards' ? 'قسم الشهادات غير مُجهّز' : platErr(e)); } }
   for (const c of list) { S.cls[c].forEach(s => { s.pts = 0; s.phrase = ''; }); S.log[c] = []; S.picked[c] = []; }
-  save(); render(); closeM('mSet');
+  save(); render();
+  if (S.syncPts) { try { for (const c of list) await syncPoints(S.cls[c].map(x => x.name), c); } catch(e) { note += (note ? ' · ' : '') + '⚠️ لم تُصفَّر نقاط المنصة: ' + platErr(e); } }
+  btn.disabled = false; closeM('mSet');
+  if (note) { $('tN').textContent = 'تصفير الأسبوع'; $('tP').textContent = ''; $('tB').className = 'tb g'; $('tB').textContent = '🔄 بدأ أسبوع جديد'; $('tL').textContent = ''; $('tS').textContent = note;
+    const t = $('toast'); t.classList.add('on'); clearTimeout(tT); tT = setTimeout(() => t.classList.remove('on'), 6000); }
 }
 function parseCSV(t){
   const rows = [], re = /("([^"]|"")*"|[^,\r\n]*)(,|\r?\n|$)/g; let row = [], m;
@@ -1483,7 +1539,7 @@ async function loadPlatform(force){
   const key = (c, n) => c + '|' + String(n).replace(/\s+/g, ' ').trim();
   PD = { works: wk.data, ids: new Map(st.data.map(x => [key(x.cls, x.name), x.id])), key };
   if (!PD.works.some(w => w.id === S.syncWork)) {
-    const w = PD.works.find(w => w.kind === 'مشاركة') || PD.works.find(w => /مشارك/.test(w.title));
+    const w = PD.works.find(w => w.kind === 'مشاركة' && w.title !== PTS_TITLE) || PD.works.find(w => /مشارك/.test(w.title) && w.title !== PTS_TITLE);
     S.syncWork = w ? w.id : ''; save();
   }
   return PD;
@@ -1500,7 +1556,7 @@ async function syncStatus(){
   m.className = 'msg'; m.textContent = '⏳ جاري التحقق من المنصة...';
   try {
     const d = await loadPlatform();
-    const cand = d.works.filter(w => w.kind === 'مشاركة' || /مشارك/.test(w.title));
+    const cand = d.works.filter(w => (w.kind === 'مشاركة' || /مشارك/.test(w.title)) && w.title !== PTS_TITLE);
     const list = cand.length ? cand : d.works;
     sel.innerHTML = (S.syncWork ? '' : '<option value="">— اختاري العمل —</option>') + list.map(w => `<option value="${w.id}" ${w.id === S.syncWork ? 'selected' : ''}>${esc(w.title)} (من ${w.max_score})</option>`).join('');
     if (!d.works.length) { m.className = 'msg bad'; m.textContent = 'لا توجد أعمال في المنصة. أضيفي عملًا من نوع «مشاركة» من تبويب الأعمال.'; return; }
@@ -1534,6 +1590,155 @@ async function syncParticipation(names, cls){
     if (missing.length) txt += ` · ⚠️ ${ar(missing.length)} غير موجودة بالمنصة`;
     out.textContent = txt;
   } catch(e) { out.textContent = '⚠️ ' + platErr(e); }
+}
+/* ===== نقاط اللوحة ← المتصدرات في المنصة (جدول board_points، منفصل عن الدرجات) ===== */
+const PTS_TITLE = 'نقاط لوحة التعزيز ⭐';
+async function syncPoints(names, cls){
+  const d = await loadPlatform(), sb = await platformClient(), rows = [], now = new Date().toISOString();
+  for (const n of names) {
+    const id = d.ids.get(d.key(cls, n)), st = S.cls[cls].find(x => x.name === n);
+    if (id && st) rows.push({ student_id:id, pts:Math.max(0, st.pts), updated_at:now });
+  }
+  if (rows.length) { const r = await sb.from('board_points').upsert(rows, { onConflict:'student_id' }); if (r.error) throw new Error(/board_points|relation|schema cache|42P01|PGRST205/i.test((r.error.message || '') + (r.error.code || '')) ? 'ptstable' : (r.error.message || 'err')); }
+  return rows.length;
+}
+async function platformAfter(names, cls, positive){
+  const out = $('tS');
+  if (positive && S.sync) await syncParticipation(names, cls);
+  if (!S.syncPts) return;
+  try { const n = await syncPoints(names, cls); if (n) out.textContent += (out.textContent ? ' · ' : '') + '🏆 تحدّثت المتصدرات في المنصة'; }
+  catch(e) { out.textContent += (out.textContent ? ' · ' : '') + '⚠️ ' + (e.message === 'ptstable' ? 'شغّلي ملف 05_board_points.sql في Supabase لتظهر المتصدرات' : platErr(e)); }
+}
+async function syncAllPoints(btn){
+  const m = $('ptsMsg'); m.className = 'msg'; m.textContent = '⏳ جاري المزامنة...';
+  try { let n = 0; for (const c in CLASSES) n += await syncPoints(S.cls[c].map(x => x.name), c); m.className = 'msg ok'; m.textContent = `✔️ تمت مزامنة نقاط ${ar(n)} طالبة مع المتصدرات في المنصة`; }
+  catch(e) { m.className = 'msg bad'; m.textContent = e.message === 'ptstable' ? 'لم يُجهَّز جدول المتصدرات بعد: شغّلي ملف 05_board_points.sql في Supabase ثم أعيدي المحاولة.' : platErr(e); }
+}
+
+/* ===== شهادات الشكر للمتصدرات ===== */
+function topsOf(classes){
+  const all = classes.flatMap(c => S.cls[c].map(s => ({ name:s.name, pts:s.pts, c })));
+  const max = Math.max(0, ...all.map(s => s.pts));
+  return max > 0 ? all.filter(s => s.pts === max) : [];
+}
+function certPlan(scope){
+  // scope: 'all' = متصدرات كل صف، أو رقم فصل = متصدرات ذلك الفصل
+  if (scope === 'all') return Object.entries(STAGES).map(([g, st]) => ({ label:'الصف ' + st.t, tops:topsOf(st.c) })).filter(x => x.tops.length);
+  return [{ label:'فصل ' + CLASSES[scope], tops:topsOf([scope]) }].filter(x => x.tops.length);
+}
+async function sendCerts(plan){
+  const d = await loadPlatform(), sb = await platformClient();
+  const want = plan.flatMap(p => p.tops).map(t => ({ t, id:d.ids.get(d.key(t.c, t.name)) }));
+  const ids = want.filter(x => x.id).map(x => x.id);
+  if (!ids.length) return { sent:[], skipped:[], missing:want.map(x => x.t.name) };
+  const since = new Date(); since.setHours(0,0,0,0);
+  const ex = await sb.from('awards').select('student_id').eq('kind','cert').eq('design','shukr').in('student_id', ids).gte('created_at', since.toISOString());
+  if (ex.error) throw new Error('awards');
+  const done = new Set(ex.data.map(x => x.student_id));
+  const rows = [...new Set(ids)].filter(id => !done.has(id)).map(id => ({ student_id:id, kind:'cert', design:'shukr', reason:null }));
+  if (rows.length) { const r = await sb.from('awards').insert(rows); if (r.error) throw new Error('awards'); }
+  const byId = new Map(want.filter(x => x.id).map(x => [x.id, x.t.name]));
+  return { sent:rows.map(r => byId.get(r.student_id)), skipped:[...done].map(id => byId.get(id)), missing:want.filter(x => !x.id).map(x => x.t.name) };
+}
+function certMsg(r){
+  let t = r.sent.length ? `🎖️ أُرسلت شهادة شكر إلى: ${r.sent.join('، ')}` : 'لم تُرسل شهادات جديدة';
+  if (r.skipped.length) t += ` · سبق إرسالها اليوم لـ: ${r.skipped.join('، ')}`;
+  if (r.missing.length) t += ` · غير موجودات في المنصة بنفس الاسم: ${r.missing.join('، ')}`;
+  return t;
+}
+function openCerts(){
+  const plan = certPlan('all');
+  $('certList').innerHTML = plan.length
+    ? plan.map(p => `<div class="sec" style="margin-bottom:10px"><h4>👑 ${p.label}</h4>${p.tops.map(t => `<div style="display:flex;align-items:center;gap:10px;margin-top:8px">${avHTML(t.name).replace('class="av ', 'style="width:40px;height:40px;font-size:20px;margin:0" class="av ')}<b>${esc(t.name)}</b><span class="note" style="margin:0">(${CLASSES[t.c]}) — ${ar(t.pts)} نقطة</span></div>`).join('')}</div>`).join('')
+    : '<div class="note" style="text-align:center;padding:20px">لا توجد نقاط بعد في أي صف.</div>';
+  $('certGo').style.display = plan.length ? '' : 'none';
+  $('certMsg').textContent = ''; $('certMsg').className = 'msg';
+  openM('mCert');
+}
+async function goCerts(){
+  const m = $('certMsg'); m.className = 'msg'; m.textContent = '⏳ جاري الإرسال...';
+  try { const r = await sendCerts(certPlan('all')); m.className = 'msg ' + (r.sent.length ? 'ok' : ''); m.textContent = certMsg(r); if (r.sent.length) { levelUp(); confetti(innerWidth / 2, innerHeight / 3, 200); } }
+  catch(e) { m.className = 'msg bad'; m.textContent = e.message === 'awards' ? 'تعذّر الإرسال: قسم الشهادات غير مُجهّز في المنصة.' : platErr(e); }
+}
+/* ===== اقتراح شهادة/استكر تلقائيًا (بتصاميم المنصة نفسها) ===== */
+const CERTS = [{k:'tamayuz',t:'شهادة تميز',w:1123,h:794},{k:'shukr',t:'شهادة شكر',w:1123,h:794},{k:'taqdir',t:'شهادة شكر وتقدير',w:1123,h:794},{k:'injaz',t:'شهادة إنجاز متميز',w:1123,h:794},{k:'passport',t:'جواز سفر المعرفة',w:1123,h:794}];
+const STKS = [{k:'nagma',t:'نجمة الاجتماعيات',w:600,h:800},{k:'explorer',t:'مستكشفة المعرفة',w:600,h:800},{k:'maphero',t:'بطلة الخرائط',w:600,h:800},{k:'ticket',t:'تذكرة رحّالة المعرفة',w:600,h:800}];
+let DSN = null;
+async function loadDSN(){
+  if (DSN) return DSN;
+  try { const t = await (await fetch('index.html', { cache:'no-cache' })).text(); const m = t.match(/const DSN = (\{[\s\S]*?\});\n/); if (m) DSN = JSON.parse(m[1]); } catch(e) {}
+  return DSN;
+}
+const dOf = (kind, k) => (kind === 'cert' ? CERTS : STKS).find(x => x.k === k) || (kind === 'cert' ? CERTS : STKS)[0];
+const hijri = iso => { try { return new Date(iso || Date.now()).toLocaleDateString('ar-SA-u-ca-islamic-umalqura', { day:'numeric', month:'long', year:'numeric' }); } catch(e) { return ''; } };
+let UQ_ = 0;
+function uqIds(h){ const n = ++UQ_, ids = []; h.replace(/\bid="([^"]+)"/g, (m, i) => { ids.push(i); return m; }); ids.forEach(i => { h = h.split('id="' + i + '"').join('id="' + i + '_' + n + '"').split('url(#' + i + ')').join('url(#' + i + '_' + n + ')').split('href="#' + i + '"').join('href="#' + i + '_' + n + '"'); }); return h; }
+function dHtml(kind, k, name, lesson){
+  const d = dOf(kind, k), src = DSN && DSN[d.k];
+  if (!src) return `<div style="padding:18px;border-radius:10px;background:var(--soft);font-weight:800">${kind === 'cert' ? '📜' : '🏷'} ${esc(d.t)}</div>`;
+  const h = uqIds(src).split('⟦N⟧').join(esc(name || '')).split('⟦D⟧').join(esc(hijri())).split('⟦L⟧').join(esc(lesson || ''));
+  return `<div class="cs" data-bw="${d.w}" data-bh="${d.h}"><div class="cert" style="width:${d.w}px;height:${d.h}px">${h}</div></div>`;
+}
+function fitCerts(){ document.querySelectorAll('.cs').forEach(e => { const bw = +e.dataset.bw, bh = +e.dataset.bh, k = e.clientWidth / bw; if (!k) return; e.firstElementChild.style.transform = 'scale(' + k + ')'; e.style.height = Math.round(bh * k) + 'px'; }); }
+addEventListener('resize', fitCerts);
+
+const GQ = [];   // طابور الاقتراحات
+let GF = null;
+const todayKey = () => new Date().toDateString();
+function giftSuggest(st, cls, reason, kind, design, tag){
+  if (!S.giftAsk) S.giftAsk = {};
+  if (S.giftOffDay === todayKey()) return;
+  const key = cls + '|' + st.name + '|' + tag;
+  if (S.giftAsk[key] || GQ.some(g => g.key === key) || (GF && GF.key === key)) return;
+  GQ.push({ key, name:st.name, cls, reason, kind, design });
+  if (!GF) setTimeout(giftNext, 1800);   // بعد رسالة التعزيز
+}
+async function giftNext(){
+  GF = GQ.shift(); if (!GF) { closeM('mGift'); return; }
+  $('toast').classList.remove('on');
+  await loadDSN();
+  $('gfWho').innerHTML = `${avHTML(GF.name)}<div><b>${esc(GF.name)}</b><span>${CLASSES[GF.cls]} · ${ar((S.cls[GF.cls].find(x => x.name === GF.name) || {pts:0}).pts)} نقطة</span></div>`;
+  $('gfAsk').innerHTML = `${GF.reason}<br><span style="font-size:15.5px;color:var(--muted)">هل تريدين إرسال شهادة أو استكر تعزيز لحسابها في المنصة؟</span>`;
+  $('gfQ').textContent = GQ.length ? `+${ar(GQ.length)} بالانتظار` : '';
+  $('gfMsg').textContent = ''; $('gfYes').disabled = false; $('gfOff').checked = false;
+  GF.sugK = GF.kind; GF.sugD = GF.design;
+  giftDraw(); openM('mGift');
+}
+function giftKind(k){ GF.kind = k; GF.design = k === GF.sugK ? GF.sugD : (k === 'cert' ? 'shukr' : 'explorer'); giftDraw(); }
+function giftPick(k){ GF.design = k; giftDraw(); }
+function giftDraw(){
+  const isC = GF.kind === 'cert', list = isC ? CERTS : STKS;
+  $('gfK1').classList.toggle('on', isC); $('gfK0').classList.toggle('on', !isC);
+  $('gfPrev').style.maxWidth = isC ? '520px' : '260px';
+  $('gfPrev').innerHTML = dHtml(GF.kind, GF.design, GF.name, '');
+  $('gfList').className = 'gift-grid' + (isC ? ' cg' : '');
+  $('gfList').innerHTML = list.map(d => `<div class="gt ${d.k === GF.design ? 'sel' : ''}" onclick="giftPick('${d.k}')">${d.k === GF.sugD && GF.kind === GF.sugK ? '<span class="sg">💡 مقترح</span>' : ''}${dHtml(GF.kind, d.k, GF.name, '')}<small>${esc(d.t)}</small></div>`).join('');
+  requestAnimationFrame(fitCerts);
+}
+function giftDone(){ S.giftAsk[GF.key] = Date.now(); if ($('gfOff').checked) S.giftOffDay = todayKey(); save(); }
+function giftNo(){ if (!GF) return closeM('mGift'); giftDone(); if ($('gfOff').checked) GQ.length = 0; GF = null; GQ.length ? giftNext() : closeM('mGift'); }
+async function giftYes(){
+  const m = $('gfMsg'); m.className = 'msg'; m.textContent = '⏳ جاري الإرسال...'; $('gfYes').disabled = true;
+  try {
+    const d = await loadPlatform(), sb = await platformClient();
+    const id = d.ids.get(d.key(GF.cls, GF.name));
+    if (!id) throw new Error('nf');
+    const r = await sb.from('awards').insert({ student_id:id, kind:GF.kind, design:GF.design, reason:null });
+    if (r.error) throw new Error('awards');
+    m.className = 'msg ok'; m.textContent = `🎁 وصلت «${dOf(GF.kind, GF.design).t}» إلى حساب ${GF.name}`;
+    levelUp(); confetti(innerWidth / 2, innerHeight / 3, 160);
+    giftDone(); GF = null; setTimeout(() => GQ.length ? giftNext() : closeM('mGift'), 1600);
+  } catch(e) {
+    $('gfYes').disabled = false; m.className = 'msg bad';
+    m.textContent = e.message === 'nf' ? 'الطالبة غير موجودة في المنصة بنفس الاسم' : e.message === 'awards' ? 'تعذّر الإرسال: قسم الشهادات غير مُجهّز في المنصة' : platErr(e);
+  }
+}
+// متى يُقترح: عند الوصول لوسام جديد، أو عندما تصبح الطالبة متصدرة صفها
+const GIFT_BY_LEVEL = { 10:['sticker','explorer'], 25:['sticker','nagma'], 50:['cert','tamayuz'], 100:['cert','injaz'] };
+function giftCheck(cls, idxs, ups, leadersBefore){
+  for (const u of ups) { const g = GIFT_BY_LEVEL[u.lv.n]; if (g) giftSuggest(u.s, cls, `🎉 وصلت إلى ${u.lv.t} ${u.lv.m}`, g[0], g[1], 'lv' + u.lv.n); }
+  const st = stageOf(cls), tops = topsOf(STAGES[st].c);
+  for (const t of tops) if (!leadersBefore.has(t.c + '|' + t.name) && t.c == cls) giftSuggest(S.cls[cls].find(x => x.name === t.name), cls, `👑 أصبحت متصدرة الصف ${STAGES[st].t} بـ${ar(t.pts)} نقطة`, 'cert', 'shukr', 'top' + new Date().toDateString());
 }
 function loadSupabase(){
   return new Promise((res, rej) => { if (window.supabase) return res(); const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'; s.onload = res; s.onerror = () => rej(new Error('net')); document.head.appendChild(s); });
