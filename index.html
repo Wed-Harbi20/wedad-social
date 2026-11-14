@@ -350,9 +350,9 @@ function loginV() {
 <button onclick="loginT()" style="width:100%" ${busy ? 'disabled' : ''}>دخول</button><p class="t-bad">${esc(msg)}</p>
 <button class="g" onclick="tm_=false;roleSet(false);msg='';app()">🎓 دخول الطالبات</button>` : `<p class="mu" style="margin-top:0">اكتبي اسمك كما في كشف الفصل ثم كلمة المرور.</p>
 <div class="row"><input id="u" type="text" readonly onfocus="this.removeAttribute('readonly')" name="sname" placeholder="اسم الطالبة بالعربية" style="width:100%" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"></div>
-<div class="row"><input id="pwS" type="text" readonly onfocus="this.removeAttribute('readonly')" name="spw" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')loginS()" style="width:100%;-webkit-text-security:disc;text-security:disc" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"></div>
+<div class="row"><div class="eyew"><input id="pwS" type="text" readonly onfocus="this.removeAttribute('readonly')" name="spw" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')loginS()" style="width:100%;-webkit-text-security:disc;text-security:disc" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"><button type="button" class="eyeb" tabindex="-1" aria-label="إظهار" onclick="eyeT('pwS',this)">${EYE_H}</button></div></div>
 <button onclick="loginS()" style="width:100%" ${busy ? 'disabled' : ''}>دخول</button><p class="t-bad">${esc(msg)}</p>
-<button class="g" onclick="tm_=true;roleSet(true);msg='';app()">👩‍🏫 دخول المعلمة</button>`}</div><p class="mu" style="text-align:center;font-size:.7rem;opacity:.6">إصدار ٢٠٢٦.١١.١٤-أ</p>` + img;
+<button class="g" onclick="tm_=true;roleSet(true);msg='';app()">👩‍🏫 دخول المعلمة</button>`}</div><p class="mu" style="text-align:center;font-size:.7rem;opacity:.6">إصدار ٢٠٢٦.١١.١٤-ب</p>` + img;
 }
 async function loginS() {
   const u = ($('u').value || '').trim(), p = ($('pwS').value || '').trim(); if (!u || busy) return;
