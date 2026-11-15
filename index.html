@@ -390,7 +390,7 @@ function loginV() {
 <div class="row"><input id="u" type="text" readonly onfocus="this.removeAttribute('readonly')" name="sname" placeholder="اسم الطالبة بالعربية" style="width:100%" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"></div>
 <div class="row"><div class="eyew"><input id="pwS" type="text" readonly onfocus="this.removeAttribute('readonly')" name="spw" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')loginS()" style="width:100%;-webkit-text-security:disc;text-security:disc" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"><button type="button" class="eyeb" tabindex="-1" aria-label="إظهار" onclick="eyeT('pwS',this)">${EYE_H}</button></div></div>
 <button onclick="loginS()" style="width:100%" ${busy ? 'disabled' : ''}>دخول</button><p class="t-bad">${esc(msg)}</p>
-<button class="g" onclick="tm_=true;roleSet(true);msg='';app()">👩‍🏫 دخول المعلمة</button>`}</div><p class="mu" style="text-align:center;font-size:.7rem;opacity:.6">إصدار ٢٠٢٦.١١.١٥-و</p>` + img;
+<button class="g" onclick="tm_=true;roleSet(true);msg='';app()">👩‍🏫 دخول المعلمة</button>`}</div><p class="mu" style="text-align:center;font-size:.7rem;opacity:.6">إصدار ٢٠٢٦.١١.١٥-ز</p>` + img;
 }
 async function loginS() {
   const u = ($('u').value || '').trim(), p = ($('pwS').value || '').trim(); if (!u || busy) return;
@@ -578,7 +578,7 @@ ${chatBoxS()}
 <div class="card"><h2>إعلانات</h2>${h.announcements.map(a => `<div class="an">${esc(a.body)}<div class="mu">${dt(a.at)}</div></div>`).join('') || '<p class="mu">لا توجد إعلانات</p>'}</div>
 <div class="card reg"><div class="rh"><span>﷽</span><h2>سجل متابعتي</h2><span>${esc(CN[h.cls] || '')}</span></div><div class="rb"><div class="sc"><table><tr><th>العمل</th><th>الدرجة</th><th>الحالة</th><th>ملاحظة المعلمة</th></tr>
 ${h.works.map(w => `<tr><td>${esc(w.title)}</td><td>${w.max}</td><td class="${w.rating ? rcls(w.rating) : ''}">${w.rating ? esc(w.rating) : ''}</td><td>${esc(w.note || '')}</td></tr>`).join('')}</table></div></div></div>
-<div class="card"><h2>🏆 إنجازاتي</h2><p class="mu">ارفعي صور أعمالك (الصور فقط).</p><div class="row"><input id="at2" placeholder="عنوان العمل (اختياري)" maxlength="60" style="flex:1"><label style="cursor:pointer;padding:8px 14px;border-radius:10px;background:var(--pr);color:#fff">⬆ رفع صورة<input type="file" accept="image/*" multiple hidden onchange="addAch(this)"></label></div>
+<div class="card"><h2>🏆 إنجازاتي</h2><p class="mu">اختاري نوع العمل ثم ارفعي صورته (الصور فقط) لتُرصد لكِ الدرجات تلقائيًا.</p><div class="row"><select id="ak" style="min-width:130px"><option value="">نوع العمل…</option><option value="ws">📄 ورقة عمل</option><option value="pt">🎯 مهمة أدائية</option></select><input id="at2" placeholder="عنوان العمل (اختياري)" maxlength="60" style="flex:1"><label style="cursor:pointer;padding:8px 14px;border-radius:10px;background:var(--pr);color:#fff">⬆ رفع صورة<input type="file" accept="image/*" multiple hidden onchange="addAch(this)"></label></div>
 <div class="ag">${SV.ach.map(a => `<div class="ai"><img src="${pub('achievements', a.path)}" loading="lazy" onclick="zoom(this.src)"><div class="mu">${esc(a.title || '')}${a.title ? ' · ' : ''}${dt(a.at)}</div><button class="d" onclick="delAch('${a.id}')">حذف</button></div>`).join('') || '<p class="mu">لم تُرفعي أي إنجاز بعد</p>'}</div></div>
 <div class="card"><h2>القادم</h2>${h.upcoming.map(w => `<div class="an"><b>${esc(w.title)}</b> · الموعد ${esc(w.hijri || w.due || '')}</div>`).join('') || '<p class="mu">لا يوجد أعمال قادمة</p>'}</div>`;
 }
@@ -600,6 +600,7 @@ async function sendS() {
 }
 async function addAch(el) {
   const files = [...el.files]; el.value = ''; if (!files.length) return;
+  const kind = ($('ak') || {}).value || ''; if (!kind) return alert('اختاري نوع العمل أولًا (ورقة عمل أو مهمة أدائية)');
   const title = ($('at2').value || '').trim().slice(0, 60);
   let added = 0; const wks = new Set();
   for (const f of files) {
@@ -609,7 +610,7 @@ async function addAch(el) {
       const path = me.sid + '/' + uid() + '.jpg';
       const up = await sb.storage.from('achievements').upload(path, blob, { contentType: 'image/jpeg', upsert: false });
       if (up.error) throw up.error;
-      const r = await sb.rpc('ach_add', { p_token: me.token, p_path: path, p_title: title });
+      const r = await sb.rpc('ach_add', { p_token: me.token, p_path: path, p_title: title, p_kind: kind });
       if (r.error || (r.data && r.data.error)) throw new Error('add');
       if (r.data && +r.data.added > 0) { added += +r.data.added; (r.data.works || []).forEach(x => wks.add(x)); }
     } catch (e) { alert('تعذّر رفع الصورة، حاولي مرة أخرى'); }
@@ -1127,15 +1128,16 @@ function delS(id) {
 /* ---------- الأعمال ---------- */
 function achCfgCard() {
   const c = D.cfg || {}, opt = k => '<option value="">— بدون —</option>' + D.works.map(w => `<option value="${w.id}" ${c[k] === w.id ? 'selected' : ''}>${esc(w.title)} (من ${w.max_score})</option>`).join('');
-  return `<div class="card"><h2>🏆 درجات المنجزات التلقائية</h2><p class="mu">كلما رفعت الطالبة منجزًا في صفحتها تُضاف درجات تلقائيًا إلى عمل «الواجب» وعمل «المهمة الأدائية» المرتبطين أدناه (دون تجاوز درجة كل عمل)، وتُسحب إن حُذف المنجز.</p>
+  return `<div class="card"><h2>🏆 درجات المنجزات التلقائية</h2><p class="mu">كلما رفعت الطالبة منجزًا في صفحتها تُضاف درجات تلقائيًا بحسب النوع الذي تختاره: «ورقة عمل» ← درجة في «أوراق العمل» + درجة في «الواجب»، و«مهمة أدائية» ← درجة في «المهام الأدائية» + درجة في «الواجب»، وفق الأعمال المرتبطة أدناه (دون تجاوز درجة كل عمل)، وتُسحب إن حُذف المنجز.</p>
 <div class="row"><b style="min-width:90px">واجب</b><select id="cw_hw" style="flex:1">${opt('ach_hw_work')}</select><input id="cp_hw" type="number" min="0" step="0.5" placeholder="درجات كل رفع" value="${esc(c.ach_hw_pts || '')}" style="width:120px"></div>
+<div class="row"><b style="min-width:90px">ورقة عمل</b><select id="cw_ws" style="flex:1">${opt('ach_ws_work')}</select><input id="cp_ws" type="number" min="0" step="0.5" placeholder="درجات كل رفع" value="${esc(c.ach_ws_pts || '')}" style="width:120px"></div>
 <div class="row"><b style="min-width:90px">مهمة أدائية</b><select id="cw_pt" style="flex:1">${opt('ach_pt_work')}</select><input id="cp_pt" type="number" min="0" step="0.5" placeholder="درجات كل رفع" value="${esc(c.ach_pt_pts || '')}" style="width:120px"></div>
 <button onclick="saveAchCfg()">حفظ الإعداد</button></div>`;
 }
 async function saveAchCfg() {
-  const rows = [['ach_hw_work', $('cw_hw').value], ['ach_hw_pts', $('cp_hw').value], ['ach_pt_work', $('cw_pt').value], ['ach_pt_pts', $('cp_pt').value]].map(([k, v]) => ({ k, v: String(v) }));
+  const rows = [['ach_hw_work', $('cw_hw').value], ['ach_hw_pts', $('cp_hw').value], ['ach_ws_work', $('cw_ws').value], ['ach_ws_pts', $('cp_ws').value], ['ach_pt_work', $('cw_pt').value], ['ach_pt_pts', $('cp_pt').value]].map(([k, v]) => ({ k, v: String(v) }));
   const r = await sb.from('site_settings').upsert(rows, { onConflict: 'k' });
-  if (r.error) return alert('تعذّر الحفظ. تأكدي من تشغيل ملف 07_achievement_grades.sql في Supabase.');
+  if (r.error) return alert('تعذّر الحفظ. تأكدي من تشغيل ملفي 07 و09 في Supabase.');
   D.cfg = Object.assign(D.cfg || {}, Object.fromEntries(rows.map(x => [x.k, x.v]))); toast('تم حفظ الإعداد ✓'); app();
 }
 function worksTab() {
