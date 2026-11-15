@@ -77,6 +77,15 @@ h1,h2,h3,.rx{font-family:'Readex Pro','Tajawal',sans-serif}
 .ab.off{background:var(--red2);border-color:#fecaca}
 .ab.off .av{filter:grayscale(1);opacity:.6}
 .ab.off .stt{background:var(--red);color:#fff}
+.ahs{width:100%;border-collapse:collapse;font-size:14.5px;margin-top:8px}
+.ahs th,.ahs td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:start}
+.ahs th{background:var(--soft);font-weight:800;font-size:13.5px;position:sticky;top:0}
+.ahs td.n{font-weight:800;text-align:center}
+.ahs tr.z td{color:var(--muted)}
+.aday{border:1px solid var(--line);border-radius:14px;padding:10px 14px;margin-top:8px}
+.aday b{font-family:'Readex Pro';font-size:14.5px}
+.aday .an{font-size:13.5px;color:var(--muted);margin-top:4px;line-height:1.8}
+.aday .ac{float:left;font-weight:800;font-size:13px;border-radius:8px;padding:2px 10px}
 .attsum{display:flex;gap:10px;flex-wrap:wrap}
 .attsum span{font-weight:800;border-radius:10px;padding:6px 12px;font-size:14px}
 .st.sel::after{content:"✓";position:absolute;top:8px;right:10px;width:22px;height:22px;border-radius:50%;background:var(--pri);color:#fff;font-size:13px;display:grid;place-items:center;font-weight:800}
@@ -427,14 +436,18 @@ body.show .layout,body.show .tools,body.show .classbar,body.show .topbar .in{max
 
 <!-- ===== التحضير ===== -->
 <div class="modal" id="mAtt"><div class="box wide">
-  <div class="bh"><h3 id="attT">📋 التحضير</h3><button class="x" onclick="closeM('mAtt')">×</button></div>
+  <div class="bh"><h3 id="attT">📋 التحضير</h3><button class="x" onclick="attClose()">×</button></div>
   <div class="bb">
-    <div class="row" style="margin:0;justify-content:space-between">
-      <div class="attsum" id="attSum"></div>
-      <div class="row" style="margin:0"><button class="ibtn" onclick="attAll()">✅ الكل حاضرات</button><button class="ibtn pri" onclick="closeM('mAtt')">تم</button></div>
+    <div class="ktabs" style="max-width:420px"><button id="atT1" class="on" onclick="attTab(1)">📋 تحضير اليوم</button><button id="atT0" onclick="attTab(0)">📅 سجل الغياب</button></div>
+    <div id="attToday">
+      <div class="row" style="margin:0;justify-content:space-between">
+        <div class="attsum" id="attSum"></div>
+        <div class="row" style="margin:0"><button class="ibtn" onclick="attAll()">✅ الكل حاضرات</button><button class="ibtn pri" onclick="attClose()">تم</button></div>
+      </div>
+      <div class="note">اضغطي على الطالبة الغائبة. الغائبات لا يدخلن في الاختيار العشوائي ولا المجموعات ولا تعزيز الفصل. يُحفظ تحضير كل يوم في «سجل الغياب».</div>
+      <div class="att" id="attList"></div>
     </div>
-    <div class="note">اضغطي على الطالبة الغائبة. الغائبات لا يدخلن في الاختيار العشوائي ولا المجموعات ولا تعزيز الفصل. يتجدد التحضير تلقائيًا كل يوم.</div>
-    <div class="att" id="attList"></div>
+    <div id="attHist" style="display:none"></div>
   </div>
 </div></div>
 
@@ -923,11 +936,22 @@ for (const c in CLASSES) {
 }
 if (!S.att) S.att = {};
 const today = () => { const d = new Date(); return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate(); };
-function absSet(c = S.cur){ const a = S.att[c]; return new Set(a && a.d === today() ? a.n : []); }
+const isoDay = (d = new Date()) => d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+function attLog(c = S.cur){ if (!S.attLog) S.attLog = {}; if (!S.attLog[c]) S.attLog[c] = {}; return S.attLog[c]; }
+// ترحيل تحضير اليوم من النسخة السابقة
+(function(){ for (const c in (S.att || {})) { const a = S.att[c]; if (a && a.d === today() && !attLog(c)[isoDay()]) attLog(c)[isoDay()] = [...a.n]; } })();
+function absSet(c = S.cur){ return new Set(attLog(c)[isoDay()] || []); }
 const isAbs = (i, A) => (A || absSet()).has(L()[i].name);
 const presentIdx = () => { const A = absSet(); return L().map((_,i) => i).filter(i => !A.has(L()[i].name)); };
-function setAbs(names){ S.att[S.cur] = { d:today(), n:[...names] }; save(); }
-function openAtt(){ if (!L().length) return openSettings(); drawAtt(); openM('mAtt'); }
+function setAbs(names){ attLog()[isoDay()] = [...names]; save(); pushAtt(S.cur, isoDay()); }
+let attTabNow = 1;
+function openAtt(){ if (!L().length) return openSettings(); attTab(1); openM('mAtt'); }
+function attClose(){ if (!attLog()[isoDay()]) setAbs([]); closeM('mAtt'); }   // «تم» يحفظ اليوم حتى لو الكل حاضرات
+function attTab(k){
+  attTabNow = k; $('atT1').classList.toggle('on', k === 1); $('atT0').classList.toggle('on', k === 0);
+  $('attToday').style.display = k ? '' : 'none'; $('attHist').style.display = k ? 'none' : '';
+  k ? drawAtt() : drawHist();
+}
 function drawAtt(){
   const A = absSet(), list = [...L()].sort((a,b) => a.name.localeCompare(b.name,'ar'));
   $('attT').textContent = `📋 تحضير ${CLASSES[S.cur]} · ${new Date().toLocaleDateString('ar-SA', { weekday:'long', day:'numeric', month:'long' })}`;
@@ -936,6 +960,60 @@ function drawAtt(){
 }
 function togAbs(i){ const A = absSet(), n = L()[i].name; A.has(n) ? A.delete(n) : A.add(n); setAbs(A); drawAtt(); render(); }
 function attAll(){ setAbs([]); drawAtt(); render(); }
+const dayLabel = iso => { const [y,m,d] = iso.split('-').map(Number), dt = new Date(y, m - 1, d); let h = ''; try { h = dt.toLocaleDateString('ar-SA-u-ca-islamic-umalqura', { weekday:'long', day:'numeric', month:'long', year:'numeric' }); } catch(e) {} return h || iso; };
+function histData(){
+  const log = attLog(), days = Object.keys(log).sort().reverse(), cnt = new Map(), last = new Map();
+  L().forEach(s => cnt.set(s.name, 0));
+  for (const d of [...days].reverse()) for (const n of log[d]) { cnt.set(n, (cnt.get(n) || 0) + 1); last.set(n, d); }
+  return { log, days, cnt, last };
+}
+function drawHist(){
+  const { log, days, cnt, last } = histData();
+  $('attT').textContent = `📅 سجل غياب ${CLASSES[S.cur]}`;
+  if (!days.length) { $('attHist').innerHTML = '<div class="note" style="text-align:center;padding:30px">لا يوجد تحضير محفوظ بعد لهذا الفصل.</div>'; return; }
+  const rows = [...cnt.entries()].sort((a,b) => b[1] - a[1] || a[0].localeCompare(b[0],'ar'));
+  const totalAbs = rows.reduce((a,r) => a + r[1], 0);
+  $('attHist').innerHTML = `
+    <div class="row" style="margin:0;justify-content:space-between">
+      <div class="attsum"><span style="background:var(--pri2);color:var(--pri)">أيام التحضير ${ar(days.length)}</span><span style="background:var(--red2);color:var(--red)">مجموع الغياب ${ar(totalAbs)}</span></div>
+      <button class="ibtn pri" onclick="exportAtt()">⬇️ تصدير Excel</button>
+    </div>
+    <h4 style="font-family:'Readex Pro';margin-top:16px">عدد أيام الغياب لكل طالبة</h4>
+    <div style="max-height:320px;overflow:auto;border:1px solid var(--line);border-radius:14px;margin-top:6px">
+      <table class="ahs"><tr><th>الطالبة</th><th style="text-align:center">أيام الغياب</th><th>آخر غياب</th></tr>
+      ${rows.map(([n,c]) => `<tr class="${c ? '' : 'z'}"><td>${esc(n)}</td><td class="n" style="color:${c >= 3 ? 'var(--red)' : c ? 'var(--gold)' : 'var(--green)'}">${ar(c)}</td><td>${last.has(n) ? dayLabel(last.get(n)) : '—'}</td></tr>`).join('')}
+      </table>
+    </div>
+    <h4 style="font-family:'Readex Pro';margin-top:18px">الأيام</h4>
+    ${days.map(d => `<div class="aday"><span class="ac" style="background:${log[d].length ? 'var(--red2)' : 'var(--green2)'};color:${log[d].length ? 'var(--red)' : 'var(--green)'}">${log[d].length ? 'غائبات ' + ar(log[d].length) : 'الكل حاضرات'}</span><b>${dayLabel(d)}</b>${log[d].length ? `<div class="an">${log[d].map(esc).join('، ')}</div>` : ''}</div>`).join('')}`;
+}
+function exportAtt(){
+  const { log, days, cnt } = histData(), asc = [...days].reverse();
+  const q = v => '"' + String(v).replace(/"/g, '""') + '"';
+  const lines = [[ 'الطالبة', 'أيام الغياب', ...asc.map(dayLabel) ].map(q).join(',')];
+  [...cnt.keys()].sort((a,b) => a.localeCompare(b,'ar')).forEach(n => lines.push([n, cnt.get(n), ...asc.map(d => log[d].includes(n) ? 'غائبة' : 'حاضرة')].map(q).join(',')));
+  const blob = new Blob(['﻿' + lines.join('\r\n')], { type:'text/csv;charset=utf-8' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `سجل-غياب-${CLASSES[S.cur].replace(/\s+/g,'-')}.csv`; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+}
+// ---- مزامنة السجل مع المنصة (جدول board_attendance) ----
+async function pushAtt(c, day){
+  if (!S.syncPts) return;
+  try {
+    await loadPlatform(); const sb = await platformClient();
+    const r = await sb.from('board_attendance').upsert({ cls:+c, day, absent:attLog(c)[day] || [], updated_at:new Date().toISOString() }, { onConflict:'cls,day' });
+    if (r.error) throw r.error;
+  } catch(e) { S.attPending = S.attPending || {}; S.attPending[c + '|' + day] = 1; save(); }
+}
+async function pullAtt(){
+  const sb = await platformClient(), since = new Date(); since.setDate(since.getDate() - 200);
+  // ارفعي أولًا ما لم يُرفع
+  for (const k of Object.keys(S.attPending || {})) { const [c, d] = k.split('|'); const r = await sb.from('board_attendance').upsert({ cls:+c, day:d, absent:attLog(c)[d] || [], updated_at:new Date().toISOString() }, { onConflict:'cls,day' }); if (r.error) return; delete S.attPending[k]; }
+  const r = await sb.from('board_attendance').select('cls,day,absent').gte('day', isoDay(since)).limit(5000);
+  if (r.error) return;   // الجدول غير مُجهّز بعد: السجل يبقى محليًا
+  let changed = false;
+  for (const x of r.data) { const lg = attLog(x.cls), v = x.absent || []; if (JSON.stringify(lg[x.day] || null) !== JSON.stringify(v)) { lg[x.day] = v; changed = true; } }
+  if (changed) { save(); render(); if ($('mAtt').classList.contains('on')) attTabNow ? drawAtt() : drawHist(); }
+}
 function save(){ try { localStorage.setItem(KEY, JSON.stringify(S)); } catch(e) {} }
 const L = () => S.cls[S.cur];
 
@@ -1636,6 +1714,7 @@ async function pullPoints(quiet){
       else if (st.pts) push.push({ student_id:id, pts:st.pts, updated_at:now });
     }
     if (push.length) { const r = await sb.from('board_points').upsert(push, { onConflict:'student_id' }); if (r.error) throw r.error; }
+    try { await pullAtt(); } catch(e) {}
     if (changed) { save(); render(); }
     SYNC.at = Date.now(); syncChip(true, 'آخر مزامنة: ' + new Date().toLocaleTimeString('ar-SA'));
     return { changed, pushed:push.length };
