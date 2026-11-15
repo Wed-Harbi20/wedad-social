@@ -132,6 +132,7 @@ html:has(body[class*=th-]),body[class*=th-]{overflow-x:clip}.th-flag .w{position
 .m.me{align-self:flex-end;background:#f1e4c3}.m.te{border:1px solid #b08a3e;background:#fbf3de}
 .m b{display:block;font-size:.8rem;color:var(--pr)}.m.te b{color:#8a5a12}
 .m small{display:block;color:var(--mu);font-size:.7rem}.m a{color:var(--bad);cursor:pointer;margin-inline-start:6px}
+.m .rq{display:block;border-inline-start:3px solid var(--pr);background:rgba(0,0,0,.05);border-radius:6px;padding:3px 8px;margin:3px 0 4px;font-size:.75rem;cursor:pointer}.m .rq b{font-size:.72rem}.m .rq span{display:block;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.m small a.rp{color:var(--pr);text-decoration:none;font-weight:700;margin-inline-start:0;margin-inline-end:6px}.rpb{display:flex;align-items:center;gap:8px;background:var(--pr2);border-inline-start:3px solid var(--pr);border-radius:8px;padding:5px 10px;margin-bottom:6px;font-size:.78rem}.rpb div{flex:1;min-width:0}.rpb span{display:block;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rpb a{cursor:pointer;font-size:1rem;color:var(--bad)}.m.hl{outline:2px solid var(--pr)}
 .m a{color:var(--pr);text-decoration:underline}.m small a{color:var(--bad)}.m img{display:block;max-width:100%;max-height:200px;border-radius:8px;margin-top:4px;cursor:zoom-in}
 .ag{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}.ai{background:var(--pr2);border-radius:12px;padding:8px}.ai img,.ai video{width:100%;height:130px;object-fit:cover;border-radius:8px;cursor:zoom-in;background:#000}.ai .mu{margin:4px 0;font-size:.8rem}
 .hero{text-align:center;margin-top:4vh}.hero h1{font-family:Amiri,serif;font-size:clamp(1.5rem,5.5vw,2.2rem);line-height:1.5;color:var(--pr)}.bis{font-family:Amiri,serif;font-size:1.6rem;color:#b08a3e}.hero p{color:var(--tx);font-family:Amiri,serif;font-size:1.2rem;margin:4px 0 16px}
@@ -389,7 +390,7 @@ function loginV() {
 <div class="row"><input id="u" type="text" readonly onfocus="this.removeAttribute('readonly')" name="sname" placeholder="اسم الطالبة بالعربية" style="width:100%" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"></div>
 <div class="row"><div class="eyew"><input id="pwS" type="text" readonly onfocus="this.removeAttribute('readonly')" name="spw" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')loginS()" style="width:100%;-webkit-text-security:disc;text-security:disc" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"><button type="button" class="eyeb" tabindex="-1" aria-label="إظهار" onclick="eyeT('pwS',this)">${EYE_H}</button></div></div>
 <button onclick="loginS()" style="width:100%" ${busy ? 'disabled' : ''}>دخول</button><p class="t-bad">${esc(msg)}</p>
-<button class="g" onclick="tm_=true;roleSet(true);msg='';app()">👩‍🏫 دخول المعلمة</button>`}</div><p class="mu" style="text-align:center;font-size:.7rem;opacity:.6">إصدار ٢٠٢٦.١١.١٥-هـ</p>` + img;
+<button class="g" onclick="tm_=true;roleSet(true);msg='';app()">👩‍🏫 دخول المعلمة</button>`}</div><p class="mu" style="text-align:center;font-size:.7rem;opacity:.6">إصدار ٢٠٢٦.١١.١٥-و</p>` + img;
 }
 async function loginS() {
   const u = ($('u').value || '').trim(), p = ($('pwS').value || '').trim(); if (!u || busy) return;
@@ -528,13 +529,23 @@ function celebrateOnEntry() {
   const all = W.length > 0 && got === W.length, first = String(SV.home.name || '').split(' ')[0];
   setTimeout(() => { celebrate(all); cel(all ? '🎉 ما شاء الله يا ' + first + '! أكملتِ جميع الأوسمة، وسام التميّز لكِ 👑' : '🎉 مبروك يا ' + first + '! حصلتِ على ' + got + ' من ' + W.length + ' أوسمة 🏅'); }, 500);
 }
+let REP = null; const MM = {};
+const snip = m => (m.body ? String(m.body) : (m.image_path ? '📷 صورة' : '')).slice(0, 80);
+function repBar() { return `<div id="rpb">${REP ? `<div class="rpb"><div><b>↩ رد على ${esc(REP.author)}</b><span>${esc(REP.body)}</span></div><a onclick="setRep(0)">✕</a></div>` : ''}</div>`; }
+function setRep(id) {
+  const m = id && MM[id]; REP = m ? { id: m.id, author: m.author, body: snip(m) } : null;
+  const b = $('rpb'); if (b) b.outerHTML = repBar();
+  const i = $('ci'); if (i && REP) i.focus();
+}
+function jumpMsg(id) { const e = $('mg' + id); if (!e) return; e.scrollIntoView({ block: 'center' }); e.classList.add('hl'); setTimeout(() => e.classList.remove('hl'), 1200); }
 function msgsHtml(L, del) {
-  return L.map(m => `<div class="m ${m.is_teacher ? 'te' : ''} ${m.mine ? 'me' : ''}"><b>${esc(m.author)}</b>${m.is_teacher ? lk(m.body || '') : esc(m.body || '')}${m.is_teacher && m.image_path ? `<img src="${pub('chat', m.image_path)}" onclick="zoom(this.src)" loading="lazy">` : ''}<small>${tm(m.created_at)}${del ? ` <a onclick="delMsg(${m.id})">حذف</a>` : ''}</small></div>`).join('') || '<p class="mu">لا توجد رسائل بعد</p>';
+  L.forEach(m => MM[m.id] = m);
+  return L.map(m => `<div class="m ${m.is_teacher ? 'te' : ''} ${m.mine ? 'me' : ''}" id="mg${m.id}"><b>${esc(m.author)}</b>${m.reply_author ? `<div class="rq" onclick="${m.reply_to ? `jumpMsg(${m.reply_to})` : ''}"><b>↩ ${esc(m.reply_author)}</b><span>${esc(m.reply_body || '')}</span></div>` : ''}${m.is_teacher ? lk(m.body || '') : esc(m.body || '')}${m.is_teacher && m.image_path ? `<img src="${pub('chat', m.image_path)}" onclick="zoom(this.src)" loading="lazy">` : ''}<small><a class="rp" onclick="setRep(${m.id})">↩ رد</a>${tm(m.created_at)}${del ? ` <a onclick="delMsg(${m.id})">حذف</a>` : ''}</small></div>`).join('') || '<p class="mu">لا توجد رسائل بعد</p>';
 }
 function chatBoxS() {
   const c = SV.chat; if (!c) return '';
   if (!c.open) return `<div class="card chat"><h2>💬 دردشة ${stName(me.stage)}</h2><p class="mu">${c.auto ? 'أُغلقت الدردشة مؤقتاً بسبب كثرة الرسائل 🔒' : 'الدردشة مغلقة حالياً من المعلمة 🔒'}</p></div>`;
-  return `<div class="card chat"><h2>💬 دردشة ${stName(me.stage)}</h2><div class="cb" id="cb">${msgsHtml(c.messages, false)}</div><div class="row"><input id="ci" placeholder="اكتبي رسالتك (نص فقط)" maxlength="300" style="flex:1" onkeydown="if(event.key==='Enter')sendS()"><button onclick="sendS()">إرسال</button></div></div>`;
+  return `<div class="card chat"><h2>💬 دردشة ${stName(me.stage)}</h2><div class="cb" id="cb">${msgsHtml(c.messages, false)}</div>${repBar()}<div class="row"><input id="ci" placeholder="اكتبي رسالتك (نص فقط)" maxlength="300" style="flex:1" onkeydown="if(event.key==='Enter')sendS()"><button onclick="sendS()">إرسال</button></div></div>`;
 }
 function gradCard() {
   if (!me || me.t || +me.stage !== 6) return '';
@@ -576,13 +587,13 @@ async function sendS() {
   const b = i.value.trim().slice(0, 300); if (!b) return;
   if (/(https?:|www\.|\.(com|net|org|sa|me|io|ly|co|tv|app)\b)/i.test(b)) return alert('الدردشة للكتابة فقط، والروابط غير مسموحة');
   busy = true;
-  const r = await sb.rpc('chat_send', { p_token: me.token, p_body: b });
+  const r = await sb.rpc('chat_send', REP ? { p_token: me.token, p_body: b, p_reply_to: REP.id } : { p_token: me.token, p_body: b });
   busy = false;
   const d = r.data || {};
   if (r.error) return alert('تعذّر الإرسال، حاولي مرة أخرى');
   if (d.error === 'links') return alert('الدردشة للكتابة فقط، والروابط غير مسموحة');
   if (d.error === 'closed') { await refreshChat(); return app(); }
-  i.value = '';
+  i.value = ''; REP = null; const rb_ = $('rpb'); if (rb_) rb_.outerHTML = repBar();
   await refreshChat(true);
   if (d.closed) app();
   const ni = $('ci'); if (ni) ni.focus();
@@ -865,7 +876,7 @@ function chatTab() {
   return `<div class="row">${STG.map(x => `<button class="${cs === x[0] ? '' : 'g'}" onclick="setStage(${x[0]})">${x[1]}${D.rooms[x[0]] && !D.rooms[x[0]].is_open ? ' 🔒' : ''}</button>`).join('')} <button class="d" onclick="allRooms(false)">🔒 إغلاق الكل</button> <button class="g" onclick="allRooms(true)">🔓 فتح الكل</button></div>
 <div class="card chat"><h2>💬 دردشة ${stName(cs)}${rm.is_open ? '' : ' <span class="tag t-bad">مغلقة</span>'}</h2>${!rm.is_open && rm.auto_closed ? '<p class="t-bad">أُغلقت تلقائياً بسبب كثرة الرسائل، افتحيها متى شئتِ.</p>' : ''}<button class="${rm.is_open ? 'd' : 'g'}" style="margin-bottom:8px" onclick="togRoom()">${rm.is_open ? '🔒 إغلاق الدردشة' : '🔓 فتح الدردشة للطالبات'}</button>
 <div class="cb" id="cb">${msgsHtml(TM, true)}</div>
-<div class="row"><input id="ci" placeholder="اكتبي رسالتك (يمكنك إرسال الروابط والصور)..." maxlength="300" style="flex:1" onkeydown="if(event.key==='Enter')tSend()"><label style="cursor:pointer;padding:8px 12px;border-radius:10px;background:var(--pr2);color:var(--pr)" title="إرفاق صورة">📷<input type="file" accept="image/*" hidden onchange="tImg(this)"></label><button onclick="tSend()">إرسال</button></div></div>`;
+${repBar()}<div class="row"><input id="ci" placeholder="اكتبي رسالتك (يمكنك إرسال الروابط والصور)..." maxlength="300" style="flex:1" onkeydown="if(event.key==='Enter')tSend()"><label style="cursor:pointer;padding:8px 12px;border-radius:10px;background:var(--pr2);color:var(--pr)" title="إرفاق صورة">📷<input type="file" accept="image/*" hidden onchange="tImg(this)"></label><button onclick="tSend()">إرسال</button></div></div>`;
 }
 async function setStage(k) { cs = k; await loadTeacherChat(); app(); }
 async function setRoom(stage, open) {
@@ -877,9 +888,11 @@ async function allRooms(open) { for (const s of [4, 5, 6]) await setRoom(s, open
 async function tSend(imgPath) {
   const i = $('ci'); const body = i ? i.value.trim().slice(0, 300) : '';
   if (!body && !imgPath) return;
-  const r = await sb.from('chat_messages').insert({ stage: cs, author: 'المعلمة', body: body || null, image_path: imgPath || null, is_teacher: true });
+  const row = { stage: cs, author: 'المعلمة', body: body || null, image_path: imgPath || null, is_teacher: true };
+  if (REP) { row.reply_to = REP.id; row.reply_author = REP.author; row.reply_body = REP.body; }
+  const r = await sb.from('chat_messages').insert(row);
   if (r.error) return alert('تعذّر الإرسال');
-  if (i) i.value = '';
+  if (i) i.value = ''; REP = null; const rb_ = $('rpb'); if (rb_) rb_.outerHTML = repBar();
   await loadTeacherChat(); paintMsgs();
 }
 async function tImg(el) {
