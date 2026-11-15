@@ -321,6 +321,7 @@ body.show .layout,body.show .tools,body.show .classbar,body.show .topbar .in{max
       <div class="logo">⭐</div>
       <div><h1>لوحة نجمات الدراسات الاجتماعية</h1><p>المعلمة / وداد محمد الكحيلي</p></div>
     </div>
+    <button class="ibtn" id="syncChip" onclick="pullPoints().catch(()=>{})" style="font-size:13.5px">☁️ …</button>
     <button class="ibtn hide-show" id="sndBtn" onclick="toggleSound()"></button>
     <button class="ibtn hide-show" onclick="openSettings()">⚙️ الإعدادات</button>
     <button class="ibtn pri" onclick="toggleFull()">📺 عرض على الشاشة</button>
@@ -526,9 +527,9 @@ body.show .layout,body.show .tools,body.show .classbar,body.show .topbar .in{max
     </div>
     <div class="sec" style="border-color:#fde68a">
       <h4>🏆 المتصدرات في المنصة</h4>
-      <div class="note">مع كل تعزيز تُحدَّث نقاط الطالبة في «🏆 المتصدرات» بالمنصة (للمعلمة والطالبات). نقاط اللوحة منفصلة تمامًا عن الدرجات؛ ما يُضاف للدرجات هو درجة المشاركة فقط.</div>
-      <label style="display:flex;gap:8px;align-items:center;font-weight:700;margin-top:10px"><input type="checkbox" id="ptsC" onchange="S.syncPts=this.checked;save()" style="width:18px;height:18px;accent-color:var(--pri)"> تحديث المتصدرات تلقائيًا</label>
-      <div class="row"><button class="ibtn" onclick="syncAllPoints(this)">🔄 مزامنة كل النقاط الآن</button></div>
+      <div class="note">النقاط محفوظة في المنصة، فتظهر نفسها في الجوال والآيباد وأي جهاز تفتحين منه اللوحة (تتحدّث تلقائيًا كل ٢٠ ثانية وعند فتح الصفحة)، وتظهر في «🏆 المتصدرات» للطالبات. نقاط اللوحة منفصلة عن الدرجات؛ ما يُضاف للدرجات هو درجة المشاركة فقط.</div>
+      <label style="display:flex;gap:8px;align-items:center;font-weight:700;margin-top:10px"><input type="checkbox" id="ptsC" onchange="S.syncPts=this.checked;save()" style="width:18px;height:18px;accent-color:var(--pri)"> حفظ النقاط في المنصة ومزامنتها بين الأجهزة</label>
+      <div class="row"><button class="ibtn" onclick="syncAllPoints(this)">🔄 مزامنة النقاط مع المنصة الآن</button></div>
       <div class="msg" id="ptsMsg"></div>
     </div>
     <div class="sec">
@@ -1126,7 +1127,7 @@ function give(k, j){
   } else { sad(); speak((targets.length === 1 ? firstName(list[targets[0]].name) + '، ' : '') + phrase, { delay:150, pitch:1 }); }
   showToast(targets.length === 1 ? list[targets[0]].name : null, name, phrase, b, up);
   $('tS').textContent = '';
-  platformAfter(targets.map(i => list[i].name), S.cur, b.p > 0);
+  platformAfter(targets.map(i => list[i].name), S.cur, b.p > 0, b.p);
 }
 let tT;
 function showToast(nm, name, phrase, b, up){
@@ -1602,18 +1603,76 @@ async function syncPoints(names, cls){
   if (rows.length) { const r = await sb.from('board_points').upsert(rows, { onConflict:'student_id' }); if (r.error) throw new Error(/board_points|relation|schema cache|42P01|PGRST205/i.test((r.error.message || '') + (r.error.code || '')) ? 'ptstable' : (r.error.message || 'err')); }
   return rows.length;
 }
-async function platformAfter(names, cls, positive){
+/* ===== المنصة هي المرجع: النقاط واحدة في كل الأجهزة ===== */
+let SYNC = { ok:null, at:0, busy:false };
+function syncChip(state, txt){
+  const c = $('syncChip'); if (!c) return;
+  SYNC.ok = state;
+  c.textContent = state === true ? '☁️ متزامنة' : state === 'busy' ? '⏳ مزامنة…' : '⚠️ غير متزامنة';
+  c.title = txt || ''; c.style.color = state === true ? 'var(--green)' : state === 'busy' ? 'var(--muted)' : 'var(--red)';
+}
+async function serverPts(ids){
+  const sb = await platformClient(), out = new Map();
+  for (let k = 0; k < ids.length; k += 300) {
+    let q = sb.from('board_points').select('student_id,pts');
+    if (ids !== 'all') q = q.in('student_id', ids.slice(k, k + 300));
+    const r = await q.limit(5000);
+    if (r.error) throw new Error(/board_points|relation|schema cache|42P01|PGRST205/i.test((r.error.message || '') + (r.error.code || '')) ? 'ptstable' : (r.error.message || 'err'));
+    r.data.forEach(x => out.set(x.student_id, +x.pts || 0));
+    if (ids === 'all') break;
+  }
+  return out;
+}
+// سحب النقاط من المنصة إلى هذا الجهاز (ورفع نقاط من ليس لها سجل بعد)
+async function pullPoints(quiet){
+  if (!S.syncPts || SYNC.busy) return;
+  SYNC.busy = true; if (!quiet) syncChip('busy');
+  try {
+    const d = await loadPlatform(), srv = await serverPts('all'), sb = await platformClient(), push = [], now = new Date().toISOString();
+    let changed = false;
+    for (const c in CLASSES) for (const st of S.cls[c]) {
+      const id = d.ids.get(d.key(c, st.name)); if (!id) continue;
+      if (srv.has(id)) { const v = srv.get(id); if (st.pts !== v) { st.pts = v; if (v <= 0) st.phrase = ''; changed = true; } }
+      else if (st.pts) push.push({ student_id:id, pts:st.pts, updated_at:now });
+    }
+    if (push.length) { const r = await sb.from('board_points').upsert(push, { onConflict:'student_id' }); if (r.error) throw r.error; }
+    if (changed) { save(); render(); }
+    SYNC.at = Date.now(); syncChip(true, 'آخر مزامنة: ' + new Date().toLocaleTimeString('ar-SA'));
+    return { changed, pushed:push.length };
+  } catch(e) {
+    syncChip(false, e.message === 'ptstable' ? 'شغّلي ملف 05_board_points.sql' : platErr(e));
+    throw e;
+  } finally { SYNC.busy = false; }
+}
+// إضافة النقاط على آخر قيمة في المنصة (حتى لو كان هذا الجهاز متأخرًا)
+async function addPoints(names, cls, delta){
+  const d = await loadPlatform(), sb = await platformClient(), now = new Date().toISOString();
+  const pairs = names.map(n => ({ n, id:d.ids.get(d.key(cls, n)), st:S.cls[cls].find(x => x.name === n) })).filter(x => x.id && x.st);
+  if (!pairs.length) return 0;
+  const srv = await serverPts(pairs.map(x => x.id));
+  const rows = pairs.map(x => { const v = srv.has(x.id) ? srv.get(x.id) + delta : x.st.pts; x.st.pts = v; return { student_id:x.id, pts:v, updated_at:now }; });
+  const r = await sb.from('board_points').upsert(rows, { onConflict:'student_id' }); if (r.error) throw r.error;
+  save(); render(); SYNC.at = Date.now(); syncChip(true);
+  return rows.length;
+}
+async function platformAfter(names, cls, positive, delta){
   const out = $('tS');
   if (positive && S.sync) await syncParticipation(names, cls);
   if (!S.syncPts) return;
-  try { const n = await syncPoints(names, cls); if (n) out.textContent += (out.textContent ? ' · ' : '') + '🏆 تحدّثت المتصدرات في المنصة'; }
-  catch(e) { out.textContent += (out.textContent ? ' · ' : '') + '⚠️ ' + (e.message === 'ptstable' ? 'شغّلي ملف 05_board_points.sql في Supabase لتظهر المتصدرات' : platErr(e)); }
+  try { const n = await addPoints(names, cls, delta); if (n) out.textContent += (out.textContent ? ' · ' : '') + '☁️ حُفظت في المنصة'; }
+  catch(e) { syncChip(false); out.textContent += (out.textContent ? ' · ' : '') + '⚠️ ' + (e.message === 'ptstable' ? 'شغّلي ملف 05_board_points.sql في Supabase' : 'لم تُحفظ في المنصة: ' + platErr(e)); }
 }
 async function syncAllPoints(btn){
   const m = $('ptsMsg'); m.className = 'msg'; m.textContent = '⏳ جاري المزامنة...';
-  try { let n = 0; for (const c in CLASSES) n += await syncPoints(S.cls[c].map(x => x.name), c); m.className = 'msg ok'; m.textContent = `✔️ تمت مزامنة نقاط ${ar(n)} طالبة مع المتصدرات في المنصة`; }
-  catch(e) { m.className = 'msg bad'; m.textContent = e.message === 'ptstable' ? 'لم يُجهَّز جدول المتصدرات بعد: شغّلي ملف 05_board_points.sql في Supabase ثم أعيدي المحاولة.' : platErr(e); }
+  try { const r = await pullPoints(); m.className = 'msg ok'; m.textContent = '✔️ النقاط متزامنة مع المنصة' + (r && r.pushed ? ` (رُفعت نقاط ${ar(r.pushed)} طالبة لأول مرة)` : ''); }
+  catch(e) { m.className = 'msg bad'; m.textContent = e.message === 'ptstable' ? 'لم يُجهَّز جدول النقاط بعد: شغّلي ملف 05_board_points.sql في Supabase ثم أعيدي المحاولة.' : platErr(e); }
 }
+// مزامنة تلقائية: عند الفتح، وعند الرجوع للصفحة، وكل ٢٠ ثانية
+function autoSync(){ if (document.visibilityState === 'visible') pullPoints(true).catch(() => {}); }
+document.addEventListener('visibilitychange', autoSync);
+addEventListener('focus', autoSync);
+setInterval(autoSync, 20000);
+setTimeout(autoSync, 800);
 
 /* ===== شهادات الشكر للمتصدرات ===== */
 function topsOf(classes){
