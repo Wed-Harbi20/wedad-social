@@ -914,7 +914,74 @@ const $ = id => document.getElementById(id);
 const ar = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const hash = s => { let h = 0; for (const ch of s) h = (h * 31 + ch.codePointAt(0)) >>> 0; return h; };
-const avHTML = (name, cls = '') => `<div class="av ${cls}" style="background:${AVC[hash(name) % AVC.length]}">${AVS[hash(name + '*') % AVS.length]}</div>`;
+/* ===== تمائم الطالبات: شخصيات أنمي ثلاثية الأبعاد (SVG أصلي) ===== */
+const AN = {
+  skin:[['#ffe4d2','#f7c3a3','#e9a785'],['#f8d6bd','#eab590','#d69670'],['#eec39f','#d9a27a','#bf8459']],
+  hair:[['#4a2c2a','#2a1514'],['#6b3e26','#3e2112'],['#1f1d2b','#0c0b14'],['#8a5a3b','#5a3520'],['#a0522d','#6b3015'],['#3b2a4a','#1d1226']],
+  hij:[['#f9a8d4','#db2777'],['#c4b5fd','#7c3aed'],['#99f6e4','#0d9488'],['#fde68a','#d97706'],['#bfdbfe','#2563eb'],['#fecdd3','#e11d48'],['#e9d5ff','#9333ea'],['#bbf7d0','#16a34a']],
+  eye:[['#7c3aed','#2e1065'],['#0ea5e9','#0c4a6e'],['#16a34a','#14532d'],['#b45309','#451a03'],['#db2777','#500724']],
+  bg:[['#fdf2f8','#fbcfe8'],['#f5f3ff','#ddd6fe'],['#ecfeff','#a5f3fc'],['#fffbeb','#fde68a'],['#eff6ff','#bfdbfe'],['#f0fdf4','#bbf7d0'],['#fff1f2','#fecdd3'],['#faf5ff','#e9d5ff']]
+};
+function anDefs(){
+  if (document.getElementById('anDefs')) return;
+  const g = (id, a, b, c) => `<radialGradient id="${id}" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="${a}"/>${c ? `<stop offset=".6" stop-color="${b}"/><stop offset="1" stop-color="${c}"/>` : `<stop offset="1" stop-color="${b}"/>`}</radialGradient>`;
+  const l = (id, a, b) => `<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>`;
+  let d = '';
+  AN.skin.forEach((c,i) => d += g('anS' + i, c[0], c[1], c[2]));
+  AN.hair.forEach((c,i) => d += g('anH' + i, c[0], c[1]));
+  AN.hij.forEach((c,i) => d += g('anJ' + i, c[0], c[1]));
+  AN.eye.forEach((c,i) => d += l('anE' + i, c[1], c[0]));
+  AN.bg.forEach((c,i) => d += g('anB' + i, c[0], c[1]));
+  const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  s.id = 'anDefs'; s.setAttribute('width', 0); s.setAttribute('height', 0); s.style.position = 'absolute';
+  s.innerHTML = `<defs>${d}<radialGradient id="anShine" cx="35%" cy="25%" r="50%"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>`;
+  document.body.prepend(s);
+}
+function animeSVG(name){
+  const h = n => hash(name + n);
+  const st = h('st') % 5, sk = h('sk') % 3, hr = h('hr') % 6, hj = h('hj') % 8, ey = h('ey') % 5, bg = h('bg') % 8, ac = AN.hij[(hj + 3) % 8];
+  const S_ = `url(#anS${sk})`, H = `url(#anH${hr})`, J = `url(#anJ${hj})`, E = `url(#anE${ey})`;
+  let back = '', front = '', top = '';
+  // الجسم (الزي)
+  const body = `<path d="M18 100 C20 80 34 74 50 74 C66 74 80 80 82 100 Z" fill="${st === 0 || st === 4 ? J : `url(#anJ${(hj + 1) % 8})`}"/><path d="M42 75 L50 84 L58 75" fill="#fff" opacity=".85"/>`;
+  if (st === 0 || st === 4) { // حجاب يحيط بالوجه
+    back = `<path d="M50 13 C26 13 15 32 16 54 C17 72 22 84 32 92 L68 92 C78 84 83 72 84 54 C85 32 74 13 50 13 Z" fill="${J}"/>`;
+    front = `<path fill-rule="evenodd" fill="${J}" d="M50 16 C29 16 19 33 20 54 C21 71 33 82 50 82 C67 82 79 71 80 54 C81 33 71 16 50 16 Z M50 31 C36 31 28.5 40 28 53 C27.5 65 37 75.5 50 75.5 C63 75.5 72.5 65 72 53 C71.5 40 64 31 50 31 Z"/>`
+          + `<path d="M28.5 50 C30 38 39 31.5 50 31.5 C61 31.5 70 38 71.5 50" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1.4"/>`
+          + `<path d="M30 70 C38 79 46 80 50 80" fill="none" stroke="#000" stroke-opacity=".12" stroke-width="2"/>`
+          + `<ellipse cx="34" cy="26" rx="10" ry="4" fill="#fff" opacity=".25" transform="rotate(-25 34 26)"/>`
+          + (st === 4 ? `<circle cx="72" cy="36" r="4.6" fill="url(#anJ${(hj + 3) % 8})"/><circle cx="72" cy="36" r="1.8" fill="#fff" opacity=".8"/>` : '');
+  } else if (st === 1) { // كعكتان
+    back = `<circle cx="27" cy="24" r="11" fill="${H}"/><circle cx="73" cy="24" r="11" fill="${H}"/><path d="M22 48 C20 30 33 20 50 20 C67 20 80 30 78 48 L78 64 L22 64 Z" fill="${H}"/>`;
+    front = `<path d="M25 48 C27 32 37 25 50 25 C63 25 73 32 75 48 C70 42 66 38 62 40 C59 35 54 36 50 39 C46 36 40 35 37 40 C33 38 29 42 25 48 Z" fill="${H}"/>`;
+    top = `<circle cx="27" cy="24" r="4" fill="${ac[0]}"/><circle cx="73" cy="24" r="4" fill="${ac[0]}"/>`;
+  } else if (st === 2) { // شعر طويل وفيونكة
+    back = `<path d="M50 18 C28 18 20 34 21 52 L18 86 C30 92 40 88 42 80 L58 80 C60 88 70 92 82 86 L79 52 C80 34 72 18 50 18 Z" fill="${H}"/>`;
+    front = `<path d="M24 50 C25 32 36 23 50 23 C64 23 75 32 76 50 C72 43 68 40 64 42 C60 36 55 35 50 37 C44 34 36 37 33 43 C29 42 26 45 24 50 Z" fill="${H}"/>`;
+    top = `<path d="M62 25 L72 18 L74 30 Z M62 25 L54 15 L51 27 Z" fill="${ac[1]}"/><circle cx="62" cy="25" r="3.2" fill="${ac[0]}"/>`;
+  } else { // قصّة قصيرة وطوق
+    back = `<path d="M50 18 C27 18 19 36 21 54 C22 64 24 70 28 72 L72 72 C76 70 78 64 79 54 C81 36 73 18 50 18 Z" fill="${H}"/>`;
+    front = `<path d="M24 50 C24 31 36 23 50 23 C64 23 76 31 76 50 C71 44 64 41 57 42 C54 39 50 38 46 40 C38 39 30 43 24 50 Z" fill="${H}"/>`;
+    top = `<path d="M26 38 C32 27 42 22 50 22 C58 22 68 27 74 38" fill="none" stroke="${ac[1]}" stroke-width="3.2" stroke-linecap="round"/>`;
+  }
+  const eyes = [38.5, 61.5].map(x => `<ellipse cx="${x}" cy="56" rx="6.3" ry="7.4" fill="#fff"/><ellipse cx="${x}" cy="57" rx="5" ry="6.4" fill="${E}"/><ellipse cx="${x}" cy="58" rx="2.3" ry="3" fill="#1a0b2e"/><ellipse cx="${x - 1.8}" cy="54" rx="1.9" ry="2.3" fill="#fff"/><circle cx="${x + 2}" cy="60.5" r="1" fill="#fff" opacity=".9"/><path d="M${x - 7} 52 Q${x} 46.5 ${x + 7} 52" fill="none" stroke="#2a1514" stroke-width="2" stroke-linecap="round"/>`).join('');
+  const brows = `<path d="M33 46.5 Q38 44.5 43 46" fill="none" stroke="#3e2112" stroke-width="1.3" stroke-linecap="round" opacity=".7"/><path d="M57 46 Q62 44.5 67 46.5" fill="none" stroke="#3e2112" stroke-width="1.3" stroke-linecap="round" opacity=".7"/>`;
+  const smile = (hash(name + 'm') % 2) ? `<path d="M45.5 67 Q50 71.5 54.5 67" fill="none" stroke="#9f1239" stroke-width="1.6" stroke-linecap="round"/>` : `<path d="M46 66.5 Q50 72.5 54 66.5 Z" fill="#e11d48"/><path d="M47.5 68.6 Q50 70.6 52.5 68.6" fill="#fda4af"/>`;
+  return `<svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true" style="display:block">
+    <circle cx="50" cy="50" r="50" fill="url(#anB${bg})"/>
+    ${back}${body}
+    <rect x="44" y="66" width="12" height="11" rx="4" fill="${S_}"/>
+    <ellipse cx="50" cy="52" rx="24.5" ry="23" fill="${S_}"/>
+    <ellipse cx="50" cy="52" rx="24.5" ry="23" fill="url(#anShine)"/>
+    <ellipse cx="34" cy="64" rx="5" ry="2.8" fill="#fb7185" opacity=".45"/><ellipse cx="66" cy="64" rx="5" ry="2.8" fill="#fb7185" opacity=".45"/>
+    ${eyes}${brows}${smile}
+    ${front}${top}
+    <ellipse cx="36" cy="22" rx="12" ry="5" fill="#fff" opacity=".18" transform="rotate(-20 36 22)"/>
+  </svg>`;
+}
+
+anDefs();
+const avHTML = (name, cls = '') => `<div class="av ${cls}" style="background:none;overflow:hidden;padding:0;box-shadow:0 6px 14px -8px rgba(76,29,149,.55)">${animeSVG(name)}</div>`;
 const shuffle = a => { a = [...a]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 const lvl = p => [...LEVELS].reverse().find(l => p >= l.n) || LEVELS[0];
 const nextLvl = p => LEVELS.find(l => Math.max(0, p) < l.n);
