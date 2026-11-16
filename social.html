@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>منصة مادة الدراسات الاجتماعية | المعلمة وداد الكحيلي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--g900:#3b2a5c;--g800:#4c3876;--g700:#6a52a3;--g600:#8068b8;--g500:#9f8ad4;--g100:#ece6f8;--g50:#f7f4fc;
+  --gold:#c4a15a;--gold-l:#efe0bd;--ink:#2a2338;--muted:#6b6380;--line:#e3dcf0;--bg:#f8f6fb;--r:16px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal',system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.8}
+a{color:inherit}
+.hero{position:relative;overflow:hidden;color:#fff;padding:34px 24px 90px;
+  background:radial-gradient(circle at 85% 10%,rgba(186,164,232,.35),transparent 45%),linear-gradient(160deg,var(--g800),var(--g900))}
+.hero .pattern{position:absolute;inset:0;opacity:.07;pointer-events:none}
+.wrap{max-width:1000px;margin:0 auto;position:relative}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+.back{display:inline-flex;align-items:center;gap:6px;text-decoration:none;border:1px solid rgba(255,255,255,.25);background:rgba(255,255,255,.08);padding:8px 14px;border-radius:12px;font-size:14px}
+.back:hover{background:rgba(255,255,255,.16)}
+.viewonly{display:inline-flex;align-items:center;gap:6px;background:var(--gold);color:var(--g900);font-weight:700;font-size:13px;padding:6px 14px;border-radius:99px}
+.hero h1{margin-top:40px;font-size:clamp(28px,4.5vw,46px);font-weight:800;line-height:1.3}
+.hero h1 span{color:var(--gold-l)}
+.hero .by{margin-top:8px;color:#e6dcf7;font-size:18px}
+.hero .lead{margin-top:16px;max-width:680px;color:#efe9fa;font-size:16.5px}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.chips span{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);padding:4px 14px;border-radius:99px;font-size:14px}
+
+.stats{max-width:1000px;margin:-56px auto 0;padding:0 24px;display:grid;grid-template-columns:repeat(4,1fr);gap:14px;position:relative;z-index:2}
+.stat{background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:0 10px 30px rgba(59,42,92,.08);text-align:center}
+.stat b{display:block;font-size:28px;color:var(--g700);line-height:1.3}
+.stat small{color:var(--muted);font-size:14px}
+
+main{max-width:1000px;margin:0 auto;padding:36px 24px 20px}
+h2.t{font-size:22px;color:var(--g900);margin:10px 0 16px;display:flex;align-items:center;gap:10px}
+h2.t::before{content:"";width:10px;height:10px;border-radius:2px;transform:rotate(45deg);background:var(--gold)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin-bottom:34px}
+.f{background:#fff;border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;gap:14px;align-items:flex-start;transition:.2s}
+.f:hover{border-color:var(--g500);box-shadow:0 8px 22px rgba(59,42,92,.08)}
+.f .ic{width:44px;height:44px;border-radius:12px;background:var(--g100);color:var(--g700);display:grid;place-items:center;flex:none}
+.f .ic svg{width:22px;height:22px}
+.f h3{font-size:16px;color:var(--g900);line-height:1.5}
+.f p{font-size:14px;color:var(--muted)}
+
+.who{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:34px}
+.who .c{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px}
+.who .c h3{color:var(--g700);font-size:17px;margin-bottom:8px}
+.who ul{list-style:none;display:grid;gap:6px}
+.who li{display:flex;gap:8px;font-size:15px}
+.who li::before{content:"✓";color:var(--g600);font-weight:800}
+
+.links{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px}
+.lk{display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,var(--g700),var(--g900));color:#fff;border-radius:14px;padding:18px 20px;text-decoration:none;transition:.2s}
+.lk:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(59,42,92,.2)}
+.lk b{display:block;font-size:17px}
+.lk small{color:#e6dcf7;font-size:13px}
+.lk span.go{background:var(--gold);color:var(--g900);font-weight:700;font-size:13px;padding:6px 14px;border-radius:9px;white-space:nowrap}
+.note{background:var(--g50);border:1px dashed var(--g500);border-radius:12px;padding:12px 16px;color:var(--muted);font-size:14px;margin-bottom:30px}
+footer{max-width:1000px;margin:0 auto;padding:18px 24px 40px;color:var(--muted);font-size:14px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+footer b{color:var(--g900)}
+@media (max-width:760px){.stats{grid-template-columns:1fr 1fr}.who,.links{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header class="hero">
+  <svg class="pattern" width="100%" height="100%"><defs><pattern id="p" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M30 0 L60 30 L30 60 L0 30Z M30 12 L48 30 L30 48 L12 30Z" fill="none" stroke="#fff" stroke-width="1"/></pattern></defs><rect width="100%" height="100%" fill="url(#p)"/></svg>
+  <div class="wrap">
+    <div class="top">
+      <a class="back" href="index.html#tech">→ العودة لملف الإنجاز</a>
+      <span class="viewonly">👁 صفحة للعرض فقط</span>
+    </div>
+    <h1>منصة مادة<br><span>الدراسات الاجتماعية</span></h1>
+    <div class="by">إعداد وتصميم المعلمة / وداد محمد الكحيلي</div>
+    <p class="lead">منصة إلكترونية صممتها لطالباتي لتكون مرجعًا مشتركًا: تدخل كل طالبة إلى صفحتها الخاصة لمتابعة أعمالها ونسبة تقدمها، وتدير المعلمة الدرجات والإنجازات من لوحة تحكم خاصة.</p>
+    <div class="chips"><span>الصف الرابع</span><span>الصف الخامس</span><span>الصف السادس</span><span>العام الدراسي 1448هـ</span></div>
+  </div>
+</header>
+
+<div class="stats">
+  <div class="stat"><b>3</b><small>مراحل دراسية</small></div>
+  <div class="stat"><b>7</b><small>فصول</small></div>
+  <div class="stat"><b>صفحة</b><small>خاصة لكل طالبة</small></div>
+  <div class="stat"><b>لوحة</b><small>تحكم للمعلمة</small></div>
+</div>
+
+<main>
+  <h2 class="t">مزايا المنصة</h2>
+  <div class="grid" id="features"></div>
+
+  <h2 class="t">لمن صُممت المنصة؟</h2>
+  <div class="who">
+    <div class="c"><h3>للطالبة</h3><ul>
+      <li>الدخول إلى صفحتها الخاصة باسمها</li>
+      <li>متابعة نسبة تقدمها في كل عمل</li>
+      <li>رفع إنجازاتها من صور ومقاطع</li>
+      <li>الحصول على شهادات الشكر وملصقات التعزيز</li>
+    </ul></div>
+    <div class="c"><h3>للمعلمة</h3><ul>
+      <li>إدارة درجات الطالبات لكل فصل</li>
+      <li>متابعة الإنجازات والواجبات المرفوعة</li>
+      <li>نشر الإعلانات للطالبات</li>
+      <li>تعزيز الطالبات وتحفيزهن عبر لوحة التعزيز</li>
+    </ul></div>
+  </div>
+
+  <h2 class="t">روابط المنصة</h2>
+  <div class="links">
+    <a class="lk" href="https://wed-harbi20.github.io/wedad-social/" target="_blank" rel="noopener">
+      <div><b>زيارة المنصة</b><small>صفحة الدخول – المحتوى محمي للطالبات والمعلمة</small></div><span class="go">فتح</span></a>
+    <a class="lk" href="https://wed-harbi20.github.io/wedad-social/board.html" target="_blank" rel="noopener">
+      <div><b>صفحة التعزيز للطالبات</b><small>لوحة التعزيز الصفية</small></div><span class="go">فتح</span></a>
+  </div>
+  <div class="note">هذه الصفحة للعرض فقط. بيانات الطالبات ودرجاتهن محمية داخل المنصة، ولا يمكن الوصول إليها إلا بحساب الطالبة أو المعلمة.</div>
+</main>
+
+<footer>
+  <div><b>المعلمة وداد محمد الكحيلي</b> – مدرسة أم معبد الخزاعية – الإدارة العامة للتعليم بمكة المكرمة</div>
+  <a href="index.html#tech">العودة لملف الإنجاز</a>
+</footer>
+
+<script>
+const I = {
+  user:'<path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"/><path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6"/>',
+  dash:'<rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/>',
+  chart:'<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  up:'<path d="M12 16V4M7 9l5-5 5 5"/><path d="M4 16v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/>',
+  chat:'<path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12Z"/>',
+  star:'<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9L12 3Z"/>',
+  award:'<circle cx="12" cy="9" r="6"/><path d="m8.5 14-1.5 7 5-3 5 3-1.5-7"/>',
+  moon:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/>'
+};
+const F = [
+  ["user","صفحة خاصة لكل طالبة","تدخل الطالبة باسمها لترى أعمالها ونتائجها."],
+  ["dash","لوحة تحكم للمعلمة","إدارة الدرجات والفصول السبعة من مكان واحد."],
+  ["chart","نسبة التقدم","تظهر للطالبة نسبة إنجازها بدل الدرجة الخام."],
+  ["up","قسم إنجازاتي","ترفع الطالبة صور ومقاطع إنجازاتها."],
+  ["chat","غرف حوار لكل صف","مساحة نقاش خاصة بطالبات كل مرحلة."],
+  ["star","لوحة التعزيز","تعزيز صفي تفاعلي لتحفيز الطالبات."],
+  ["award","شهادات وملصقات","شهادات شكر وملصقات تعزيز قابلة للطباعة."],
+  ["moon","واجهات المناسبات","ثيمات تتغير مع رمضان والأعياد ويوم التأسيس."]
+];
+document.getElementById("features").innerHTML = F.map(([i,t,d])=>`<div class="f"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">${I[i]}</svg></div><div><h3>${t}</h3><p>${d}</p></div></div>`).join("");
+</script>
+</body>
+</html>
