@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>لوحة تعزيز التربية البدنية – الثاني ١</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+Bhaijaan+2:wght@500;700;800&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --pink:#ff6fae; --pink-l:#ffd6e8; --pink-xl:#fff0f7;
+  --sky:#38bdf8; --sky-l:#c9efff; --sky-xl:#effaff;
+  --purple:#a46cf5; --purple-l:#e6d8ff; --purple-xl:#f6f0ff;
+  --ink:#4a2a6b; --muted:#8b75a8; --white:#fff;
+  --shadow:0 8px 24px rgba(164,108,245,.18);
+  --r:22px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Tajawal',sans-serif;color:var(--ink);min-height:100vh;
+  background:linear-gradient(160deg,#fff0f7 0%,#f6f0ff 45%,#e8f8ff 100%);
+  overflow-x:hidden;
+}
+h1,h2,h3,.fun{font-family:'Baloo Bhaijaan 2','Tajawal',sans-serif}
+button{font-family:inherit;cursor:pointer;border:none}
+.bubbles{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.bubbles span{position:absolute;bottom:-80px;border-radius:50%;opacity:.35;animation:rise linear infinite}
+@keyframes rise{to{transform:translateY(-120vh) rotate(360deg)}}
+.wrap{position:relative;z-index:1;max-width:1300px;margin:0 auto;padding:16px}
+
+/* Header */
+header{
+  background:linear-gradient(120deg,var(--pink),var(--purple) 55%,var(--sky));
+  border-radius:28px;padding:18px 24px;color:#fff;display:flex;align-items:center;gap:16px;
+  box-shadow:0 12px 30px rgba(164,108,245,.35);position:relative;overflow:hidden;flex-wrap:wrap
+}
+header::after{content:"";position:absolute;inset:auto -40px -60px auto;width:220px;height:220px;border-radius:50%;background:rgba(255,255,255,.15)}
+.logo{font-size:52px;background:#fff;border-radius:22px;width:78px;height:78px;display:grid;place-items:center;box-shadow:0 6px 0 rgba(0,0,0,.08);animation:bounce 2.4s ease-in-out infinite}
+@keyframes bounce{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-6px) rotate(4deg)}}
+header h1{font-size:clamp(24px,3.4vw,38px);line-height:1.1}
+header p{opacity:.95;font-weight:500;margin-top:4px}
+.teacher{display:inline-block;margin-top:8px;background:#fff;color:var(--purple);font-family:'Baloo Bhaijaan 2';font-weight:800;font-size:clamp(16px,2vw,20px);padding:5px 16px;border-radius:16px;box-shadow:0 4px 0 rgba(0,0,0,.08)}
+.head-tools{margin-inline-start:auto;display:flex;gap:8px;z-index:1;flex-wrap:wrap}
+.icon-btn{background:rgba(255,255,255,.25);color:#fff;border-radius:14px;padding:9px 13px;font-weight:700;font-size:15px;backdrop-filter:blur(4px);transition:.2s}
+.icon-btn:hover{background:rgba(255,255,255,.4);transform:translateY(-2px)}
+
+/* Class goal */
+.goal{margin-top:14px;background:#fff;border-radius:var(--r);padding:12px 18px;box-shadow:var(--shadow);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.goal b{font-family:'Baloo Bhaijaan 2';font-size:18px}
+.bar{flex:1;min-width:200px;height:22px;background:var(--purple-xl);border-radius:20px;overflow:hidden;border:2px solid var(--purple-l)}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sky),var(--purple),var(--pink));border-radius:20px;transition:width .8s cubic-bezier(.2,1.4,.4,1)}
+
+/* Tabs */
+nav{display:flex;gap:8px;margin:16px 0;flex-wrap:wrap;justify-content:center}
+nav button{
+  background:#fff;color:var(--ink);font-weight:800;font-size:16px;padding:11px 18px;border-radius:18px;
+  box-shadow:0 4px 0 var(--purple-l);transition:.2s;font-family:'Baloo Bhaijaan 2'
+}
+nav button:hover{transform:translateY(-2px)}
+nav button.on{background:linear-gradient(135deg,var(--pink),var(--purple));color:#fff;box-shadow:0 4px 0 #7d48d0}
+.view{display:none;animation:pop .35s ease}
+.view.on{display:block}
+@keyframes pop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:none}}
+
+.panel{background:#fff;border-radius:26px;padding:20px;box-shadow:var(--shadow)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{border-radius:16px;padding:11px 18px;font-weight:800;font-size:16px;color:#fff;transition:.15s;box-shadow:0 4px 0 rgba(0,0,0,.12)}
+.btn:active{transform:translateY(3px);box-shadow:none}
+.btn.pink{background:var(--pink)} .btn.sky{background:var(--sky)} .btn.purple{background:var(--purple)}
+.btn.ghost{background:var(--purple-xl);color:var(--ink);box-shadow:0 4px 0 var(--purple-l)}
+.btn.big{font-size:22px;padding:16px 30px;border-radius:22px}
+.title{font-size:24px;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.muted{color:var(--muted)}
+
+/* Students grid */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(168px,1fr));gap:14px}
+.card{
+  background:#fff;border-radius:24px;padding:14px 10px 12px;text-align:center;position:relative;
+  box-shadow:var(--shadow);border:3px solid transparent;transition:.2s;cursor:pointer;overflow:hidden
+}
+.card:hover{transform:translateY(-4px) rotate(-.5deg);border-color:var(--pink-l)}
+.card::before{content:"";position:absolute;inset:0 0 auto 0;height:54px;background:var(--c1,var(--pink-xl));z-index:0}
+.card>*{position:relative;z-index:1}
+.av{font-size:40px;width:70px;height:70px;margin:0 auto;border-radius:50%;background:#fff;display:grid;place-items:center;border:4px solid var(--c2,var(--pink-l));box-shadow:0 4px 10px rgba(0,0,0,.06)}
+.card .nm{font-weight:800;font-size:16px;margin-top:8px;min-height:40px;line-height:1.25}
+.pts{font-family:'Baloo Bhaijaan 2';font-size:30px;font-weight:800;color:var(--purple);line-height:1}
+.lvl{display:inline-block;font-size:12px;font-weight:800;padding:3px 10px;border-radius:20px;background:var(--sky-xl);color:#0b7fae;margin-top:4px}
+.qbtns{display:flex;gap:6px;justify-content:center;margin-top:8px}
+.qbtns button{width:42px;height:38px;border-radius:12px;font-size:18px;font-weight:800;color:#fff}
+.qbtns .p{background:var(--pink)} .qbtns .s{background:var(--sky)} .qbtns .m{background:#d9c9f2;color:var(--ink)}
+.card.absent{opacity:.45;filter:grayscale(.7)}
+.card.absent::after{content:"غائبة";position:absolute;top:8px;left:8px;background:#fff;border-radius:10px;padding:2px 8px;font-size:11px;font-weight:800;color:#c0392b;z-index:2}
+.float{position:fixed;font-family:'Baloo Bhaijaan 2';font-weight:800;font-size:34px;pointer-events:none;z-index:99;animation:fl 1s ease-out forwards}
+@keyframes fl{to{transform:translateY(-80px) scale(1.4);opacity:0}}
+.wiggle{animation:wig .5s}
+@keyframes wig{25%{transform:rotate(-6deg) scale(1.05)}75%{transform:rotate(6deg) scale(1.05)}}
+
+/* Attendance */
+.att-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:10px}
+.att{display:flex;align-items:center;gap:10px;background:var(--purple-xl);border-radius:18px;padding:8px 12px}
+.att .e{font-size:28px}
+.att .n{flex:1;font-weight:700}
+.att button{border-radius:12px;padding:7px 10px;font-weight:800;font-size:13px;background:#fff;color:var(--muted)}
+.att button.on.p{background:#4cd3a1;color:#fff} .att button.on.a{background:#ff7b8a;color:#fff} .att button.on.l{background:#ffc35c;color:#fff}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.stat{flex:1;min-width:120px;border-radius:18px;padding:12px;text-align:center;color:#fff}
+.stat b{display:block;font-family:'Baloo Bhaijaan 2';font-size:34px;line-height:1}
+
+/* Challenge */
+.ch-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:850px){.ch-grid{grid-template-columns:1fr}}
+.stage{background:linear-gradient(150deg,var(--pink-xl),var(--sky-xl));border-radius:24px;padding:22px;text-align:center;min-height:250px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px;border:3px dashed var(--pink-l)}
+.big-name{font-family:'Baloo Bhaijaan 2';font-size:clamp(30px,4.5vw,52px);font-weight:800;color:var(--purple);min-height:70px}
+.big-emoji{font-size:80px;line-height:1}
+.ch-card{font-family:'Baloo Bhaijaan 2';font-size:clamp(22px,3vw,32px);font-weight:700;color:var(--ink)}
+.chip{display:inline-block;background:#fff;border-radius:14px;padding:5px 12px;font-weight:800;margin:2px}
+
+/* Timer ring */
+.ring{position:relative;width:min(340px,80vw);aspect-ratio:1;margin:0 auto}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .t{position:absolute;inset:0;display:grid;place-items:center;font-family:'Baloo Bhaijaan 2';font-weight:800;font-size:clamp(48px,9vw,86px);color:var(--purple)}
+.ring.small{width:200px}
+.ring.small .t{font-size:52px}
+.ring.warn .t{color:var(--pink);animation:wig .6s infinite}
+
+/* Games */
+.games{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.game{border-radius:24px;padding:18px;color:var(--ink);position:relative;overflow:hidden;cursor:pointer;transition:.2s;box-shadow:var(--shadow);background:#fff;border:3px solid var(--purple-l)}
+.game:hover{transform:translateY(-5px)}
+.game .ge{font-size:54px}
+.game h3{font-size:22px;margin:6px 0}
+.game .tag{position:absolute;top:12px;left:12px;font-size:12px;font-weight:800;padding:4px 10px;border-radius:12px;color:#fff}
+.sec{font-size:22px;margin:22px 0 10px}
+.light{width:min(300px,70vw);aspect-ratio:1;border-radius:50%;margin:10px auto;display:grid;place-items:center;font-family:'Baloo Bhaijaan 2';font-size:clamp(36px,6vw,58px);font-weight:800;color:#fff;transition:background .25s,box-shadow .25s;background:#ddd;text-shadow:0 3px 0 rgba(0,0,0,.15)}
+.dice{display:flex;gap:18px;justify-content:center;flex-wrap:wrap}
+.die{width:150px;height:150px;border-radius:28px;background:#fff;display:grid;place-items:center;text-align:center;font-family:'Baloo Bhaijaan 2';font-weight:800;box-shadow:0 8px 0 var(--purple-l);border:4px solid var(--purple-l)}
+.die .x{font-size:60px;line-height:1}
+.die small{font-size:16px;display:block}
+.rolling{animation:roll .12s linear infinite}
+@keyframes roll{50%{transform:rotate(12deg) scale(1.05)}}
+
+/* Teams */
+.teams{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+.team{border-radius:24px;padding:16px;background:#fff;box-shadow:var(--shadow);border-top:12px solid var(--tc)}
+.team h3{font-size:22px;display:flex;justify-content:space-between;align-items:center}
+.team .score{font-family:'Baloo Bhaijaan 2';font-size:48px;font-weight:800;color:var(--tc);text-align:center;line-height:1.1}
+.team ul{list-style:none;display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.team li{background:var(--purple-xl);border-radius:12px;padding:4px 9px;font-size:14px;font-weight:700}
+
+/* Heroes */
+.podium{display:flex;align-items:flex-end;justify-content:center;gap:12px;margin:20px 0}
+.pod{text-align:center;width:min(200px,30vw)}
+.pod .av{width:84px;height:84px;font-size:50px}
+.pod .blk{margin-top:8px;border-radius:20px 20px 8px 8px;color:#fff;font-family:'Baloo Bhaijaan 2';font-size:40px;font-weight:800;display:grid;place-items:center}
+.rank{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px}
+.rank div{background:var(--purple-xl);border-radius:14px;padding:8px 12px;display:flex;gap:8px;align-items:center;font-weight:700}
+.rank b{margin-inline-start:auto;color:var(--purple);font-family:'Baloo Bhaijaan 2';font-size:20px}
+
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(74,42,107,.45);display:none;place-items:center;z-index:50;padding:16px;backdrop-filter:blur(3px)}
+.modal.on{display:grid}
+.box{background:#fff;border-radius:28px;padding:22px;width:min(520px,100%);max-height:90vh;overflow:auto;animation:pop .3s}
+.reasons{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0}
+.reasons button{border-radius:16px;padding:12px 8px;font-weight:800;font-size:15px;background:var(--pink-xl);color:var(--ink);border:2px solid var(--pink-l);transition:.15s}
+.reasons button:hover{transform:scale(1.03)}
+.reasons button.neg{background:#f3f3f7;border-color:#e2e2ea}
+textarea{width:100%;min-height:260px;border-radius:16px;border:2px solid var(--purple-l);padding:12px;font-family:'Tajawal';font-size:15px}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:98}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(120px);background:var(--ink);color:#fff;padding:12px 22px;border-radius:18px;font-weight:700;z-index:99;transition:.35s}
+.toast.on{transform:translateX(-50%) translateY(0)}
+
+.lesson-bar{margin-top:12px;background:linear-gradient(120deg,#fff,var(--sky-xl));border:3px solid var(--sky-l);border-radius:var(--r);padding:12px 18px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;box-shadow:var(--shadow)}
+.lesson-bar .lt{flex:1;min-width:220px}
+.lesson-bar .lt small{color:#0b7fae;font-weight:800}
+.lesson-bar .lt div{font-family:'Baloo Bhaijaan 2';font-size:20px;font-weight:700;line-height:1.3}
+.lessons{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.les{background:#fff;border-radius:22px;padding:14px;box-shadow:var(--shadow);border:3px solid transparent;cursor:pointer;transition:.2s;position:relative}
+.les:hover{transform:translateY(-3px)}
+.les.cur{border-color:var(--pink);background:var(--pink-xl)}
+.les.cur::after{content:"هذا الأسبوع";position:absolute;top:10px;left:10px;background:var(--pink);color:#fff;font-size:11px;font-weight:800;padding:3px 9px;border-radius:10px}
+.les.act{outline:4px dashed var(--purple)}
+.les.hol{background:#fff7e6;cursor:default}
+.les .wk{display:inline-block;background:linear-gradient(135deg,var(--purple),var(--sky));color:#fff;font-weight:800;border-radius:12px;padding:3px 12px;font-family:'Baloo Bhaijaan 2'}
+.les h3{font-size:17px;margin:8px 0 4px;line-height:1.35}
+.ans{background:#fff;border-radius:16px;padding:10px 16px;font-weight:800;color:#0b7fae;border:2px dashed var(--sky)}
+footer{text-align:center;color:var(--muted);font-size:13px;margin:24px 0 8px}
+</style>
+</head>
+<body>
+<div class="bubbles" id="bubbles"></div>
+<canvas id="confetti"></canvas>
+<div class="wrap">
+
+<header>
+  <div class="logo">🤸‍♀️</div>
+  <div>
+    <h1>نجمات الحركة والنشاط</h1>
+    <p>لوحة تعزيز التربية البدنية · الصف الثاني الابتدائي (١) · ابتدائية أم معبد الخزاعية</p>
+    <div class="teacher">👩‍🏫 المعلمة: وداد الكحيلي</div>
+  </div>
+  <div class="head-tools">
+    <button class="icon-btn" id="whistleBtn" title="صافرة">📯 صافرة</button>
+    <button class="icon-btn" id="soundBtn">🔊 الأصوات</button>
+    <button class="icon-btn" id="fsBtn">⛶ ملء الشاشة</button>
+    <button class="icon-btn" id="setBtn">⚙️ الإعدادات</button>
+  </div>
+</header>
+
+<div class="goal">
+  <b>🎁 هدف الفصل:</b>
+  <span id="goalTxt" class="fun"></span>
+  <div class="bar"><i id="goalBar"></i></div>
+  <b id="goalNum">0</b>
+</div>
+
+<div class="lesson-bar">
+  <div style="font-size:40px">📚</div>
+  <div class="lt"><small id="lbWeek"></small><div id="lbTitle"></div></div>
+  <select id="lbSel" style="border:2px solid var(--sky-l);border-radius:12px;padding:8px;font-family:Tajawal;max-width:240px"></select>
+  <a class="btn purple" id="lbPpt" target="_blank" rel="noopener" style="text-decoration:none">📊 عرض الدرس</a>
+  <button class="btn sky" id="lbGame">🎮 لعبة الدرس</button>
+  <button class="btn pink" id="lbCh">🎯 تحدي الدرس</button>
+</div>
+
+<nav id="nav">
+  <button data-v="stars" class="on">⭐ النجوم</button>
+  <button data-v="lessons">📚 دروسي</button>
+  <button data-v="att">📋 التحضير</button>
+  <button data-v="ch">🎯 التحدي</button>
+  <button data-v="games">🎮 الألعاب</button>
+  <button data-v="teams">👯‍♀️ الفرق</button>
+  <button data-v="timer">⏱️ المؤقت</button>
+  <button data-v="heroes">🏆 البطلات</button>
+</nav>
+
+<!-- النجوم -->
+<section class="view on" id="v-stars">
+  <div class="row" style="margin-bottom:14px;justify-content:space-between">
+    <div class="row">
+      <button class="btn pink" id="allPlus">🌟 نجمة للجميع</button>
+      <button class="btn sky" id="presentPlus">💙 نجمة للحاضرات</button>
+    </div>
+    <div class="row">
+      <span class="muted">ترتيب:</span>
+      <button class="btn ghost" data-sort="num">بالأرقام</button>
+      <button class="btn ghost" data-sort="pts">بالنقاط</button>
+    </div>
+  </div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<!-- الدروس -->
+<section class="view" id="v-lessons">
+  <div class="panel">
+    <h2 class="title">📚 دروس التربية البدنية والدفاع عن النفس · الصف الثاني · الفصل الدراسي الأول</h2>
+    <p class="muted" style="margin-bottom:12px">درس الأسبوع يُختار تلقائيًا حسب التاريخ، واضغطي أي درس لاختياره وتشغيل لعبته وتحدياته</p>
+    <div class="lessons" id="lessonList"></div>
+  </div>
+</section>
+
+<!-- التحضير -->
+<section class="view" id="v-att">
+  <div class="panel">
+    <div class="row" style="justify-content:space-between">
+      <h2 class="title">📋 تحضير الطالبات <span class="muted" id="attDate" style="font-size:16px"></span></h2>
+      <div class="row">
+        <input type="date" id="attPick" style="border:2px solid var(--purple-l);border-radius:12px;padding:8px;font-family:Tajawal">
+        <button class="btn sky" id="allPresent">✅ الكل حاضرات</button>
+        <button class="btn pink" id="attStar">⭐ نجمة الحضور</button>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat" style="background:#4cd3a1"><b id="cP">0</b>حاضرة</div>
+      <div class="stat" style="background:#ff7b8a"><b id="cA">0</b>غائبة</div>
+      <div class="stat" style="background:#ffc35c"><b id="cL">0</b>متأخرة</div>
+      <div class="stat" style="background:var(--purple)"><b id="cN">0</b>لم تُحضَّر</div>
+    </div>
+    <div class="att-list" id="attList"></div>
+  </div>
+</section>
+
+<!-- التحدي -->
+<section class="view" id="v-ch">
+  <div class="ch-grid">
+    <div class="panel">
+      <h2 class="title">🎯 تحدي البطلة</h2>
+      <div class="stage">
+        <div class="big-emoji" id="chEmoji">🎡</div>
+        <div class="big-name" id="chName">من البطلة اليوم؟</div>
+        <div class="ch-card" id="chText">اضغطي "اختاري بطلة" ثم "اسحبي تحديًا"</div>
+        <div id="chChips"></div>
+        <button class="btn sky" id="ansBtn" style="display:none">👀 أظهري الإجابة</button>
+        <div class="ans" id="ansTxt" style="display:none"></div>
+      </div>
+      <div class="row" style="justify-content:center;margin-top:14px">
+        <button class="btn purple big" id="pickBtn">🎲 اختاري بطلة</button>
+        <button class="btn pink big" id="drawBtn">🃏 اسحبي تحديًا</button>
+      </div>
+      <div class="row" style="justify-content:center;margin-top:10px">
+        <span class="muted">مصدر التحديات:</span>
+        <button class="btn ghost cs" data-s="lesson">📚 تحديات الدرس</button>
+        <button class="btn ghost cs" data-s="general">🌟 تحديات عامة</button>
+      </div>
+      <p class="muted" style="text-align:center;margin-top:8px">القرعة تختار من الحاضرات فقط، ولا تتكرر البطلة حتى يأتي دور الجميع</p>
+    </div>
+    <div class="panel" style="text-align:center">
+      <h2 class="title" style="justify-content:center">⏳ وقت التحدي</h2>
+      <div class="ring small" id="chRing"></div>
+      <div class="row" style="justify-content:center;margin-top:14px">
+        <button class="btn sky" id="chStart">▶️ ابدئي</button>
+        <button class="btn ghost" id="chReset">↺ إعادة</button>
+      </div>
+      <h3 style="margin:18px 0 8px" class="fun">النتيجة</h3>
+      <div class="row" style="justify-content:center">
+        <button class="btn pink big" id="chWin">🎉 نجحت!</button>
+        <button class="btn ghost big" id="chTry">💪 محاولة رائعة</button>
+      </div>
+      <p class="muted" style="margin-top:8px">النجاح يمنح نقاط التحدي، والمحاولة تمنح نجمة تشجيع ⭐</p>
+    </div>
+  </div>
+</section>
+
+<!-- الألعاب -->
+<section class="view" id="v-games">
+  <div id="gameHome">
+    <h2 class="sec fun">📚 لعبة درس الأسبوع</h2>
+    <div class="games" id="lessonGame"></div>
+    <h2 class="sec fun">📺 ألعاب على الشاشة (للعرض على السبورة)</h2>
+    <div class="games" id="screenGames"></div>
+    <h2 class="sec fun">🏃‍♀️ ألعاب الساحة</h2>
+    <div class="games" id="fieldGames"></div>
+  </div>
+  <div id="gamePlay" class="panel" style="display:none"></div>
+</section>
+
+<!-- الفرق -->
+<section class="view" id="v-teams">
+  <div class="panel" style="margin-bottom:14px">
+    <div class="row" style="justify-content:space-between">
+      <h2 class="title">👯‍♀️ تقسيم الفرق</h2>
+      <div class="row">
+        <span class="muted">عدد الفرق:</span>
+        <button class="btn ghost tn" data-n="2">2</button>
+        <button class="btn ghost tn" data-n="3">3</button>
+        <button class="btn ghost tn" data-n="4">4</button>
+        <button class="btn purple" id="mkTeams">🔀 وزّعي عشوائيًا</button>
+        <button class="btn pink" id="teamWin">🏆 الفريق الفائز</button>
+      </div>
+    </div>
+    <p class="muted">التوزيع يشمل الحاضرات فقط · نقاط الفريق مستقلة، وزر "الفريق الفائز" يمنح كل عضوة فيه نجمتين</p>
+  </div>
+  <div class="teams" id="teams"></div>
+</section>
+
+<!-- المؤقت -->
+<section class="view" id="v-timer">
+  <div class="panel" style="text-align:center">
+    <h2 class="title" style="justify-content:center">⏱️ مؤقت النشاط</h2>
+    <div class="row" style="justify-content:center;margin-bottom:14px" id="presets"></div>
+    <div class="ring" id="bigRing"></div>
+    <div class="row" style="justify-content:center;margin-top:16px">
+      <button class="btn ghost" id="tMinus">− ١٠ ث</button>
+      <button class="btn sky big" id="tStart">▶️ ابدئي</button>
+      <button class="btn ghost big" id="tReset">↺</button>
+      <button class="btn ghost" id="tPlus">+ ١٠ ث</button>
+    </div>
+    <p class="muted" style="margin-top:10px">صافرة البداية والنهاية تعمل تلقائيًا، وعدّ تنازلي صوتي لآخر ٥ ثوانٍ</p>
+  </div>
+</section>
+
+<!-- البطلات -->
+<section class="view" id="v-heroes">
+  <div class="panel">
+    <h2 class="title" style="justify-content:center">🏆 منصة البطلات</h2>
+    <div class="podium" id="podium"></div>
+    <h3 class="fun" style="margin:10px 0">🌈 ترتيب الفصل</h3>
+    <div class="rank" id="rank"></div>
+    <div class="row" style="justify-content:center;margin-top:16px">
+      <button class="btn purple" id="celebrate">🎉 احتفال!</button>
+      <button class="btn ghost" id="resetPts">🔄 بداية أسبوع جديد (تصفير النقاط)</button>
+    </div>
+  </div>
+</section>
+
+<footer>معلمة المادة: وداد الكحيلي · ١٤٤٧–١٤٤٨هـ 💗💜💙</footer>
+</div>
+
+<!-- Modals -->
+<div class="modal" id="mStudent"><div class="box">
+  <div style="text-align:center">
+    <div class="av" id="msAv" style="width:90px;height:90px;font-size:52px"></div>
+    <h2 class="fun" id="msName" style="margin-top:8px"></h2>
+    <div class="pts" id="msPts"></div>
+  </div>
+  <div class="reasons" id="reasons"></div>
+  <button class="btn ghost" style="width:100%" data-close>إغلاق</button>
+</div></div>
+
+<div class="modal" id="mConfirm"><div class="box" style="text-align:center">
+  <div style="font-size:56px">🤔</div>
+  <h2 class="fun" id="cfTxt" style="margin:8px 0 16px"></h2>
+  <div class="row" style="justify-content:center">
+    <button class="btn pink" id="cfYes">نعم</button>
+    <button class="btn ghost" data-close>إلغاء</button>
+  </div>
+</div></div>
+
+<div class="modal" id="mSet"><div class="box">
+  <h2 class="fun">⚙️ الإعدادات</h2>
+  <p class="muted" style="margin:6px 0">أسماء الطالبات (اسم في كل سطر — يمكن التعديل والإضافة):</p>
+  <textarea id="namesTa"></textarea>
+  <p class="muted" style="margin:10px 0 4px">هدف الفصل (عدد النجوم) والمكافأة:</p>
+  <div class="row">
+    <input id="goalN" type="number" min="10" style="width:110px;border:2px solid var(--purple-l);border-radius:12px;padding:8px;font-family:Tajawal">
+    <input id="goalR" style="flex:1;border:2px solid var(--purple-l);border-radius:12px;padding:8px;font-family:Tajawal">
+  </div>
+  <div class="row" style="margin-top:14px">
+    <button class="btn purple" id="saveSet">💾 حفظ</button>
+    <button class="btn ghost" data-close>إغلاق</button>
+  </div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===================== البيانات ===================== */
+const FULL = [
+"ايلاف شفيع الله ظهير احمد لال مياة","بشرى شريف محمد أنور بركات علي","جنان عثمان ظهير الحق سيد عالم","دنيا عبدالله نور عظيم",
+"رؤى ابو الهاشم خليل احمد","رهام خورشيد يوسف علي","روابي لال محمد ابو القاسم كالو","ريتاج جابر احمد عبد الصمد",
+"ريتاج جابر مشتاق اسماعيل","ريتاج سعيد الامين محمد ياسين مقبول الرحمن","ريتان حمادى داخل الحربي","ريفال محمد طيب محمدصديق ابوحسين",
+"سهام عبد الله محراب عبدالحكيم فضل","شهد أختر حسين مظهر مياه","عيدة محمد اسلام عباس علي","فائزة محمد حسين حسين علي",
+"فاطمة محمد طاهر","فايزة عبد الرشيد عبد الرب مولا","لجين حسن عبد الرشيد مخلص الرحمن","مها شريف طه واريكيلاتا",
+"ميار عثمان ابو الهاشم","نجاة نور عالم عبد الصبي عبد الحكيم","نجوى نور عالم عبد الصبي عبد الحكيم","نهى نور الإسلام مظهر مياة اسير علي",
+"نوارة محمد اسلام عباس علي","وجدان محمد شفي علي اكبر"];
+const SHORT = ["إيلاف شفيع الله","بشرى شريف","جنان عثمان","دنيا عبدالله","رؤى أبو الهاشم","رهام خورشيد","روابي لال محمد","ريتاج جابر أحمد",
+"ريتاج جابر مشتاق","ريتاج سعيد الأمين","ريتان حمادى","ريفال محمد طيب","سهام عبدالله","شهد أختر","عيدة محمد إسلام","فائزة محمد حسين",
+"فاطمة محمد","فايزة عبدالرشيد","لجين حسن","مها شريف","ميار عثمان","نجاة نور عالم","نجوى نور عالم","نهى نور الإسلام","نوارة محمد إسلام","وجدان محمد شفي"];
+const AV = ['🦋','🌸','🐰','🦄','🐱','🌈','🐼','🍓','🐥','🌷','🦊','🍭','🐨','⭐','🐬','🌼','🐞','🍒','🐣','💖','🦩','🐠','🌙','🧁','🐝','🎀','🐧','🍉','🌻','🐳'];
+const PAL = [['#fff0f7','#ffd6e8'],['#effaff','#c9efff'],['#f6f0ff','#e6d8ff']];
+const LEVELS = [[0,'🌱 بذرة نشيطة'],[10,'⭐ نجمة صاعدة'],[25,'🏅 بطلة رياضية'],[45,'👑 أسطورة الملعب']];
+const REASONS = [
+ ['👟 الالتزام بالزي الرياضي',1],['🤸‍♀️ إتقان المهارة',2],['🤝 التعاون مع الفريق',1],['💪 روح رياضية',2],
+ ['🤫 النظام والإنصات',1],['🔥 حماس ونشاط',1],['🧹 ترتيب الأدوات',1],['🎯 فوز في لعبة',2],
+ ['🙈 عدم الالتزام',-1],['🗣️ إزعاج',-1]];
+const CHALLENGES = [
+ ['🐰','اقفزي قفزة الأرنب ١٠ مرات',20,2],['🦩','قفي على قدم واحدة مثل الفلامنجو',15,2],['⭐','قفزات النجمة (جامبنج جاك) ١٠ مرات',20,2],
+ ['🐸','قفزة الضفدع ٥ مرات',20,2],['🏃‍♀️','الجري في المكان بسرعة',20,1],['🙆‍♀️','المسي أصابع قدميك ثم ارفعي يديك ٨ مرات',25,1],
+ ['⚽','ارمي الكرة لأعلى وامسكيها ٥ مرات',25,2],['🦆','امشي مشية البطة حتى الخط وارجعي',30,2],['🌀','دوّري ذراعيك للأمام ثم للخلف ١٠ مرات',20,1],
+ ['🪑','القرفصاء (جلوس ووقوف) ٨ مرات',25,2],['🦀','امشي مشية السلطعون للجانب',25,2],['🧘‍♀️','وضعية الشجرة بثبات وهدوء',15,2],
+ ['🦘','قفزة الكنغر للأمام ٦ مرات',20,2],['🎯','ارمي الكيس في الطوق من خلف الخط',30,2],['🪢','نط الحبل ١٠ مرات متتالية',30,3],
+ ['🐻','زحف الدب على اليدين والقدمين حتى العلامة',30,3]];
+const ANIMALS = [['🐸','قفزة الضفدع'],['🐰','قفز الأرنب'],['🦆','مشية البطة'],['🐻','زحف الدب'],['🦀','مشية السلطعون'],['🦩','وقفة الفلامنجو'],['🦘','قفزة الكنغر'],['🐍','زحف الأفعى'],['🐧','مشية البطريق'],['🦅','طيران النسر'],['🐒','حركة القرد'],['🐢','مشي السلحفاة البطيء']];
+const EXER = [['🦘','قفز'],['🏃‍♀️','جري بالمكان'],['🪑','قرفصاء'],['⭐','قفزة نجمة'],['🙆‍♀️','لمس الأصابع'],['🌀','دوران ذراعين']];
+const FIELD = [
+ {e:'🏁',n:'سباق التتابع',tag:'فرق',c:'#ff6fae',t:180,tools:'أقماع + عصا تتابع',rules:'تقسيم الفصل لفرق، كل طالبة تجري حتى القمع وترجع وتسلم العصا لزميلتها. الفريق الذي ينهي أولًا يفوز.'},
+ {e:'🦅',n:'الصياد والعصافير',tag:'جري',c:'#38bdf8',t:120,tools:'مساحة مفتوحة',rules:'طالبة "صيادة" في المنتصف، و"العصافير" تعبر من جهة لأخرى. من تُلمس تصبح صيادة معها.'},
+ {e:'🏀',n:'رمي الكرة في السلة',tag:'دقة',c:'#a46cf5',t:120,tools:'كرات + سلة/صندوق',rules:'كل طالبة ترمي ٣ رميات من خلف الخط، ولكل إصابة نقطة لفريقها.'},
+ {e:'⭕',n:'القفز في الأطواق',tag:'رشاقة',c:'#ff6fae',t:90,tools:'أطواق ملونة',rules:'ترتيب الأطواق على الأرض والقفز بالقدمين داخلها دون لمس الحواف، ثم بقدم واحدة.'},
+ {e:'🪢',n:'نط الحبل',tag:'لياقة',c:'#38bdf8',t:60,tools:'حبال',rules:'عدّ القفزات المتتالية خلال دقيقة، وتسجيل الرقم القياسي الجديد للطالبة.'},
+ {e:'🧺',n:'جمع الكنوز',tag:'فرق',c:'#a46cf5',t:90,tools:'كرات صغيرة + سلال',rules:'تُنثر الكرات في الساحة، وكل فريق يجمع كرات لونه فقط وينقلها لسلته واحدة واحدة.'},
+ {e:'🐛',n:'القطار الطويل',tag:'تعاون',c:'#ff6fae',t:90,tools:'أقماع',rules:'الفريق يمسك الأكتاف ويمشي كقطار بين الأقماع دون أن ينفصل، والانفصال يعيد القطار للبداية.'},
+ {e:'⚖️',n:'تحدي التوازن',tag:'توازن',c:'#38bdf8',t:60,tools:'خط على الأرض / كيس رمل',rules:'المشي على الخط وكيس الرمل على الرأس حتى النهاية دون أن يسقط.'}];
+/* دروس توزيع المنهج – الصف الثاني – الفصل الأول ١٤٤٨هـ
+   كل تحدٍّ: [رمز, نص, ثوانٍ, نقاط, إجابة (للأسئلة فقط)] */
+const LESSONS = [
+ {w:'١',d:'2026-08-30',u:'التهيئة + الوحدة الأولى',t:'عناصر اللياقة الحركية (الرشاقة، المرونة، الاتزان، التوافق)',
+  game:{e:'🎪',n:'محطات اللياقة الأربع',tools:'أقماع + أطواق + مساحة',t:240,rules:'٤ محطات: رشاقة (جري متعرج بين الأقماع)، مرونة (لمس الأصابع)، اتزان (الوقوف على قدم)، توافق (قفز مع تصفيق). كل مجموعة دقيقة في المحطة ثم تنتقل مع الصافرة.'},
+  ch:[['🏃‍♀️','رشاقة: اجري متعرجة بين ٤ أقماع وارجعي',25,2],['🙆‍♀️','مرونة: المسي أصابع قدميك دون ثني الركبتين ٥ مرات',20,2],['🦩','اتزان: قفي على قدم واحدة',15,2],['👏','توافق: اقفزي وصفقي فوق رأسك ٨ مرات',20,2],['❓','سؤال: اذكري عنصرين من عناصر اللياقة الحركية',0,1,'الرشاقة، المرونة، الاتزان، التوافق']]},
+ {w:'٢',d:'2026-09-06',u:'الوحدة الأولى',t:'التغير في معدل التنفس أثناء المجهود البدني + ملابس الأجواء الحارة',
+  game:{e:'💨',n:'نفَسي يتسارع',tools:'مساحة مفتوحة',t:90,rules:'الطالبات يضعن اليد على الصدر ويلاحظن التنفس، ثم جري في المكان ٣٠ ثانية، ثم يلاحظن كيف أصبح التنفس أسرع. بعدها تمرين تنفس هادئ.'},
+  ch:[['🏃‍♀️','اجري في المكان بسرعة ثم ضعي يدك على صدرك',30,2],['🌬️','خذي شهيقًا عميقًا من الأنف وزفيرًا من الفم ٥ مرات',20,1],['❓','سؤال: ماذا يحدث لتنفسنا عندما نجري؟',0,1,'يصبح أسرع لأن الجسم يحتاج هواءً أكثر'],['☀️','سؤال: ماذا نلبس في الجو الحار؟',0,1,'ملابس قطنية واسعة فاتحة اللون، وغطاء للرأس، ونشرب الماء']]},
+ {w:'٣',d:'2026-09-13',u:'الوحدة الأولى',t:'ملابس الأجواء الباردة + أهمية الغذاء الصحي',
+  game:{e:'🧥',n:'سباق خزانة الملابس',tools:'بطاقات صور ملابس + سلتان (حار/بارد)',t:120,rules:'تجري الطالبة إلى كومة البطاقات وتأخذ بطاقة وتضعها في سلة "الجو الحار" أو "الجو البارد" الصحيحة، ثم تعود وتلمس يد زميلتها.'},
+  ch:[['🧣','سؤال: ماذا نلبس عند اللعب في الجو البارد؟',0,1,'ملابس دافئة على طبقات، وجاكيت، وقفازات'],['🍎','سؤال: لماذا نأكل الطعام الصحي؟',0,1,'ليعطينا الطاقة والقوة والنمو ويحمينا من المرض'],['🏃‍♀️','اجري في المكان مثل لاعبة نشيطة أكلت فطورًا صحيًا',20,1],['⭐','قفزات النجمة ١٠ مرات',20,2]]},
+ {w:'٤',d:'2026-09-20',u:'الوحدة الأولى',t:'كيفية اختيار الغذاء الصحي',note:'🌴 إجازة اليوم الوطني (الأربعاء والخميس)',
+  game:{e:'🥕',n:'صحي أم غير صحي؟',tools:'خط في المنتصف + صور أطعمة',t:120,rules:'المعلمة تعرض طعامًا: إذا كان صحيًا تجري الطالبات لجهة اليمين 🥦، وإذا كان غير صحي لجهة اليسار 🍟. من تخطئ تؤدي ٣ قفزات وتعود للعب.'},
+  ch:[['🥛','سؤال: اختاري الأفضل للفطور: حليب وبيض أم مشروب غازي؟',0,1,'الحليب والبيض'],['🍌','سؤال: اذكري فاكهتين مفيدتين للرياضيات',0,1,'مثل الموز والتفاح والبرتقال'],['💧','سؤال: ماذا نشرب أثناء الرياضة؟',0,1,'الماء'],['🦘','قفزة الكنغر ٦ مرات',20,2]]},
+ {w:'٥',d:'2026-09-27',u:'الوحدة الثانية',t:'الانزلاق الصحيح من الجري (خط مستقيم، متعرج، منحني) + سحب المقاومات',
+  game:{e:'⛸️',n:'متزلجات على الجليد',tools:'أقماع + حبل',t:150,rules:'جري ثم انزلاق جانبي على خط مستقيم ثم متعرج بين الأقماع ثم منحنٍ حول دائرة. وفي الختام "شد الحبل" بين فريقين بطريقة آمنة.'},
+  ch:[['⛸️','انزلقي جانبيًا على خط مستقيم ذهابًا وإيابًا',25,2],['〰️','انزلقي بين الأقماع في خط متعرج',30,2],['🌀','انزلقي حول الدائرة في خط منحنٍ',30,2],['🪢','اسحبي الحبل مع زميلتك بثبات (الظهر مستقيم والركبتان مثنيتان)',20,2]]},
+ {w:'٦',d:'2026-10-04',u:'الوحدة الثانية',t:'الوقوف من الجلوس التربيع والذراعان ممدودتان للأمام',
+  game:{e:'🚀',n:'الصاروخ الصغير',tools:'مراتب أو أرض نظيفة',t:90,rules:'الطالبات يجلسن جلسة التربيع. عند "١-٢-٣ انطلاق" يمددن الذراعين للأمام وينهضن دون الاستناد على الأرض، ثم يجلسن مرة أخرى بهدوء.'},
+  ch:[['🚀','من جلسة التربيع انهضي والذراعان للأمام ٥ مرات',25,2],['🧘‍♀️','اجلسي التربيع بظهر مستقيم وهدوء',15,1],['🏆','انهضي دون أن تلمس يداك الأرض ٣ مرات متتالية',20,3]]},
+ {w:'٧',d:'2026-10-11',u:'الوحدة الثانية',t:'تمرير الكرة بطريقة صحيحة باليدين',
+  game:{e:'🏐',n:'تمريرة الدائرة',tools:'كرات',t:120,rules:'الطالبات في دائرة، يمررن الكرة باليدين من مستوى الصدر للزميلة المقابلة مع ذكر اسمها. كل تمريرة صحيحة دون سقوط = نقطة للفصل.'},
+  ch:[['🏐','مرري الكرة باليدين لزميلتك واستقبليها ٥ مرات',25,2],['🎯','مرري الكرة إلى داخل الطوق من خلف الخط',20,2],['🤲','ارمي الكرة لأعلى وامسكيها باليدين ٥ مرات',20,2]]},
+ {w:'٨',d:'2026-10-18',u:'الوحدة الثالثة',t:'الحجل بطريقة صحيحة إلى الأمام والخلف والمتعرج',
+  game:{e:'🦩',n:'حجلة الفلامنجو',tools:'أقماع + طباشير',t:120,rules:'الحجل على قدم واحدة: للأمام حتى القمع، ثم للخلف خطوتين، ثم متعرج بين الأقماع. نبدّل القدم في كل جولة.'},
+  ch:[['🦩','احجلي للأمام ٥ حجلات على القدم اليمنى',20,2],['↩️','احجلي للخلف ٣ حجلات بحذر',20,2],['〰️','احجلي متعرجة بين الأقماع',30,3],['🔁','احجلي على القدم اليسرى ٥ حجلات',20,2]]},
+ {w:'٩',d:'2026-10-25',u:'الوحدة الثالثة',t:'الدفع بطريقة صحيحة وآمنة وفعالة',
+  game:{e:'💪',n:'ادفعي الكرة الكبيرة',tools:'كرة كبيرة / طبية خفيفة',t:120,rules:'الدفع باليدين من أمام الصدر مع تقديم قدم ومدّ الذراعين. فريقان يدفعان الكرة نحو خط الفريق الآخر.'},
+  ch:[['🧱','ادفعي الحائط بيديك وأنت بوضع صحيح ١٠ مرات',25,2],['🏐','ادفعي الكرة من أمام الصدر لأبعد مسافة',20,2],['❓','سؤال: كيف نقف عند الدفع؟',0,1,'قدم أمام قدم، والذراعان تمتدان للأمام']]},
+ {w:'١٠',d:'2026-11-01',u:'الوحدة الثالثة',t:'الميزان الأمامي من الثبات',
+  game:{e:'✈️',n:'الطائرات الواقفة',tools:'مراتب',t:90,rules:'عندما تقول المعلمة "طائرة!" تميل الطالبات للأمام على قدم واحدة والذراعان جانبًا والرجل الأخرى للخلف (الميزان الأمامي) حتى العدّ إلى ٥.'},
+  ch:[['✈️','الميزان الأمامي ٥ ثوانٍ دون اهتزاز',15,2],['⏳','الميزان الأمامي ١٠ ثوانٍ',20,3],['🔁','الميزان الأمامي على القدم الأخرى',15,2]]},
+ {w:'١١',d:'2026-11-08',u:'الوحدة الرابعة',t:'القفز لتجاوز ارتفاعات مختلفة باستخدام الجسم كله، اليدين والرجلين',
+  game:{e:'🌊',n:'عبور النهر',tools:'حواجز منخفضة / مقاعد سويدية / حبال',t:150,rules:'"النهر" مجموعة حواجز بارتفاعات مختلفة؛ تعبرها الطالبات بالقفز بالرجلين، ثم بالاستناد على اليدين، ثم بالجسم كله بأمان.'},
+  ch:[['🐸','اقفزي فوق الحاجز المنخفض بالرجلين ٤ مرات',25,2],['🤸‍♀️','اعبري المقعد بالاستناد على يديك',25,3],['🦘','اقفزي فوق الحبل وهو يرتفع قليلًا كل مرة',30,3]]},
+ {w:'١٢',d:'2026-11-15',u:'الوحدة الرابعة',t:'القوس المعكوس نصفًا',
+  game:{e:'🌈',n:'جسر قوس قزح',tools:'مراتب',t:120,rules:'على المرتبة: الاستلقاء على الظهر، القدمان على الأرض، رفع الحوض لأعلى لعمل نصف قوس (جسر). عند "مرّي يا سيارة!" تزحف زميلة صغيرة بحذر قرب الجسر، والمعلمة تساعد وتراقب.'},
+  ch:[['🌈','اعملي نصف القوس (الجسر) واثبتي',10,2],['⏳','نصف القوس مع الثبات حتى العدّ ١٠',15,3],['🔁','ارفعي الحوض وأنزليه ببطء ٥ مرات',25,2],['❓','سؤال: أين نؤدي القوس المعكوس؟',0,1,'على المرتبة وبوجود المعلمة']]},
+ {w:'إجازة',d:'2026-11-22',holiday:true,t:'🌴 إجازة الخريف'},
+ {w:'١٣',d:'2026-11-29',u:'الوحدة الرابعة',t:'تمرير الكرة بطريقة صحيحة بيد واحدة',
+  game:{e:'🎣',n:'صيد السمك',tools:'كرات صغيرة + سلال/أطواق',t:120,rules:'كل طالبة ترمي "السمكة" (كرة صغيرة) بيد واحدة من فوق الكتف إلى "الشبكة" (السلة). كل إصابة نقطة لفريقها.'},
+  ch:[['🎣','مرري الكرة بيد واحدة لزميلتك ٥ مرات',25,2],['🎯','ارمي الكرة بيد واحدة داخل الطوق',20,2],['🔁','مرري باليد الأخرى ٣ مرات',20,3]]},
+ {w:'١٤',d:'2026-12-06',u:'الوحدة الخامسة',t:'القفز لتجاوز ارتفاعات مختلفة بطريقة صحيحة وآمنة',
+  game:{e:'🐇',n:'حواجز الأرانب',tools:'حواجز بارتفاعات متدرجة',t:120,rules:'صف من الحواجز يرتفع تدريجيًا؛ القفز بالقدمين معًا والهبوط على مشط القدم مع ثني الركبتين.'},
+  ch:[['🐇','اقفزي فوق ٣ حواجز متتالية بالقدمين',25,2],['🦵','اهبطي بثني الركبتين دون صوت عالٍ ٥ مرات',20,2],['❓','سؤال: كيف نهبط بأمان بعد القفز؟',0,1,'على مشط القدم مع ثني الركبتين']]},
+ {w:'١٥',d:'2026-12-13',u:'الوحدة الخامسة',t:'الرفع الصحيح للأثقال',
+  game:{e:'📦',n:'نقل الكنز',tools:'صناديق/كرات خفيفة',t:120,rules:'نقل "الكنز" من مكان لآخر برفعه بطريقة صحيحة: ثني الركبتين، ظهر مستقيم، الثقل قريب من الجسم.'},
+  ch:[['📦','ارفعي الصندوق الخفيف بثني الركبتين والظهر مستقيم ٥ مرات',25,2],['❓','سؤال: هل نرفع الثقل بثني الظهر أم الركبتين؟',0,1,'بثني الركبتين والظهر مستقيم'],['🧺','انقلي ٣ كرات للسلة برفع صحيح',30,2]]},
+ {w:'١٦',d:'2026-12-20',u:'الوحدة الخامسة',t:'ركل الكرة المتحركة بالقدم + مراجعة',
+  game:{e:'⚽',n:'هدف النجمة',tools:'كرات + مرمى صغير / أقماع',t:150,rules:'المعلمة أو الزميلة تدحرج الكرة، والطالبة تركلها بباطن القدم نحو المرمى بين القمعين.'},
+  ch:[['⚽','اركلي الكرة المتدحرجة نحو المرمى ٣ مرات',25,2],['🎯','اركلي بين القمعين بباطن القدم',20,2],['🔁','مراجعة: الميزان الأمامي ٥ ثوانٍ',15,2]]},
+ {w:'١٧',d:'2026-12-27',u:'الوحدة الخامسة',t:'ركل الكرة المتحركة بالقدم + مراجعة عامة',
+  game:{e:'🏆',n:'بطولة المهارات',tools:'محطات لكل المهارات',t:300,rules:'محطات مراجعة: حجل، تمرير، قفز، ميزان، ركل. كل فريق يمر على المحطات ويجمع النجوم.'},
+  ch:[['⚽','اركلي الكرة المتحركة نحو الهدف',25,2],['🦩','احجلي للأمام ٥ حجلات',20,2],['🏐','مرري الكرة بيد واحدة',20,2],['🌈','نصف القوس المعكوس',10,2]]},
+ {w:'١٨–١٩',d:'2027-01-03',u:'',t:'📝 اختبارات شفهية وعملية ونهائية',
+  game:{e:'📝',n:'مراجعة قبل الاختبار',tools:'محطات المهارات',t:180,rules:'جولة سريعة على جميع المهارات العملية مع أسئلة شفهية قصيرة.'},
+  ch:[['❓','سؤال: اذكري عنصرين من عناصر اللياقة',0,1,'الرشاقة، المرونة، الاتزان، التوافق'],['🍎','سؤال: اذكري غذاءً صحيًا',0,1,'الخضار، الفواكه، الحليب...'],['✈️','الميزان الأمامي ٥ ثوانٍ',15,2],['⚽','ركل الكرة المتحركة',20,2]]}];
+const PPT_BASE='https://wed-harbi20.github.io/wedad-social/pe-lessons/';
+function pptUrl(i){const f=i<12?i+1:i;return PPT_BASE+'week-'+String(f).padStart(2,'0')+'.pptx'}
+function lessonIdxFor(date){let k=0;LESSONS.forEach((l,i)=>{if(date>=l.d)k=i});return k}
+
+const TEAMS = [{n:'فريق الوردي',e:'🌸',c:'#ff6fae'},{n:'فريق السماوي',e:'💧',c:'#38bdf8'},{n:'فريق الموف',e:'🔮',c:'#a46cf5'},{n:'فريق الأبيض',e:'☁️',c:'#b9a7d6'}];
+
+const KEY='pe-board-2-1-v1';
+let S;
+function defaults(){return {students:FULL.map((f,i)=>({full:f,name:SHORT[i],pts:0,av:AV[i%AV.length]})),att:{},teams:[],tScores:[],teamN:2,goal:200,reward:'حصة لعب حر 🎈',sound:true,used:[],chSrc:'lesson',lesson:null}}
+function load(){try{const r=localStorage.getItem(KEY);S=r?Object.assign(defaults(),JSON.parse(r)):defaults()}catch(e){S=defaults()}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+load();
+
+/* ===================== الأصوات ===================== */
+let AC;
+function ac(){if(!AC){try{AC=new (window.AudioContext||window.webkitAudioContext)()}catch(e){}}if(AC&&AC.state==='suspended')AC.resume();return AC}
+function tone(f,d=.15,type='sine',v=.18,when=0){if(!S.sound)return;const a=ac();if(!a)return;const t=a.currentTime+when;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(v,t);g.gain.exponentialRampToValueAtTime(.001,t+d);o.connect(g).connect(a.destination);o.start(t);o.stop(t+d+.02)}
+const SFX={
+ up(){tone(660,.12,'triangle');tone(990,.2,'triangle',.18,.09)},
+ big(){[523,659,784,1047].forEach((f,i)=>tone(f,.25,'triangle',.18,i*.09))},
+ down(){tone(330,.18,'sine',.15);tone(220,.25,'sine',.15,.12)},
+ tick(){tone(880,.06,'square',.06)},
+ click(){tone(520,.05,'triangle',.08)},
+ fanfare(){[523,523,523,659,784,659,784,1047].forEach((f,i)=>tone(f,.22,'triangle',.2,i*.13))},
+ whistle(){if(!S.sound)return;const a=ac();if(!a)return;const t=a.currentTime;const o=a.createOscillator(),l=a.createOscillator(),lg=a.createGain(),g=a.createGain();o.type='sine';o.frequency.value=2300;l.frequency.value=38;lg.gain.value=180;l.connect(lg).connect(o.frequency);g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.16,t+.03);g.gain.setValueAtTime(.16,t+.55);g.gain.linearRampToValueAtTime(0,t+.65);o.connect(g).connect(a.destination);o.start(t);l.start(t);o.stop(t+.7);l.stop(t+.7)}
+};
+
+/* ===================== أدوات ===================== */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),2000)}
+function today(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+let attDay=today();
+function status(i,day=today()){return (S.att[day]||{})[i]}
+function present(){return S.students.map((s,i)=>i).filter(i=>status(i)!=='a')}
+function level(p){let l=LEVELS[0][1];for(const [m,n] of LEVELS)if(p>=m)l=n;return l}
+function fmt(s){s=Math.max(0,Math.ceil(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')}
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function floatAt(el,txt,color){const r=el.getBoundingClientRect();const f=document.createElement('div');f.className='float';f.textContent=txt;f.style.color=color;f.style.left=(r.left+r.width/2-20)+'px';f.style.top=(r.top+20)+'px';document.body.appendChild(f);setTimeout(()=>f.remove(),1000)}
+function confirmBox(txt,fn){$('#cfTxt').textContent=txt;open('#mConfirm');$('#cfYes').onclick=()=>{close('#mConfirm');fn()}}
+function open(s){$(s).classList.add('on')} function close(s){$(s).classList.remove('on')}
+$$('[data-close]').forEach(b=>b.onclick=()=>b.closest('.modal').classList.remove('on'));
+$$('.modal').forEach(m=>m.onclick=e=>{if(e.target===m)m.classList.remove('on')});
+
+/* ===================== فقاعات + احتفال ===================== */
+(function(){const b=$('#bubbles'),c=['#ffd6e8','#c9efff','#e6d8ff','#fff'];for(let i=0;i<18;i++){const s=document.createElement('span');const z=20+Math.random()*60;s.style.cssText=`width:${z}px;height:${z}px;left:${Math.random()*100}%;background:${c[i%4]};animation-duration:${14+Math.random()*16}s;animation-delay:${-Math.random()*20}s`;b.appendChild(s)}})();
+const cv=$('#confetti'),cx=cv.getContext('2d');let parts=[],raf;
+function confetti(n=160){cv.width=innerWidth;cv.height=innerHeight;const col=['#ff6fae','#38bdf8','#a46cf5','#ffd6e8','#c9efff','#fff'];for(let i=0;i<n;i++)parts.push({x:Math.random()*cv.width,y:-20-Math.random()*cv.height*.4,vx:(Math.random()-.5)*4,vy:2+Math.random()*4,s:6+Math.random()*8,r:Math.random()*6,vr:(Math.random()-.5)*.3,c:col[i%col.length],sh:Math.random()<.3?'★':null});if(!raf)anim()}
+function anim(){cx.clearRect(0,0,cv.width,cv.height);parts.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.05;p.r+=p.vr;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;if(p.sh){cx.font=p.s*2+'px serif';cx.fillText('★',0,0)}else cx.fillRect(-p.s/2,-p.s/4,p.s,p.s/2);cx.restore()});parts=parts.filter(p=>p.y<cv.height+30);if(parts.length)raf=requestAnimationFrame(anim);else{raf=null;cx.clearRect(0,0,cv.width,cv.height)}}
+
+/* ===================== النقاط ===================== */
+function addPts(i,n,el){const s=S.students[i];s.pts=Math.max(0,s.pts+n);save();
+ if(n>0){n>=2?SFX.big():SFX.up()}else SFX.down();
+ if(el){floatAt(el,(n>0?'+':'')+n+(n>0?' ⭐':''),n>0?'#ff6fae':'#8b75a8')}
+ const before=level(s.pts-n),after=level(s.pts);if(n>0&&before!==after){confetti(120);toast('🎉 '+s.name+' صارت '+after)}
+ renderAll()}
+function totalPts(){return S.students.reduce((a,s)=>a+s.pts,0)}
+let sortMode='num';
+function renderGrid(){const g=$('#grid');g.innerHTML='';
+ let idx=S.students.map((s,i)=>i);if(sortMode==='pts')idx.sort((a,b)=>S.students[b].pts-S.students[a].pts);
+ idx.forEach(i=>{const s=S.students[i],p=PAL[i%3];const c=document.createElement('div');c.className='card'+(status(i)==='a'?' absent':'');c.style.setProperty('--c1',p[0]);c.style.setProperty('--c2',p[1]);
+  c.innerHTML=`<div class="av">${s.av}</div><div class="nm">${s.name}</div><div class="pts">${s.pts}</div><div class="lvl">${level(s.pts)}</div>
+  <div class="qbtns"><button class="p" data-a="1">+1</button><button class="s" data-a="2">+2</button><button class="m" data-a="-1">−1</button></div>`;
+  c.title=s.full;
+  c.onclick=e=>{const a=e.target.dataset.a;if(a){e.stopPropagation();c.classList.remove('wiggle');void c.offsetWidth;c.classList.add('wiggle');addPts(i,+a,e.target)}else openStudent(i)};
+  g.appendChild(c)})}
+function openStudent(i){const s=S.students[i];$('#msAv').textContent=s.av;$('#msName').textContent=s.full;$('#msPts').textContent=s.pts+' ⭐ · '+level(s.pts);
+ const r=$('#reasons');r.innerHTML='';REASONS.forEach(([t,n])=>{const b=document.createElement('button');if(n<0)b.className='neg';b.textContent=t+'  '+(n>0?'+':'')+n;b.onclick=()=>{addPts(i,n,b);$('#msPts').textContent=S.students[i].pts+' ⭐ · '+level(S.students[i].pts)};r.appendChild(b)});
+ const av=document.createElement('button');av.textContent='🔄 تغيير الرمز';av.onclick=()=>{s.av=AV[(AV.indexOf(s.av)+1)%AV.length];save();$('#msAv').textContent=s.av;renderGrid()};r.appendChild(av);
+ open('#mStudent')}
+$('#allPlus').onclick=()=>{S.students.forEach(s=>s.pts++);save();SFX.fanfare();confetti();toast('🌟 نجمة لكل البطلات!');renderAll()};
+$('#presentPlus').onclick=()=>{present().forEach(i=>S.students[i].pts++);save();SFX.big();confetti(90);toast('💙 نجمة للحاضرات');renderAll()};
+$$('[data-sort]').forEach(b=>b.onclick=()=>{sortMode=b.dataset.sort;renderGrid()});
+function renderGoal(){const t=totalPts(),p=Math.min(100,t/S.goal*100);$('#goalBar').style.width=p+'%';$('#goalNum').textContent=t+' / '+S.goal+' ⭐';$('#goalTxt').textContent=S.reward;
+ if(t>=S.goal&&!renderGoal.done){renderGoal.done=true;setTimeout(()=>{confetti(250);SFX.fanfare();toast('🎁 وصلنا للهدف! '+S.reward)},300)}}
+
+/* ===================== التحضير ===================== */
+const AR_DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+function renderAtt(){$('#attPick').value=attDay;const d=new Date(attDay+'T12:00');$('#attDate').textContent='· '+AR_DAYS[d.getDay()]+' '+attDay;
+ const day=S.att[attDay]||{};let c={p:0,a:0,l:0,n:0};const L=$('#attList');L.innerHTML='';
+ S.students.forEach((s,i)=>{const st=day[i];c[st||'n']++;const r=document.createElement('div');r.className='att';
+  r.innerHTML=`<span class="e">${s.av}</span><span class="n">${i+1}. ${s.name}</span>`+[['p','حاضرة'],['l','متأخرة'],['a','غائبة']].map(([k,t])=>`<button class="${k}${st===k?' on':''}" data-k="${k}">${t}</button>`).join('');
+  r.querySelectorAll('button').forEach(b=>b.onclick=()=>{S.att[attDay]=S.att[attDay]||{};S.att[attDay][i]=b.dataset.k;save();SFX.click();renderAtt();renderGrid()});L.appendChild(r)});
+ $('#cP').textContent=c.p;$('#cA').textContent=c.a;$('#cL').textContent=c.l;$('#cN').textContent=c.n}
+$('#attPick').onchange=e=>{attDay=e.target.value||today();renderAtt()};
+$('#allPresent').onclick=()=>{S.att[attDay]={};S.students.forEach((s,i)=>S.att[attDay][i]='p');save();SFX.big();renderAtt();renderGrid()};
+$('#attStar').onclick=()=>{const day=S.att[attDay]||{};let n=0;S.students.forEach((s,i)=>{if(day[i]==='p'){s.pts++;n++}});save();if(n){SFX.fanfare();confetti();toast('⭐ نجمة الحضور لـ '+n+' طالبة')}else toast('حضّري الطالبات أولًا');renderAll()};
+
+/* ===================== المؤقت (مكوّن) ===================== */
+function makeRing(el,colorA,colorB){const id='g'+Math.random().toString(36).slice(2,7);
+ el.innerHTML=`<svg viewBox="0 0 120 120"><defs><linearGradient id="${id}"><stop offset="0" stop-color="${colorA}"/><stop offset="1" stop-color="${colorB}"/></linearGradient></defs><circle cx="60" cy="60" r="52" fill="none" stroke="#f1e9ff" stroke-width="12"/><circle class="arc" cx="60" cy="60" r="52" fill="none" stroke="url(#${id})" stroke-width="12" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="0"/></svg><div class="t">0:00</div>`;
+ const T={total:60,left:60,run:false,last:0,arc:el.querySelector('.arc'),txt:el.querySelector('.t'),onEnd:null,
+  set(s){this.total=this.left=s;this.run=false;this.draw()},
+  draw(){this.txt.textContent=fmt(this.left);this.arc.style.strokeDashoffset=326.7*(1-this.left/this.total);el.classList.toggle('warn',this.run&&this.left<=5)},
+  start(){if(this.left<=0)this.left=this.total;this.run=true;this.last=performance.now();SFX.whistle();this.loop()},
+  pause(){this.run=false;this.draw()},
+  loop(){if(!this.run)return;const n=performance.now();const prev=Math.ceil(this.left);this.left-=(n-this.last)/1000;this.last=n;const cur=Math.ceil(this.left);
+   if(cur!==prev&&cur<=5&&cur>0)SFX.tick();
+   if(this.left<=0){this.left=0;this.run=false;this.draw();SFX.whistle();setTimeout(SFX.fanfare,700);confetti(140);this.onEnd&&this.onEnd();return}
+   this.draw();requestAnimationFrame(()=>this.loop())}};
+ T.draw();return T}
+const big=makeRing($('#bigRing'),'#ff6fae','#38bdf8');big.set(60);
+big.onEnd=()=>{$('#tStart').textContent='▶️ ابدئي';toast('⏰ انتهى الوقت!')};
+[[30,'٣٠ ث'],[60,'١ د'],[120,'٢ د'],[180,'٣ د'],[300,'٥ د'],[600,'١٠ د']].forEach(([s,t])=>{const b=document.createElement('button');b.className='btn ghost';b.textContent=t;b.onclick=()=>{big.set(s);$('#tStart').textContent='▶️ ابدئي';SFX.click()};$('#presets').appendChild(b)});
+$('#tStart').onclick=()=>{if(big.run){big.pause();$('#tStart').textContent='▶️ تابعي'}else{big.start();$('#tStart').textContent='⏸️ إيقاف'}};
+$('#tReset').onclick=()=>{big.set(big.total);$('#tStart').textContent='▶️ ابدئي'};
+$('#tPlus').onclick=()=>{big.total+=10;big.left+=10;big.draw()};
+$('#tMinus').onclick=()=>{if(big.left>10){big.left-=10;big.total=Math.max(big.total-10,big.left);big.draw()}};
+
+/* ===================== التحدي ===================== */
+const chT=makeRing($('#chRing'),'#a46cf5','#ff6fae');chT.set(20);
+let chStudent=null,chCur=null;
+chT.onEnd=()=>{$('#chStart').textContent='▶️ ابدئي'};
+$('#pickBtn').onclick=()=>{let pool=present().filter(i=>!S.used.includes(i));if(!pool.length){S.used=[];pool=present()}if(!pool.length){toast('لا توجد طالبات حاضرات');return}
+ const pick=pool[Math.floor(Math.random()*pool.length)];let k=0;const steps=22;
+ const spin=()=>{const r=pool[Math.floor(Math.random()*pool.length)];$('#chName').textContent=S.students[r].name;$('#chEmoji').textContent=S.students[r].av;SFX.tick();
+  if(++k<steps)setTimeout(spin,40+k*k*.6);else{chStudent=pick;S.used.push(pick);save();$('#chName').textContent=S.students[pick].name;$('#chEmoji').textContent=S.students[pick].av;SFX.big();confetti(60)}};spin()};
+function chPool(){const L=LESSONS[curLesson()];return (S.chSrc==='lesson'&&L.ch)?L.ch:CHALLENGES}
+$('#drawBtn').onclick=()=>{const pool=chPool();$('#ansBtn').style.display='none';$('#ansTxt').style.display='none';let k=0;const go=()=>{const c=pool[Math.floor(Math.random()*pool.length)];$('#chText').textContent=c[0]+' '+c[1];SFX.click();
+  if(++k<12)setTimeout(go,70);else{chCur=c;if(c[2]){$('#chChips').innerHTML=`<span class="chip">⏳ ${c[2]} ثانية</span><span class="chip">⭐ ${c[3]} نقاط</span>`;chT.set(c[2])}else{$('#chChips').innerHTML=`<span class="chip">💬 سؤال شفهي</span><span class="chip">⭐ ${c[3]} نقاط</span>`;chT.set(15);$('#ansBtn').style.display='inline-block';$('#ansTxt').textContent='✅ '+c[4]}$('#chStart').textContent='▶️ ابدئي';SFX.up()}};go()};
+$('#ansBtn').onclick=()=>{$('#ansTxt').style.display='block';SFX.up()};
+function renderChSrc(){$$('.cs').forEach(b=>b.className='btn cs '+(b.dataset.s===S.chSrc?'purple':'ghost'))}
+$$('.cs').forEach(b=>b.onclick=()=>{S.chSrc=b.dataset.s;save();renderChSrc();SFX.click()});
+$('#chStart').onclick=()=>{if(chT.run){chT.pause();$('#chStart').textContent='▶️ تابعي'}else{chT.start();$('#chStart').textContent='⏸️ إيقاف'}};
+$('#chReset').onclick=()=>{chT.set(chT.total);$('#chStart').textContent='▶️ ابدئي'};
+$('#chWin').onclick=e=>{if(chStudent==null){toast('اختاري بطلة أولًا');return}const n=chCur?chCur[3]:2;addPts(chStudent,n,e.target);confetti(200);SFX.fanfare();toast('🎉 أحسنتِ يا '+S.students[chStudent].name)};
+$('#chTry').onclick=e=>{if(chStudent==null){toast('اختاري بطلة أولًا');return}addPts(chStudent,1,e.target);toast('💪 محاولة رائعة يا '+S.students[chStudent].name)};
+
+/* ===================== الألعاب ===================== */
+const SCREEN=[
+ {id:'traffic',e:'🚦',n:'إشارة المرور',c:'#ff6fae',d:'أخضر = اجري · أصفر = امشي · أحمر = قفي مكانك! الإشارة تتغير فجأة.'},
+ {id:'statue',e:'🗿',n:'لعبة التمثال',c:'#38bdf8',d:'تحركي وارقصي مع النغمة، وعندما تتوقف كوني تمثالًا لا يتحرك!'},
+ {id:'animals',e:'🐸',n:'حركات الحيوانات',c:'#a46cf5',d:'عجلة الحيوانات تختار حيوانًا، وكل الطالبات يقلّدن حركته.'},
+ {id:'dice',e:'🎲',n:'النرد الرياضي',c:'#ff6fae',d:'نرد للتمرين ونرد للعدد: ماذا ستكون مهمتنا؟'},
+ {id:'mirror',e:'🪞',n:'المرآة السريعة',c:'#38bdf8',d:'تظهر حركة على الشاشة وتنفذها الطالبات بأسرع ما يمكن قبل انتهاء الوقت.'}];
+function renderGames(){const s=$('#screenGames');s.innerHTML='';SCREEN.forEach(g=>{const d=document.createElement('div');d.className='game';d.style.borderColor=g.c+'55';
+  d.innerHTML=`<span class="tag" style="background:${g.c}">على الشاشة</span><div class="ge">${g.e}</div><h3 class="fun">${g.n}</h3><p class="muted">${g.d}</p>`;d.onclick=()=>playGame(g);s.appendChild(d)});
+ const f=$('#fieldGames');f.innerHTML='';FIELD.forEach(g=>{const d=document.createElement('div');d.className='game';d.style.borderColor=g.c+'55';
+  d.innerHTML=`<span class="tag" style="background:${g.c}">${g.tag}</span><div class="ge">${g.e}</div><h3 class="fun">${g.n}</h3><p class="muted">${g.rules}</p><p style="margin-top:8px;font-weight:700">🧰 ${g.tools} · ⏱️ ${fmt(g.t)}</p>`;d.onclick=()=>playField(g);f.appendChild(d)})}
+let gameStop=null;
+function backBtn(){return `<button class="btn ghost" id="gBack">↩ رجوع للألعاب</button>`}
+function showPlay(html){$('#gameHome').style.display='none';const p=$('#gamePlay');p.style.display='block';p.innerHTML=html;$('#gBack').onclick=exitGame}
+function exitGame(){gameStop&&gameStop();gameStop=null;$('#gamePlay').style.display='none';$('#gameHome').style.display='block'}
+function playField(g){showPlay(`<div class="row" style="justify-content:space-between">${backBtn()}<h2 class="fun">${g.e} ${g.n}</h2></div>
+ <div class="ch-grid" style="margin-top:14px"><div class="stage"><div class="big-emoji">${g.e}</div><div class="ch-card">${g.rules}</div><div><span class="chip">🧰 ${g.tools}</span></div></div>
+ <div style="text-align:center"><div class="ring small" id="fRing"></div><div class="row" style="justify-content:center;margin-top:12px"><button class="btn sky big" id="fGo">▶️ ابدئي</button><button class="btn pink big" id="fTeams">👯‍♀️ الفرق</button></div></div></div>`);
+ const t=makeRing($('#fRing'),'#38bdf8','#a46cf5');t.set(g.t);t.onEnd=()=>$('#fGo').textContent='▶️ ابدئي';
+ $('#fGo').onclick=()=>{if(t.run){t.pause();$('#fGo').textContent='▶️ تابعي'}else{t.start();$('#fGo').textContent='⏸️ إيقاف'}};
+ $('#fTeams').onclick=()=>{exitGame();go('teams')};gameStop=()=>t.pause()}
+function playGame(g){
+ if(g.id==='traffic'){showPlay(`<div class="row" style="justify-content:space-between">${backBtn()}<h2 class="fun">🚦 إشارة المرور</h2></div>
+  <div class="light" id="lt">جاهزات؟</div><div class="row" style="justify-content:center"><button class="btn sky big" id="lGo">▶️ ابدئي</button>
+  <span class="muted">السرعة:</span><button class="btn ghost sp" data-s="1.4">بطيئة</button><button class="btn ghost sp" data-s="1">متوسطة</button><button class="btn ghost sp" data-s=".65">سريعة</button></div>`);
+  const C=[['#3ccf7e','اجري! 🏃‍♀️',0],['#ffc23d','امشي 🚶‍♀️',1],['#ff4d6d','قفي! ✋',2]];let tm=null,on=false,sp=1,last=-1;
+  const step=()=>{let k;do{k=Math.floor(Math.random()*3)}while(k===last);last=k;const c=C[k];const l=$('#lt');l.style.background=c[0];l.style.boxShadow=`0 0 0 18px ${c[0]}33,0 0 60px ${c[0]}`;l.textContent=c[1];k===2?SFX.whistle():tone(k?600:900,.2,'triangle',.2);tm=setTimeout(step,(1800+Math.random()*2800)*sp)};
+  $('#lGo').onclick=()=>{on=!on;if(on){$('#lGo').textContent='⏸️ إيقاف';step()}else{clearTimeout(tm);$('#lGo').textContent='▶️ ابدئي'}};
+  $$('.sp').forEach(b=>b.onclick=()=>{sp=+b.dataset.s;toast('السرعة: '+b.textContent)});gameStop=()=>clearTimeout(tm)}
+ if(g.id==='statue'){showPlay(`<div class="row" style="justify-content:space-between">${backBtn()}<h2 class="fun">🗿 لعبة التمثال</h2></div>
+  <div class="light" id="st" style="background:linear-gradient(135deg,#ff6fae,#a46cf5)">💃 جاهزات؟</div><div class="row" style="justify-content:center"><button class="btn purple big" id="sGo">▶️ ابدئي</button></div>
+  <p class="muted" style="text-align:center;margin-top:8px">النغمة تتوقف في وقت عشوائي، ومن تتحرك بعد التوقف تشجّع زميلاتها 😄</p>`);
+  const mel=[523,587,659,784,659,587,523,659,784,880,784,659];let mt=null,st=null,on=false,k=0;
+  const play=()=>{tone(mel[k++%mel.length],.18,'triangle',.16);tone(mel[k%mel.length]/2,.18,'sine',.08);mt=setTimeout(play,230)};
+  const dance=()=>{const s=$('#st');s.textContent='💃 تحركي!';s.style.background='linear-gradient(135deg,#ff6fae,#a46cf5)';play();st=setTimeout(freeze,3000+Math.random()*6000)};
+  const freeze=()=>{clearTimeout(mt);const s=$('#st');s.textContent='🗿 تمثال!';s.style.background='linear-gradient(135deg,#38bdf8,#a46cf5)';SFX.whistle();st=setTimeout(dance,2500+Math.random()*2500)};
+  const stop=()=>{clearTimeout(mt);clearTimeout(st)};
+  $('#sGo').onclick=()=>{on=!on;if(on){$('#sGo').textContent='⏸️ إيقاف';dance()}else{stop();$('#sGo').textContent='▶️ ابدئي'}};gameStop=stop}
+ if(g.id==='animals'){showPlay(`<div class="row" style="justify-content:space-between">${backBtn()}<h2 class="fun">🐸 حركات الحيوانات</h2></div>
+  <div class="stage" style="margin-top:12px"><div class="big-emoji" id="anE" style="font-size:120px">🎡</div><div class="big-name" id="anN">من سيظهر؟</div><div class="ch-card" id="anC"></div></div>
+  <div class="row" style="justify-content:center;margin-top:14px"><button class="btn pink big" id="anGo">🎡 أديري العجلة</button></div>`);
+  $('#anGo').onclick=()=>{let k=0;const sp=()=>{const a=ANIMALS[Math.floor(Math.random()*ANIMALS.length)];$('#anE').textContent=a[0];$('#anN').textContent=a[1];SFX.tick();
+   if(++k<18)setTimeout(sp,50+k*k*.8);else{const n=[5,6,8,10][Math.floor(Math.random()*4)];$('#anC').textContent='نفّذي الحركة '+n+' مرات / خطوات 👏';SFX.big()}};sp()}}
+ if(g.id==='dice'){showPlay(`<div class="row" style="justify-content:space-between">${backBtn()}<h2 class="fun">🎲 النرد الرياضي</h2></div>
+  <div class="dice" style="margin:24px 0"><div class="die" id="d1"><div><div class="x">❔</div><small>التمرين</small></div></div><div class="die" id="d2" style="box-shadow:0 8px 0 var(--sky-l);border-color:var(--sky-l)"><div><div class="x">❔</div><small>العدد</small></div></div></div>
+  <div class="ch-card" id="dRes" style="text-align:center;min-height:44px"></div><div class="row" style="justify-content:center;margin-top:14px"><button class="btn purple big" id="dGo">🎲 ارمي النرد</button></div>`);
+  $('#dGo').onclick=()=>{$$('.die').forEach(d=>d.classList.add('rolling'));let k=0;let e,n;const r=()=>{e=EXER[Math.floor(Math.random()*6)];n=(Math.floor(Math.random()*6)+1)*2;
+   $('#d1').innerHTML=`<div><div class="x">${e[0]}</div><small>${e[1]}</small></div>`;$('#d2').innerHTML=`<div><div class="x">${n}</div><small>مرات</small></div>`;SFX.tick();
+   if(++k<14)setTimeout(r,80);else{$$('.die').forEach(d=>d.classList.remove('rolling'));$('#dRes').textContent=`${e[0]} ${e[1]} × ${n} — هيا جميعًا!`;SFX.big()}};r()}}
+ if(g.id==='mirror'){showPlay(`<div class="row" style="justify-content:space-between">${backBtn()}<h2 class="fun">🪞 المرآة السريعة</h2></div>
+  <div class="ch-grid" style="margin-top:12px"><div class="stage"><div class="big-emoji" id="mE" style="font-size:110px">🪞</div><div class="big-name" id="mN">قلّدي الحركة!</div></div>
+  <div style="text-align:center"><div class="ring small" id="mRing"></div><div class="row" style="justify-content:center;margin-top:12px"><button class="btn sky big" id="mGo">▶️ ابدئي</button></div><p class="muted" style="margin-top:8px">١٠ حركات متتالية · ٥ ثوانٍ لكل حركة</p></div></div>`);
+  const M=[['🙌','يدان للأعلى'],['🤸‍♀️','قفزة نجمة'],['🦩','قدم واحدة'],['🧎‍♀️','اجلسي القرفصاء'],['👐','يدان للجانبين'],['🙇‍♀️','المسي الأرض'],['🔄','دوري حول نفسك'],['👏','صفقي ٣ مرات'],['🦵','ارفعي الركبة'],['🐢','انكمشي كالسلحفاة']];
+  const t=makeRing($('#mRing'),'#38bdf8','#ff6fae');t.set(5);let k=0,on=false;
+  const next=()=>{if(k>=10){on=false;$('#mN').textContent='🎉 رائعات!';$('#mE').textContent='🏆';$('#mGo').textContent='▶️ من جديد';k=0;SFX.fanfare();confetti();return}
+   const m=M[Math.floor(Math.random()*M.length)];$('#mE').textContent=m[0];$('#mN').textContent=(k+1)+'. '+m[1];k++;t.set(5);t.run=true;t.last=performance.now();SFX.up();t.loop()};
+  t.onEnd=()=>{};
+  const origEnd=t.loop.bind(t);
+  t.loop=function(){if(!this.run)return;const n=performance.now();this.left-=(n-this.last)/1000;this.last=n;if(this.left<=0){this.left=0;this.run=false;this.draw();if(on)setTimeout(next,250);return}this.draw();requestAnimationFrame(()=>this.loop())};
+  $('#mGo').onclick=()=>{on=!on;if(on){$('#mGo').textContent='⏸️ إيقاف';SFX.whistle();setTimeout(next,600)}else{t.pause();$('#mGo').textContent='▶️ تابعي'}};gameStop=()=>{on=false;t.pause()}}
+}
+
+/* ===================== الفرق ===================== */
+function renderTeamBtns(){$$('.tn').forEach(b=>{b.className='btn tn '+(+b.dataset.n===S.teamN?'purple':'ghost')})}
+$$('.tn').forEach(b=>b.onclick=()=>{S.teamN=+b.dataset.n;save();renderTeamBtns()});
+$('#mkTeams').onclick=()=>{const p=shuffle(present());S.teams=Array.from({length:S.teamN},()=>[]);p.forEach((i,k)=>S.teams[k%S.teamN].push(i));S.tScores=Array(S.teamN).fill(0);save();SFX.big();renderTeams()};
+function renderTeams(){const w=$('#teams');w.innerHTML='';if(!S.teams.length){w.innerHTML='<div class="panel muted" style="text-align:center">اضغطي "وزّعي عشوائيًا" لتكوين الفرق 🎈</div>';return}
+ S.teams.forEach((m,t)=>{const T=TEAMS[t];const d=document.createElement('div');d.className='team';d.style.setProperty('--tc',T.c);
+  d.innerHTML=`<h3 class="fun"><span>${T.e} ${T.n}</span><span class="muted" style="font-size:14px">${m.length} طالبات</span></h3><div class="score">${S.tScores[t]||0}</div>
+  <div class="row" style="justify-content:center"><button class="btn" style="background:${T.c}" data-t="1">+1</button><button class="btn" style="background:${T.c}" data-t="3">+3</button><button class="btn ghost" data-t="-1">−1</button></div>
+  <ul>${m.map(i=>`<li>${S.students[i].av} ${S.students[i].name}</li>`).join('')}</ul>`;
+  d.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{const n=+b.dataset.t;S.tScores[t]=Math.max(0,(S.tScores[t]||0)+n);save();n>0?SFX.up():SFX.down();floatAt(b,(n>0?'+':'')+n,T.c);renderTeams()});w.appendChild(d)})}
+$('#teamWin').onclick=()=>{if(!S.teams.length){toast('كوّني الفرق أولًا');return}const mx=Math.max(...S.tScores);if(mx<=0){toast('لم يسجل أي فريق نقاطًا بعد');return}
+ const win=S.tScores.map((s,i)=>s===mx?i:-1).filter(i=>i>=0);win.forEach(t=>S.teams[t].forEach(i=>S.students[i].pts+=2));save();SFX.fanfare();confetti(260);
+ toast('🏆 الفائز: '+win.map(t=>TEAMS[t].n).join(' و ')+' — نجمتان لكل عضوة');renderAll()};
+
+/* ===================== البطلات ===================== */
+function renderHeroes(){const idx=S.students.map((s,i)=>i).sort((a,b)=>S.students[b].pts-S.students[a].pts);
+ const P=$('#podium');P.innerHTML='';const order=[1,0,2],H=[150,200,120],C=['#a46cf5','#ff6fae','#38bdf8'],M=['🥈','🥇','🥉'];
+ order.forEach((r,k)=>{const i=idx[r];if(i==null)return;const s=S.students[i];const d=document.createElement('div');d.className='pod';
+  d.innerHTML=`<div style="font-size:34px">${M[k]}</div><div class="av" style="margin:auto">${s.av}</div><div class="fun" style="font-weight:800;margin-top:6px">${s.name}</div><div class="muted">${s.pts} ⭐</div><div class="blk" style="height:${H[k]}px;background:${C[k]}">${r+1}</div>`;P.appendChild(d)});
+ $('#rank').innerHTML=idx.map((i,k)=>`<div><span>${k+1}.</span><span>${S.students[i].av}</span><span>${S.students[i].name}</span><b>${S.students[i].pts}</b></div>`).join('')}
+$('#celebrate').onclick=()=>{SFX.fanfare();confetti(300)};
+$('#resetPts').onclick=()=>confirmBox('تصفير نقاط جميع الطالبات لبداية أسبوع جديد؟',()=>{S.students.forEach(s=>s.pts=0);S.used=[];renderGoal.done=false;save();renderAll();toast('🔄 بداية جديدة موفقة!')});
+
+/* ===================== الدروس ===================== */
+const thisWeek=lessonIdxFor(today());
+function curLesson(){return S.lesson==null?thisWeek:S.lesson}
+function setLesson(i){S.lesson=(i===thisWeek)?null:i;save();renderLesson()}
+function renderLesson(){const i=curLesson(),L=LESSONS[i];
+ $('#lbWeek').textContent=(i===thisWeek?'درس هذا الأسبوع':'الدرس المختار')+' · الأسبوع '+L.w+(L.u?' · '+L.u:'')+(L.note?' · '+L.note:'');
+ $('#lbTitle').textContent=L.t;
+ $('#lbSel').innerHTML=LESSONS.map((l,k)=>l.holiday?'':`<option value="${k}" ${k===i?'selected':''}>الأسبوع ${l.w}${k===thisWeek?' (الحالي)':''}</option>`).join('');
+ $('#lbGame').style.display=$('#lbCh').style.display=$('#lbPpt').style.display=L.game?'':'none';
+ if(L.game)$('#lbPpt').href=pptUrl(i);
+ const lg=$('#lessonGame');lg.innerHTML='';if(L.game){const g=L.game;const d=document.createElement('div');d.className='game';d.style.borderColor='#ff6fae88';
+  d.innerHTML=`<span class="tag" style="background:#ff6fae">الأسبوع ${L.w}</span><div class="ge">${g.e}</div><h3 class="fun">${g.n}</h3><p style="font-weight:700;color:#0b7fae">${L.t}</p><p class="muted" style="margin-top:4px">${g.rules}</p><p style="margin-top:8px;font-weight:700">🧰 ${g.tools} · ⏱️ ${fmt(g.t)}</p>`;d.onclick=()=>playField(g);lg.appendChild(d)}
+ const ll=$('#lessonList');ll.innerHTML='';LESSONS.forEach((l,k)=>{const d=document.createElement('div');d.className='les'+(l.holiday?' hol':'')+(k===thisWeek?' cur':'')+(k===i&&k!==thisWeek?' act':'');
+  d.innerHTML=l.holiday?`<span class="wk" style="background:#ffb020">إجازة</span><h3>${l.t}</h3>`:`<span class="wk">الأسبوع ${l.w}</span><div class="muted" style="font-size:13px;margin-top:6px">${l.u}${l.note?' · '+l.note:''}</div><h3>${l.t}</h3><div style="font-weight:700;color:var(--pink)">${l.game.e} ${l.game.n}</div><a class="btn ghost" href="${pptUrl(k)}" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;text-decoration:none;font-size:14px;padding:7px 12px" onclick="event.stopPropagation()">📊 عرض الدرس</a>`;
+  if(!l.holiday)d.onclick=()=>{setLesson(k);SFX.up();toast('📚 تم اختيار درس الأسبوع '+l.w)};ll.appendChild(d)})}
+$('#lbSel').onchange=e=>setLesson(+e.target.value);
+$('#lbGame').onclick=()=>{go('games');const L=LESSONS[curLesson()];if(L.game)playField(L.game)};
+$('#lbCh').onclick=()=>{S.chSrc='lesson';save();renderChSrc();go('ch')};
+
+/* ===================== التنقل والإعدادات ===================== */
+function go(v){$$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));$$('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));if(v!=='games')exitGame();if(v==='heroes')renderHeroes();if(v==='att')renderAtt();SFX.click()}
+$$('#nav button').forEach(b=>b.onclick=()=>go(b.dataset.v));
+$('#soundBtn').onclick=()=>{S.sound=!S.sound;save();$('#soundBtn').textContent=S.sound?'🔊 الأصوات':'🔇 بدون صوت';if(S.sound)SFX.up()};
+$('#whistleBtn').onclick=()=>SFX.whistle();
+$('#fsBtn').onclick=()=>{try{document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen().catch(()=>toast('ملء الشاشة غير متاح هنا'))}catch(e){toast('ملء الشاشة غير متاح هنا')}};
+$('#setBtn').onclick=()=>{$('#namesTa').value=S.students.map(s=>s.full).join('\n');$('#goalN').value=S.goal;$('#goalR').value=S.reward;open('#mSet')};
+$('#saveSet').onclick=()=>{const lines=$('#namesTa').value.split('\n').map(x=>x.trim()).filter(Boolean);
+ S.students=lines.map((f,i)=>{const old=S.students.find(s=>s.full===f);if(old)return old;const w=f.split(/\s+/);return {full:f,name:w.slice(0,2).join(' '),pts:0,av:AV[i%AV.length]}});
+ S.goal=Math.max(10,+$('#goalN').value||200);S.reward=$('#goalR').value||S.reward;renderGoal.done=totalPts()>=S.goal;save();close('#mSet');renderAll();toast('💾 تم الحفظ')};
+
+function renderAll(){renderGrid();renderGoal();if($('#v-heroes').classList.contains('on'))renderHeroes();if(S.teams.length)renderTeams()}
+$('#soundBtn').textContent=S.sound?'🔊 الأصوات':'🔇 بدون صوت';
+renderGoal.done=totalPts()>=S.goal;
+renderGames();renderLesson();renderChSrc();renderTeamBtns();renderTeams();renderAll();
+</script>
+</body>
+</html>
