@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>استبيان قياس الأثر | الدراسات الاجتماعية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@400;600;700&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal',system-ui,sans-serif;min-height:100vh;color:#1e1537;
+  background:radial-gradient(circle at 12% 8%,#fbcfe8 0,transparent 40%),radial-gradient(circle at 90% 90%,#c4b5fd 0,transparent 45%),linear-gradient(160deg,#fdf4ff,#f5f3ff 60%,#ecfeff)}
+button{font-family:inherit;cursor:pointer}
+.sadu{height:6px;background:repeating-linear-gradient(45deg,#6d28d9 0 6px,#d97706 6px 12px,#db2777 12px 18px,#0d9488 18px 24px)}
+.wrap{max-width:720px;margin:0 auto;padding:18px 16px 40px}
+.top{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.top .lg{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:22px;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff}
+.top b{font-family:'Readex Pro';font-size:16px;display:block}.top small{color:#6f6888;font-size:13px}
+.card{background:#fff;border-radius:26px;padding:26px 22px;box-shadow:0 20px 50px -24px rgba(109,40,217,.45);text-align:center;animation:pop .35s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{from{transform:scale(.94);opacity:0}}
+.av{width:110px;height:110px;border-radius:50%;overflow:hidden;margin:0 auto 10px;box-shadow:0 12px 26px -12px #6d28d9}
+h1{font-family:'Readex Pro';font-size:clamp(22px,4.5vw,30px);line-height:1.5}
+h2{font-family:'Readex Pro';font-size:clamp(19px,4vw,25px);line-height:1.65;margin:8px 0 18px}
+.mu{color:#6f6888;line-height:1.9;font-size:15.5px}
+.go{border:none;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font-weight:800;font-size:18px;border-radius:16px;padding:14px 34px;margin-top:18px;box-shadow:0 10px 22px -10px #db2777}
+.go:disabled{opacity:.45;cursor:default}
+.ghost{border:none;background:#f3f0fb;color:#6d28d9;font-weight:800;font-size:15px;border-radius:14px;padding:12px 20px}
+.prog{display:flex;align-items:center;gap:10px;margin-bottom:14px;font-weight:800;color:#6d28d9}
+.prog .b{flex:1;height:10px;border-radius:9px;background:#ede9fe;overflow:hidden}.prog .b i{display:block;height:100%;background:linear-gradient(90deg,#14b8a6,#7c3aed,#db2777);border-radius:9px;transition:width .4s}
+.kind{display:inline-block;font-size:13px;font-weight:800;border-radius:999px;padding:4px 12px;background:#f5f3ff;color:#6d28d9}
+.opts{display:grid;gap:12px;text-align:start}
+.opt{border:2px solid #ede9fe;background:#fff;border-radius:18px;padding:15px 16px;font-size:18px;font-weight:700;display:flex;align-items:center;gap:12px;transition:.15s;color:#1e1537}
+.opt:hover{border-color:#c4b5fd}
+.opt .k{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;color:#fff;font-weight:800;flex-shrink:0}
+.opt.on{border-color:#7c3aed;background:#f5f3ff;transform:scale(1.02)}
+.lik{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.lk{border:2px solid #ede9fe;background:#fff;border-radius:20px;padding:16px 6px;font-weight:800;font-size:16px;color:#1e1537;transition:.15s}
+.lk span{display:block;font-size:46px;margin-bottom:6px}
+.lk.on{border-color:#7c3aed;background:#f5f3ff;transform:scale(1.05)}
+textarea{width:100%;min-height:120px;border:2px solid #ede9fe;border-radius:18px;padding:14px;font-family:inherit;font-size:17px;outline:none;resize:vertical}
+textarea:focus{border-color:#7c3aed}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:20px}
+.score{font-family:'Readex Pro';font-size:56px;font-weight:700;background:linear-gradient(90deg,#7c3aed,#db2777);-webkit-background-clip:text;background-clip:text;color:transparent}
+canvas{position:fixed;inset:0;pointer-events:none;z-index:9}
+</style>
+</head>
+<body>
+<canvas id="fx"></canvas>
+<div class="sadu"></div>
+<div class="wrap">
+  <div class="top"><div class="lg">📊</div><div><b>استبيان قياس الأثر</b><small>الدراسات الاجتماعية · المعلمة وداد محمد الكحيلي</small></div></div>
+  <div id="app"><div class="card"><div class="mu">⏳ جاري التحميل…</div></div></div>
+</div>
+<script>
+const SITE = { url:'https://dqhzvghuocaxtchmqhul.supabase.co', key:'sb_publishable_c18je76xJ2Ut1pTw1-8Jbw_JsQaUuO5' };
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ar = n => String(n).replace(/\d/g, d => '٠١٢٣٤٥٦٧٨٩'[d]);
+const hash = s => { let h = 0; for (const ch of s) h = (h * 31 + ch.codePointAt(0)) >>> 0; return h; };
+/* ===== تمائم الطالبات: شخصيات أنمي ثلاثية الأبعاد (SVG أصلي) ===== */
+const AN = {
+  skin:[['#ffe4d2','#f7c3a3','#e9a785'],['#f8d6bd','#eab590','#d69670'],['#eec39f','#d9a27a','#bf8459']],
+  hair:[['#4a2c2a','#2a1514'],['#6b3e26','#3e2112'],['#1f1d2b','#0c0b14'],['#8a5a3b','#5a3520'],['#a0522d','#6b3015'],['#3b2a4a','#1d1226']],
+  hij:[['#f9a8d4','#db2777'],['#c4b5fd','#7c3aed'],['#99f6e4','#0d9488'],['#fde68a','#d97706'],['#bfdbfe','#2563eb'],['#fecdd3','#e11d48'],['#e9d5ff','#9333ea'],['#bbf7d0','#16a34a']],
+  eye:[['#7c3aed','#2e1065'],['#0ea5e9','#0c4a6e'],['#16a34a','#14532d'],['#b45309','#451a03'],['#db2777','#500724']],
+  bg:[['#fdf2f8','#fbcfe8'],['#f5f3ff','#ddd6fe'],['#ecfeff','#a5f3fc'],['#fffbeb','#fde68a'],['#eff6ff','#bfdbfe'],['#f0fdf4','#bbf7d0'],['#fff1f2','#fecdd3'],['#faf5ff','#e9d5ff']]
+};
+function anDefs(){
+  if (document.getElementById('anDefs')) return;
+  const g = (id, a, b, c) => `<radialGradient id="${id}" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="${a}"/>${c ? `<stop offset=".6" stop-color="${b}"/><stop offset="1" stop-color="${c}"/>` : `<stop offset="1" stop-color="${b}"/>`}</radialGradient>`;
+  const l = (id, a, b) => `<linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient>`;
+  let d = '';
+  AN.skin.forEach((c,i) => d += g('anS' + i, c[0], c[1], c[2]));
+  AN.hair.forEach((c,i) => d += g('anH' + i, c[0], c[1]));
+  AN.hij.forEach((c,i) => d += g('anJ' + i, c[0], c[1]));
+  AN.eye.forEach((c,i) => d += l('anE' + i, c[1], c[0]));
+  AN.bg.forEach((c,i) => d += g('anB' + i, c[0], c[1]));
+  const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  s.id = 'anDefs'; s.setAttribute('width', 0); s.setAttribute('height', 0); s.style.position = 'absolute';
+  s.innerHTML = `<defs>${d}<radialGradient id="anShine" cx="35%" cy="25%" r="50%"><stop offset="0" stop-color="#fff" stop-opacity=".55"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>`;
+  document.body.prepend(s);
+}
+function animeSVG(name){
+  const h = n => hash(name + n);
+  const st = h('st') % 5, sk = h('sk') % 3, hr = h('hr') % 6, hj = h('hj') % 8, ey = h('ey') % 5, bg = h('bg') % 8, ac = AN.hij[(hj + 3) % 8];
+  const S_ = `url(#anS${sk})`, H = `url(#anH${hr})`, J = `url(#anJ${hj})`, E = `url(#anE${ey})`;
+  let back = '', front = '', top = '';
+  // الجسم (الزي)
+  const body = `<path d="M18 100 C20 80 34 74 50 74 C66 74 80 80 82 100 Z" fill="${st === 0 || st === 4 ? J : `url(#anJ${(hj + 1) % 8})`}"/><path d="M42 75 L50 84 L58 75" fill="#fff" opacity=".85"/>`;
+  if (st === 0 || st === 4) { // حجاب يحيط بالوجه
+    back = `<path d="M50 13 C26 13 15 32 16 54 C17 72 22 84 32 92 L68 92 C78 84 83 72 84 54 C85 32 74 13 50 13 Z" fill="${J}"/>`;
+    front = `<path fill-rule="evenodd" fill="${J}" d="M50 16 C29 16 19 33 20 54 C21 71 33 82 50 82 C67 82 79 71 80 54 C81 33 71 16 50 16 Z M50 31 C36 31 28.5 40 28 53 C27.5 65 37 75.5 50 75.5 C63 75.5 72.5 65 72 53 C71.5 40 64 31 50 31 Z"/>`
+          + `<path d="M28.5 50 C30 38 39 31.5 50 31.5 C61 31.5 70 38 71.5 50" fill="none" stroke="#fff" stroke-opacity=".45" stroke-width="1.4"/>`
+          + `<path d="M30 70 C38 79 46 80 50 80" fill="none" stroke="#000" stroke-opacity=".12" stroke-width="2"/>`
+          + `<ellipse cx="34" cy="26" rx="10" ry="4" fill="#fff" opacity=".25" transform="rotate(-25 34 26)"/>`
+          + (st === 4 ? `<circle cx="72" cy="36" r="4.6" fill="url(#anJ${(hj + 3) % 8})"/><circle cx="72" cy="36" r="1.8" fill="#fff" opacity=".8"/>` : '');
+  } else if (st === 1) { // كعكتان
+    back = `<circle cx="27" cy="24" r="11" fill="${H}"/><circle cx="73" cy="24" r="11" fill="${H}"/><path d="M22 48 C20 30 33 20 50 20 C67 20 80 30 78 48 L78 64 L22 64 Z" fill="${H}"/>`;
+    front = `<path d="M25 48 C27 32 37 25 50 25 C63 25 73 32 75 48 C70 42 66 38 62 40 C59 35 54 36 50 39 C46 36 40 35 37 40 C33 38 29 42 25 48 Z" fill="${H}"/>`;
+    top = `<circle cx="27" cy="24" r="4" fill="${ac[0]}"/><circle cx="73" cy="24" r="4" fill="${ac[0]}"/>`;
+  } else if (st === 2) { // شعر طويل وفيونكة
+    back = `<path d="M50 18 C28 18 20 34 21 52 L18 86 C30 92 40 88 42 80 L58 80 C60 88 70 92 82 86 L79 52 C80 34 72 18 50 18 Z" fill="${H}"/>`;
+    front = `<path d="M24 50 C25 32 36 23 50 23 C64 23 75 32 76 50 C72 43 68 40 64 42 C60 36 55 35 50 37 C44 34 36 37 33 43 C29 42 26 45 24 50 Z" fill="${H}"/>`;
+    top = `<path d="M62 25 L72 18 L74 30 Z M62 25 L54 15 L51 27 Z" fill="${ac[1]}"/><circle cx="62" cy="25" r="3.2" fill="${ac[0]}"/>`;
+  } else { // قصّة قصيرة وطوق
+    back = `<path d="M50 18 C27 18 19 36 21 54 C22 64 24 70 28 72 L72 72 C76 70 78 64 79 54 C81 36 73 18 50 18 Z" fill="${H}"/>`;
+    front = `<path d="M24 50 C24 31 36 23 50 23 C64 23 76 31 76 50 C71 44 64 41 57 42 C54 39 50 38 46 40 C38 39 30 43 24 50 Z" fill="${H}"/>`;
+    top = `<path d="M26 38 C32 27 42 22 50 22 C58 22 68 27 74 38" fill="none" stroke="${ac[1]}" stroke-width="3.2" stroke-linecap="round"/>`;
+  }
+  const eyes = [38.5, 61.5].map(x => `<ellipse cx="${x}" cy="56" rx="6.3" ry="7.4" fill="#fff"/><ellipse cx="${x}" cy="57" rx="5" ry="6.4" fill="${E}"/><ellipse cx="${x}" cy="58" rx="2.3" ry="3" fill="#1a0b2e"/><ellipse cx="${x - 1.8}" cy="54" rx="1.9" ry="2.3" fill="#fff"/><circle cx="${x + 2}" cy="60.5" r="1" fill="#fff" opacity=".9"/><path d="M${x - 7} 52 Q${x} 46.5 ${x + 7} 52" fill="none" stroke="#2a1514" stroke-width="2" stroke-linecap="round"/>`).join('');
+  const brows = `<path d="M33 46.5 Q38 44.5 43 46" fill="none" stroke="#3e2112" stroke-width="1.3" stroke-linecap="round" opacity=".7"/><path d="M57 46 Q62 44.5 67 46.5" fill="none" stroke="#3e2112" stroke-width="1.3" stroke-linecap="round" opacity=".7"/>`;
+  const smile = (hash(name + 'm') % 2) ? `<path d="M45.5 67 Q50 71.5 54.5 67" fill="none" stroke="#9f1239" stroke-width="1.6" stroke-linecap="round"/>` : `<path d="M46 66.5 Q50 72.5 54 66.5 Z" fill="#e11d48"/><path d="M47.5 68.6 Q50 70.6 52.5 68.6" fill="#fda4af"/>`;
+  return `<svg viewBox="0 0 100 100" width="100%" height="100%" aria-hidden="true" style="display:block">
+    <circle cx="50" cy="50" r="50" fill="url(#anB${bg})"/>
+    ${back}${body}
+    <rect x="44" y="66" width="12" height="11" rx="4" fill="${S_}"/>
+    <ellipse cx="50" cy="52" rx="24.5" ry="23" fill="${S_}"/>
+    <ellipse cx="50" cy="52" rx="24.5" ry="23" fill="url(#anShine)"/>
+    <ellipse cx="34" cy="64" rx="5" ry="2.8" fill="#fb7185" opacity=".45"/><ellipse cx="66" cy="64" rx="5" ry="2.8" fill="#fb7185" opacity=".45"/>
+    ${eyes}${brows}${smile}
+    ${front}${top}
+    <ellipse cx="36" cy="22" rx="12" ry="5" fill="#fff" opacity=".18" transform="rotate(-20 36 22)"/>
+  </svg>`;
+}
+
+anDefs();
+const STG = {4:'الرابع',5:'الخامس',6:'السادس'};
+const KC = ['#e11d48','#2563eb','#d97706','#059669'], KL = ['أ','ب','ج','د'];
+const LIK = [['😊','نعم',2],['😐','إلى حدٍّ ما',1],['🙁','لا',0]];
+let sb, me, SV, ans = [], pos = 0;
+const app = h => { $('app').innerHTML = h; scrollTo({ top:0, behavior:'smooth' }); };
+const msg = (emoji, title, text, btn) => app(`<div class="card"><div style="font-size:64px">${emoji}</div><h1>${title}</h1><p class="mu" style="margin-top:8px">${text}</p>${btn || ''}</div>`);
+const back = `<a href="index.html"><button class="go">🏠 الرجوع للمنصة</button></a>`;
+
+async function boot(){
+  const id = +new URLSearchParams(location.search).get('id');
+  try { me = JSON.parse(localStorage.getItem('stu') || 'null'); } catch(e) { me = null; }
+  if (!id) return msg('🤔', 'الرابط غير مكتمل', 'افتحي الاستبيان من لوحة الإعلانات في المنصة.', back);
+  if (!me || !me.token) return msg('🔐', 'ادخلي المنصة أولًا', 'سجّلي دخولك في المنصة باسمك وكلمة المرور، ثم افتحي الاستبيان من لوحة الإعلانات.', `<a href="index.html"><button class="go">الدخول للمنصة</button></a>`);
+  sb = window.supabase.createClient(SITE.url, SITE.key, { auth:{ persistSession:false } });
+  const r = await sb.rpc('impact_get', { p_token:me.token, p_id:id });
+  const d = r.data || {};
+  if (r.error || d.error === 'auth') return msg('🔐', 'انتهت جلسة الدخول', 'ادخلي المنصة مرة أخرى ثم افتحي الاستبيان.', back);
+  if (d.error === 'not_found') return msg('🗂️', 'الاستبيان غير موجود', 'ربما حذفته المعلمة.', back);
+  if (d.error === 'stage') return msg('🙂', 'هذا الاستبيان لصف آخر', `هذا الاستبيان لطالبات الصف ${STG[d.stage] || ''}.`, back);
+  SV = d;
+  if (d.done) return msg('💜', 'شكرًا لكِ!', 'سبق أن أرسلتِ إجاباتكِ في هذا الاستبيان.', back);
+  if (!d.open) return msg('🔒', 'الاستبيان مغلق', 'أغلقت المعلمة هذا الاستبيان.', back);
+  ans = d.questions.map(() => null);
+  intro();
+}
+function intro(){
+  const first = String(SV.name || '').trim().split(/\s+/)[0];
+  const nk = SV.questions.filter(q => q.t === 'k').length;
+  app(`<div class="card"><div class="av">${animeSVG(SV.name || 'طالبة')}</div>
+    <h1>أهلًا يا ${esc(first)} 🌸</h1>
+    <p class="mu" style="margin-top:6px">${esc(SV.title)}</p>
+    <p class="mu">${ar(SV.questions.length)} أسئلة قصيرة: ${ar(nk)} أسئلة عمّا تعلّمتِه، وأسئلة عن رأيكِ في دروس الوحدة.<br>لا توجد درجة على رأيكِ، أجيبي بصدق 💜</p>
+    <button class="go" onclick="pos=0;show()">ابدئي ✨</button></div>`);
+}
+function show(){
+  const q = SV.questions[pos], n = SV.questions.length, a = ans[pos];
+  let body = '', kind = '';
+  if (q.t === 'k') { kind = '🧠 ماذا تعلّمتِ؟'; body = `<div class="opts">${q.o.map((o,i) => `<button class="opt ${a === i ? 'on' : ''}" onclick="pick(${i})"><span class="k" style="background:${KC[i % 4]}">${q.o.length === 2 ? (i ? '✗' : '✓') : KL[i]}</span>${esc(o)}</button>`).join('')}</div>`; }
+  else if (q.t === 'l') { kind = '💭 رأيكِ'; body = `<div class="lik">${LIK.map(([e,l,v]) => `<button class="lk ${a === v ? 'on' : ''}" onclick="pick(${v})"><span>${e}</span>${l}</button>`).join('')}</div>`; }
+  else if (q.t === 'c') { kind = '⭐ اختاري واحدًا'; body = `<div class="opts">${q.o.map((o,i) => `<button class="opt ${a === i ? 'on' : ''}" onclick="pick(${i})">${esc(o)}</button>`).join('')}</div>`; }
+  else { kind = '✍️ اكتبي (اختياري)'; body = `<textarea id="txt" maxlength="300" placeholder="اكتبي هنا…" oninput="ans[pos]=this.value">${esc(a || '')}</textarea>`; }
+  const last = pos === n - 1, can = q.t === 'o' || a !== null;
+  app(`<div class="prog"><span>${ar(pos + 1)} / ${ar(n)}</span><div class="b"><i style="width:${Math.round(pos / n * 100)}%"></i></div></div>
+    <div class="card"><span class="kind">${kind}</span><h2>${esc(q.q)}</h2>${body}
+    <div class="nav">${pos ? '<button class="ghost" onclick="pos--;show()">→ السابق</button>' : '<span></span>'}
+      <button class="go" id="nx" style="margin:0" ${can ? '' : 'disabled'} onclick="${last ? 'send()' : 'pos++;show()'}">${last ? 'إرسال 📨' : 'التالي ←'}</button></div></div>`);
+}
+function pick(v){ ans[pos] = v; const q = SV.questions[pos]; show(); if (q.t !== 'o' && pos < SV.questions.length - 1) setTimeout(() => { pos++; show(); }, 380); }
+async function send(){
+  $('nx').disabled = true; $('nx').textContent = '⏳ جاري الإرسال…';
+  const payload = ans.map((a, i) => SV.questions[i].t === 'o' ? String(a || '').slice(0, 300) : a);
+  const r = await sb.rpc('impact_submit', { p_token:me.token, p_id:SV.id, p_answers:payload });
+  const d = r.data || {};
+  if (r.error || d.error) { $('nx').disabled = false; $('nx').textContent = 'إرسال 📨'; return alert(d.error === 'done' ? 'سبق أن أرسلتِ إجاباتكِ.' : d.error === 'closed' ? 'أُغلق الاستبيان.' : 'تعذّر الإرسال، حاولي مرة أخرى.'); }
+  const pct = d.total ? Math.round(d.score / d.total * 100) : 0;
+  app(`<div class="card"><div class="av">${animeSVG(SV.name || 'طالبة')}</div><h1>شكرًا لكِ يا ${esc(String(SV.name).split(/\s+/)[0])} 💜</h1>
+    ${d.total ? `<p class="mu" style="margin-top:8px">أجبتِ إجابة صحيحة عن</p><div class="score">${ar(d.score)} / ${ar(d.total)}</div><p class="mu">${pct >= 80 ? 'ممتاز! فهمتِ الوحدة فهمًا رائعًا 🌟' : pct >= 50 ? 'أحسنتِ! راجعي الدروس قليلًا لتصلي للقمة 💪' : 'لا بأس، مراجعة بسيطة وستتقنين الوحدة بإذن الله 🌱'}</p>` : ''}
+    ${back}</div>`);
+  confetti();
+}
+function confetti(){
+  const cv = $('fx'), cx = cv.getContext('2d'); cv.width = innerWidth; cv.height = innerHeight;
+  const C = ['#db2777','#7c3aed','#d97706','#0d9488','#fbbf24'], P = Array.from({length:160}, (_,k) => ({ x:innerWidth / 2, y:innerHeight / 3, vx:(Math.random() - .5) * 14, vy:Math.random() * -12 - 2, r:4 + Math.random() * 5, c:C[k % 5], l:110 }));
+  (function t(){ cx.clearRect(0,0,cv.width,cv.height); let alive = 0; for (const p of P) { if (p.l-- <= 0) continue; alive++; p.vy += .25; p.x += p.vx; p.y += p.vy; cx.fillStyle = p.c; cx.globalAlpha = Math.min(1, p.l / 40); cx.fillRect(p.x, p.y, p.r, p.r / 1.6); } if (alive) requestAnimationFrame(t); else cx.clearRect(0,0,cv.width,cv.height); })();
+}
+boot().catch(() => msg('📶', 'تعذّر الاتصال', 'تأكدي من الإنترنت ثم حدّثي الصفحة.', back));
+</script>
+</body>
+</html>

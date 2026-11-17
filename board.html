@@ -77,6 +77,23 @@ h1,h2,h3,.rx{font-family:'Readex Pro','Tajawal',sans-serif}
 .ab.off{background:var(--red2);border-color:#fecaca}
 .ab.off .av{filter:grayscale(1);opacity:.6}
 .ab.off .stt{background:var(--red);color:#fff}
+.st-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:7px 13px;font-weight:700;font-size:13.5px;color:var(--ink)}
+.st-chip.on{background:var(--pri);border-color:var(--pri);color:#fff}
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:12px 0}
+.kpi div{background:var(--soft);border:1px solid var(--line);border-radius:16px;padding:12px;text-align:center}
+.kpi b{display:block;font-family:'Readex Pro';font-size:26px;color:var(--pri)}
+.kpi small{color:var(--muted);font-weight:700}
+.qbar{margin:10px 0}
+.qbar .qt{font-weight:700;font-size:14px;line-height:1.6}
+.qbar .qbb{display:flex;height:16px;border-radius:9px;overflow:hidden;background:#f0edf7;margin-top:5px}
+.qbar .qbb i{display:block;height:100%}
+.qbar .lg{display:flex;gap:12px;font-size:12.5px;color:var(--muted);font-weight:700;margin-top:3px;flex-wrap:wrap}
+.svl{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;cursor:pointer}
+.svl:hover{border-color:#c4b5fd}
+.svl b{font-family:'Readex Pro'}
+.pv{border:1px dashed var(--line);border-radius:12px;padding:10px 12px;margin-top:6px;font-size:14px;line-height:1.7}
+.pv small{color:var(--green);font-weight:800}
+@media print{body *{visibility:hidden}#printArea,#printArea *{visibility:visible}#printArea{position:absolute;inset:0;padding:20px}}
 .ahs{width:100%;border-collapse:collapse;font-size:14.5px;margin-top:8px}
 .ahs th,.ahs td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:start}
 .ahs th{background:var(--soft);font-weight:800;font-size:13.5px;position:sticky;top:0}
@@ -1343,6 +1360,7 @@ function gHint(){
 }
 let lastGroups = [];
 function makeGroups(){
+  S.grpDay = S.grpDay || {}; S.grpDay[S.cur] = isoDay(); save();
   if (!presentIdx().length) return;
   const g = gCount(), order = shuffle(presentIdx()), teams = shuffle(TEAMS);
   lastGroups = Array.from({length:g}, () => []);
@@ -1429,7 +1447,7 @@ const QZ = { g:4, les:null, list:[], pos:0, cur:null, who:null, answered:false, 
 const KEYS = ['أ','ب','ج','د'];
 const ORD = ['','الأول','الثاني','الثالث','الرابع','الخامس','السادس','السابع','الثامن','التاسع','العاشر'];
 function openQuiz(){ QZ.g = stageOf(S.cur); if (S.qzSec != null) QZ.sec = S.qzSec; $('quiz').classList.add('on'); qzLessons(); }
-function qzClose(){ qzStop(); $('quiz').classList.remove('on'); }
+function qzClose(){ qzStop(); $('quiz').classList.remove('on'); if (QZ.tries) autoLessonReport(); }
 function qzStop(){ clearInterval(QZ.int); QZ.int = null; }
 function qzLessons(){
   qzStop(); QZ.les = null;
@@ -1451,7 +1469,7 @@ function qzStart(k){
   const L = QBANK[QZ.g];
   const src = k < 0 ? L.flatMap(l => l.q.map(q => ({q, l}))) : L[k].q.map(q => ({q, l:L[k]}));
   QZ.les = k < 0 ? { t:'كل الدروس', n:'مراجعة شاملة', e:'🎲' } : L[k];
-  QZ.list = shuffle(src); QZ.pos = 0; QZ.used = new Set(); QZ.hits = {}; QZ.tries = 0; QZ.right = 0; QZ.who = null;
+  QZ.list = shuffle(src); QZ.parts = new Set(); QZ.pos = 0; QZ.used = new Set(); QZ.hits = {}; QZ.tries = 0; QZ.right = 0; QZ.who = null;
   $('qzBack').style.display = '';
   qzShow();
 }
@@ -1527,7 +1545,7 @@ function qzAnswer(i){
   QZ.answered = true; qzStop();
   const c = QZ.cur, ok = i === c.ans, opts = $('qzOpts');
   opts.classList.add('done'); opts.children[c.ans].classList.add('right'); if (!ok) opts.children[i].classList.add('wrong');
-  QZ.tries++;
+  QZ.tries++; if (QZ.who != null) (QZ.parts = QZ.parts || new Set()).add(L()[QZ.who].name);
   const s = QZ.who != null ? L()[QZ.who] : null;
   if (ok) {
     QZ.right++;
@@ -1559,6 +1577,7 @@ function qzEnd(){
     ${top.length ? `<ol>${top.map(([n,c]) => `<li>${esc(n)} — ${ar(c)} ✅</li>`).join('')}</ol>` : ''}
     <div class="qctl"><button class="qbtn w big" onclick="qzStart(${QBANK[QZ.g].indexOf(QZ.les)})">🔁 إعادة الدرس</button><button class="qbtn big" onclick="qzLessons()">📚 درس آخر</button></div></div>`;
   levelUp(); confetti(innerWidth / 2, innerHeight / 3, 240);
+  if (QZ.tries) autoLessonReport().then(t => { const el = document.querySelector('.qend'); if (el && t) el.insertAdjacentHTML('beforeend', `<div style="margin-top:14px;font-weight:700;opacity:.9">${t}</div>`); });
 }
 
 /* ======================= القصاصات ======================= */
@@ -1944,6 +1963,48 @@ function giftCheck(cls, idxs, ups, leadersBefore){
   for (const u of ups) { const g = GIFT_BY_LEVEL[u.lv.n]; if (g) giftSuggest(u.s, cls, `🎉 وصلت إلى ${u.lv.t} ${u.lv.m}`, g[0], g[1], 'lv' + u.lv.n); }
   const st = stageOf(cls), tops = topsOf(STAGES[st].c);
   for (const t of tops) if (!leadersBefore.has(t.c + '|' + t.name) && t.c == cls) giftSuggest(S.cls[cls].find(x => x.name === t.name), cls, `👑 أصبحت متصدرة الصف ${STAGES[st].t} بـ${ar(t.pts)} نقطة`, 'cert', 'shukr', 'top' + new Date().toDateString());
+}
+/* ======================= قياس الأثر ======================= */
+function impErr(e){
+  const m = String((e && (e.message || e.code)) || e);
+  return /impact_|lesson_reports|relation|schema cache|42P01|PGRST20/i.test(m) ? 'لم يُجهَّز قياس الأثر بعد: شغّلي ملف 07_impact_reports.sql في Supabase.' : platErr(e);
+}
+/* ======================= تقارير الدروس لمنصة الشواهد ======================= */
+const STRATS = ['التعلم باللعب','التعلم النشط','التعلم التعاوني','التقويم البنائي','التعزيز الفوري','التغذية الراجعة الفورية','التنافس الإيجابي','توظيف التقنية في التعليم','التعلم الذاتي','التعليم المتمايز','العصف الذهني','التعلم بالاكتشاف','الحوار والمناقشة','الخرائط الذهنية','لعب الأدوار','إدارة الوقت'];
+const LR_KINDS = [
+  { k:'لعبة تعليمية', e:'🎮', s:['التعلم باللعب','التنافس الإيجابي','التعزيز الفوري','التقويم البنائي','توظيف التقنية في التعليم'] },
+  { k:'ورقة عمل تفاعلية', e:'📄', s:['التعلم الذاتي','التقويم البنائي','التغذية الراجعة الفورية','التعليم المتمايز','توظيف التقنية في التعليم'] },
+  { k:'درس تفاعلي', e:'📱', s:['التعلم النشط','الحوار والمناقشة','التقويم البنائي','توظيف التقنية في التعليم'] },
+  { k:'فيديو تعليمي', e:'🎬', s:['التعلم بالاكتشاف','الحوار والمناقشة','توظيف التقنية في التعليم'] },
+  { k:'نشاط صفي', e:'🧩', s:['التعلم التعاوني','التعلم النشط','العصف الذهني'] }
+];
+const LR_TOOLS = ['Wordwall','Liveworksheets','Wizer','Nearpod','YouTube','Padlet','لعبة ثلاثية الأبعاد','أخرى'];
+async function addReport(rep){
+  await loadPlatform(); const sb = await platformClient();
+  const r = await sb.from('lesson_reports').insert({ day:isoDay(), ...rep, updated_at:new Date().toISOString() }).select().single();
+  if (r.error) throw r.error; return r.data;
+}
+// تقرير تلقائي بعد الأسئلة المباشرة (تقرير واحد لكل درس وفصل في اليوم، يتجمّع)
+async function autoLessonReport(){
+  if (!QZ.les || !QZ.tries) return '';
+  const lesson = QZ.les.t === 'كل الدروس' ? 'مراجعة شاملة لدروس الوحدة' : `${QZ.les.n}: ${QZ.les.t}`;
+  const key = [isoDay(), S.cur, lesson].join('|');
+  S.lrep = S.lrep || {}; const A = S.lrep[key] = S.lrep[key] || { tries:0, right:0, parts:[], id:null };
+  A.tries += QZ.tries - (QZ.repT || 0); A.right += QZ.right - (QZ.repR || 0); QZ.repT = QZ.tries; QZ.repR = QZ.right;
+  A.parts = [...new Set([...A.parts, ...(QZ.parts || [])])]; save();
+  const strategies = ['التعلم باللعب','التقويم البنائي','التعزيز الفوري','التنافس الإيجابي','توظيف التقنية في التعليم'];
+  if (QZ.sec) strategies.push('إدارة الوقت');
+  if (S.grpDay && S.grpDay[S.cur] === isoDay()) strategies.push('التعلم التعاوني');
+  const pct = A.tries ? Math.round(A.right / A.tries * 100) : 0;
+  const row = { stage:QZ.g, cls:+S.cur, lesson, kind:'أسئلة مباشرة', tool:'لوحة التعزيز', link:null, strategies,
+    stats:{ 'عدد الأسئلة':A.tries, 'الإجابات الصحيحة':`${A.right} (${pct}%)`, 'الطالبات المشاركات':A.parts.length, 'الحاضرات':presentIdx().length },
+    notes:`نُفّذت أسئلة مباشرة تفاعلية في درس «${lesson}» لطالبات فصل ${CLASSES[S.cur]}، باختيار عشوائي عادل للمجيبات وتعزيز فوري للإجابات الصحيحة، وبلغت نسبة الإجابات الصحيحة ${pct}% بمشاركة ${A.parts.length} طالبة.` };
+  try {
+    await loadPlatform(); const sb = await platformClient();
+    if (A.id) { const r = await sb.from('lesson_reports').update({ ...row, updated_at:new Date().toISOString() }).eq('id', A.id); if (r.error) throw r.error; }
+    else { const r = await addReport(row); A.id = r.id; save(); }
+    return '📤 رُفع تقرير الدرس والاستراتيجيات إلى منصة الشواهد ✓';
+  } catch(e) { return '⚠️ لم يُرفع تقرير الدرس: ' + impErr(e); }
 }
 function loadSupabase(){
   return new Promise((res, rej) => { if (window.supabase) return res(); const s = document.createElement('script'); s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2'; s.onload = res; s.onerror = () => rej(new Error('net')); document.head.appendChild(s); });
