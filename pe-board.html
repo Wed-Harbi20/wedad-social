@@ -202,6 +202,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin:24px 0 8px}
     <button class="icon-btn" id="whistleBtn" title="صافرة">📯 صافرة</button>
     <button class="icon-btn" id="soundBtn">🔊 الأصوات</button>
     <button class="icon-btn" id="fsBtn">⛶ ملء الشاشة</button>
+    <button class="icon-btn" id="cloudBtn">☁️ المزامنة</button>
     <button class="icon-btn" id="setBtn">⚙️ الإعدادات</button>
   </div>
 </header>
@@ -217,7 +218,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin:24px 0 8px}
   <div style="font-size:40px">📚</div>
   <div class="lt"><small id="lbWeek"></small><div id="lbTitle"></div></div>
   <select id="lbSel" style="border:2px solid var(--sky-l);border-radius:12px;padding:8px;font-family:Tajawal;max-width:240px"></select>
-  <a class="btn purple" id="lbPpt" target="_blank" rel="noopener" style="text-decoration:none">📊 عرض الدرس</a>
+  <button class="btn purple" id="lbPpt">📊 عرض الدرس</button>
   <button class="btn sky" id="lbGame">🎮 لعبة الدرس</button>
   <button class="btn pink" id="lbCh">🎯 تحدي الدرس</button>
 </div>
@@ -276,6 +277,19 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin:24px 0 8px}
       <div class="stat" style="background:var(--purple)"><b id="cN">0</b>لم تُحضَّر</div>
     </div>
     <div class="att-list" id="attList"></div>
+  </div>
+  <div class="panel" style="margin-top:14px">
+    <div class="row" style="justify-content:space-between">
+      <h2 class="title">🗂️ سجل الحضور والغياب</h2>
+      <div class="row">
+        <span class="muted" id="histDays"></span>
+        <button class="btn ghost" id="histCopy">📋 نسخ السجل</button>
+        <button class="btn sky" id="histDl">⬇️ تنزيل Excel (CSV)</button>
+      </div>
+    </div>
+    <div style="overflow:auto;margin-top:10px">
+      <table id="histTbl" style="width:100%;border-collapse:separate;border-spacing:0 6px;font-weight:700"></table>
+    </div>
   </div>
 </section>
 
@@ -420,6 +434,38 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin:24px 0 8px}
   </div>
 </div></div>
 
+<div class="modal" id="mPpt"><div class="box" style="width:min(1200px,100%);max-height:96vh;padding:14px">
+  <div class="row" style="justify-content:space-between;margin-bottom:10px">
+    <h2 class="fun" id="pptTitle" style="font-size:20px"></h2>
+    <div class="row">
+      <a class="btn purple" id="pptApp" style="text-decoration:none">📱 افتحي في PowerPoint</a>
+      <a class="btn sky" id="pptDl" style="text-decoration:none" target="_blank" rel="noopener">⬇️ تنزيل</a>
+      <button class="btn pink" id="pptFs">⛶ ملء الشاشة</button>
+      <button class="btn ghost" data-close>✖ إغلاق</button>
+    </div>
+  </div>
+  <div id="pptWrap" style="position:relative;width:100%;aspect-ratio:16/9.6;background:#f6f0ff;border-radius:18px;overflow:hidden"></div>
+</div></div>
+
+<div class="modal" id="mCloud"><div class="box">
+  <h2 class="fun">☁️ مزامنة اللوحة بين الأجهزة</h2>
+  <p class="muted" id="cloudState" style="margin:8px 0 12px"></p>
+  <div id="cloudLogin">
+    <p style="margin-bottom:8px">ادخلي بحساب المعلمة في منصتك (مرة واحدة على كل جهاز):</p>
+    <input id="cEm" type="text" inputmode="email" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="البريد" style="width:100%;border:2px solid var(--purple-l);border-radius:12px;padding:10px;font-family:Tajawal;margin-bottom:8px;direction:ltr;-webkit-text-security:disc" >
+    <div class="row" style="flex-wrap:nowrap">
+      <input id="cPw" type="password" autocomplete="off" placeholder="كلمة المرور" style="flex:1;border:2px solid var(--purple-l);border-radius:12px;padding:10px;font-family:Tajawal;direction:ltr">
+      <button class="btn ghost" id="cEye" type="button">👁️</button>
+    </div>
+    <button class="btn purple" id="cLogin" style="width:100%;margin-top:10px">🔐 دخول وتفعيل المزامنة</button>
+  </div>
+  <div id="cloudOn" style="display:none">
+    <button class="btn sky" id="cNow" style="width:100%">🔄 مزامنة الآن</button>
+    <button class="btn ghost" id="cOut" style="width:100%;margin-top:8px">🚪 خروج من هذا الجهاز</button>
+  </div>
+  <button class="btn ghost" data-close style="width:100%;margin-top:10px">إغلاق</button>
+</div></div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -528,7 +574,7 @@ const KEY='pe-board-2-1-v1';
 let S;
 function defaults(){return {students:FULL.map((f,i)=>({full:f,name:SHORT[i],pts:0,av:AV[i%AV.length]})),att:{},teams:[],tScores:[],teamN:2,goal:200,reward:'حصة لعب حر 🎈',sound:true,used:[],chSrc:'lesson',lesson:null}}
 function load(){try{const r=localStorage.getItem(KEY);S=r?Object.assign(defaults(),JSON.parse(r)):defaults()}catch(e){S=defaults()}}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}if(window.Cloud)Cloud.dirty()}
 load();
 
 /* ===================== الأصوات ===================== */
@@ -595,7 +641,7 @@ function renderGoal(){const t=totalPts(),p=Math.min(100,t/S.goal*100);$('#goalBa
 
 /* ===================== التحضير ===================== */
 const AR_DAYS=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
-function renderAtt(){$('#attPick').value=attDay;const d=new Date(attDay+'T12:00');$('#attDate').textContent='· '+AR_DAYS[d.getDay()]+' '+attDay;
+function renderAtt(){setTimeout(renderHist,0);$('#attPick').value=attDay;const d=new Date(attDay+'T12:00');$('#attDate').textContent='· '+AR_DAYS[d.getDay()]+' '+attDay;
  const day=S.att[attDay]||{};let c={p:0,a:0,l:0,n:0};const L=$('#attList');L.innerHTML='';
  S.students.forEach((s,i)=>{const st=day[i];c[st||'n']++;const r=document.createElement('div');r.className='att';
   r.innerHTML=`<span class="e">${s.av}</span><span class="n">${i+1}. ${s.name}</span>`+[['p','حاضرة'],['l','متأخرة'],['a','غائبة']].map(([k,t])=>`<button class="${k}${st===k?' on':''}" data-k="${k}">${t}</button>`).join('');
@@ -739,15 +785,94 @@ function renderLesson(){const i=curLesson(),L=LESSONS[i];
  $('#lbTitle').textContent=L.t;
  $('#lbSel').innerHTML=LESSONS.map((l,k)=>l.holiday?'':`<option value="${k}" ${k===i?'selected':''}>الأسبوع ${l.w}${k===thisWeek?' (الحالي)':''}</option>`).join('');
  $('#lbGame').style.display=$('#lbCh').style.display=$('#lbPpt').style.display=L.game?'':'none';
- if(L.game)$('#lbPpt').href=pptUrl(i);
+ $('#lbPpt').onclick=()=>openPpt(i);
  const lg=$('#lessonGame');lg.innerHTML='';if(L.game){const g=L.game;const d=document.createElement('div');d.className='game';d.style.borderColor='#ff6fae88';
   d.innerHTML=`<span class="tag" style="background:#ff6fae">الأسبوع ${L.w}</span><div class="ge">${g.e}</div><h3 class="fun">${g.n}</h3><p style="font-weight:700;color:#0b7fae">${L.t}</p><p class="muted" style="margin-top:4px">${g.rules}</p><p style="margin-top:8px;font-weight:700">🧰 ${g.tools} · ⏱️ ${fmt(g.t)}</p>`;d.onclick=()=>playField(g);lg.appendChild(d)}
  const ll=$('#lessonList');ll.innerHTML='';LESSONS.forEach((l,k)=>{const d=document.createElement('div');d.className='les'+(l.holiday?' hol':'')+(k===thisWeek?' cur':'')+(k===i&&k!==thisWeek?' act':'');
-  d.innerHTML=l.holiday?`<span class="wk" style="background:#ffb020">إجازة</span><h3>${l.t}</h3>`:`<span class="wk">الأسبوع ${l.w}</span><div class="muted" style="font-size:13px;margin-top:6px">${l.u}${l.note?' · '+l.note:''}</div><h3>${l.t}</h3><div style="font-weight:700;color:var(--pink)">${l.game.e} ${l.game.n}</div><a class="btn ghost" href="${pptUrl(k)}" target="_blank" rel="noopener" style="display:inline-block;margin-top:8px;text-decoration:none;font-size:14px;padding:7px 12px" onclick="event.stopPropagation()">📊 عرض الدرس</a>`;
+  d.innerHTML=l.holiday?`<span class="wk" style="background:#ffb020">إجازة</span><h3>${l.t}</h3>`:`<span class="wk">الأسبوع ${l.w}</span><div class="muted" style="font-size:13px;margin-top:6px">${l.u}${l.note?' · '+l.note:''}</div><h3>${l.t}</h3><div style="font-weight:700;color:var(--pink)">${l.game.e} ${l.game.n}</div><button class="btn ghost ppt-open" data-k="${k}" style="margin-top:8px;font-size:14px;padding:7px 12px">📊 عرض الدرس</button>`;
+  const pb=d.querySelector('.ppt-open');if(pb)pb.onclick=e=>{e.stopPropagation();openPpt(k)};
   if(!l.holiday)d.onclick=()=>{setLesson(k);SFX.up();toast('📚 تم اختيار درس الأسبوع '+l.w)};ll.appendChild(d)})}
 $('#lbSel').onchange=e=>setLesson(+e.target.value);
 $('#lbGame').onclick=()=>{go('games');const L=LESSONS[curLesson()];if(L.game)playField(L.game)};
 $('#lbCh').onclick=()=>{S.chSrc='lesson';save();renderChSrc();go('ch')};
+
+/* ===================== عارض العروض ===================== */
+function openPpt(i){const L=LESSONS[i],url=pptUrl(i);
+ $('#pptTitle').textContent='📊 الأسبوع '+L.w+' · '+L.t;
+ $('#pptApp').href='ms-powerpoint:ofv|u|'+url;
+ $('#pptDl').href=url;
+ const w=$('#pptWrap');
+ if(/github\.io$/.test(location.hostname)){
+  w.innerHTML='<iframe src="https://view.officeapps.live.com/op/embed.aspx?src='+encodeURIComponent(url)+'" style="position:absolute;inset:0;width:100%;height:100%;border:0" allowfullscreen></iframe>';
+ }else{
+  w.innerHTML='<div style="position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:20px"><div><div style="font-size:60px">📊</div><h3 class="fun" style="margin:8px 0">العرض يظهر هنا داخل اللوحة عند فتحها من رابط GitHub</h3><p class="muted">أو اضغطي «افتحي في PowerPoint» في الأعلى</p></div></div>';
+ }
+ open('#mPpt');SFX.click()}
+$('#pptFs').onclick=()=>{const w=$('#pptWrap');try{(w.requestFullscreen||w.webkitRequestFullscreen).call(w)}catch(e){toast('ملء الشاشة غير متاح هنا')}};
+$('#mPpt').addEventListener('click',e=>{if(e.target.matches('[data-close]')||e.target.id==='mPpt')$('#pptWrap').innerHTML=''});
+
+/* ===================== سجل الحضور ===================== */
+function attHistory(){const days=Object.keys(S.att).filter(d=>Object.keys(S.att[d]||{}).length).sort();
+ const rows=S.students.map((s,i)=>{let p=0,a=0,l=0;const ab=[];days.forEach(d=>{const v=S.att[d][i];if(v==='p')p++;else if(v==='a'){a++;ab.push(d)}else if(v==='l')l++});return {i,s,p,a,l,ab}});
+ return {days,rows}}
+function renderHist(){const {days,rows}=attHistory();$('#histDays').textContent='عدد أيام التحضير: '+days.length;
+ const th='style="text-align:right;padding:6px 10px;color:var(--muted);font-size:14px"';
+ $('#histTbl').innerHTML=`<tr><th ${th}>الطالبة</th><th ${th}>✅ حضور</th><th ${th}>⏰ تأخر</th><th ${th}>❌ غياب</th><th ${th}>أيام الغياب</th></tr>`+
+  rows.map(r=>`<tr style="background:var(--purple-xl)"><td style="padding:8px 10px;border-radius:0 12px 12px 0">${r.s.av} ${r.s.name}</td><td style="padding:8px 10px;color:#1f9e6e">${r.p}</td><td style="padding:8px 10px;color:#d48a00">${r.l}</td><td style="padding:8px 10px;color:#d23c4d">${r.a}</td><td style="padding:8px 10px;border-radius:12px 0 0 12px;font-size:13px;color:var(--muted)">${r.ab.join('، ')||'—'}</td></tr>`).join('')}
+function histCSV(){const {days,rows}=attHistory();const M={p:'حاضرة',a:'غائبة',l:'متأخرة'};
+ const head=['الطالبة',...days,'حضور','تأخر','غياب'];const lines=[head.join(',')];
+ rows.forEach(r=>lines.push([r.s.full,...days.map(d=>M[S.att[d][r.i]]||''),r.p,r.l,r.a].map(x=>'"'+String(x).replace(/"/g,'""')+'"').join(',')));
+ return '\ufeff'+lines.join('\n')}
+$('#histCopy').onclick=async()=>{try{await navigator.clipboard.writeText(histCSV().slice(1));toast('📋 تم نسخ السجل — الصقيه في Excel')}catch(e){toast('تعذّر النسخ هنا')}};
+$('#histDl').onclick=()=>{try{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([histCSV()],{type:'text/csv;charset=utf-8'}));a.download='سجل-الحضور-الثاني-1.csv';document.body.appendChild(a);a.click();a.remove()}catch(e){toast('التنزيل غير متاح هنا — استخدمي النسخ')}};
+
+/* ===================== المزامنة السحابية (Supabase) ===================== */
+const Cloud=(()=>{
+ const URL_='https://dqhzvghuocaxtchmqhul.supabase.co',KEY_='sb_publishable_c18je76xJ2Ut1pTw1-8Jbw_JsQaUuO5',ROW='pe-2-1',META='pe-board-2-1-cloud';
+ let sb=null,on=false,busy=false,timer=null,meta={at:null,pending:false};
+ try{Object.assign(meta,JSON.parse(localStorage.getItem(META)||'{}'))}catch(e){}
+ const keep=()=>{try{localStorage.setItem(META,JSON.stringify(meta))}catch(e){}};
+ const chip=(t)=>{$('#cloudBtn').textContent=t};
+ const payload=()=>{const d=Object.assign({},S);delete d.sound;return d};
+ function lib(){return new Promise((res,rej)=>{if(window.supabase)return res();const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';s.onload=res;s.onerror=()=>rej(new Error('net'));document.head.appendChild(s)})}
+ async function client(){await lib();if(!sb)sb=window.supabase.createClient(URL_,KEY_);return sb}
+ function mergeAtt(local,remote){const out=JSON.parse(JSON.stringify(remote||{}));for(const d in local){out[d]=Object.assign({},out[d]||{},local[d])}return out}
+ function apply(d){const snd=S.sound;S=Object.assign(defaults(),d);S.sound=snd;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}
+  renderGoal.done=totalPts()>=S.goal;renderAll();renderLesson();renderChSrc();renderTeamBtns();renderTeams();if($('#v-att').classList.contains('on'))renderAtt();renderHist()}
+ async function pull(){const r=await sb.from('pe_board_state').select('data,updated_at').eq('id',ROW).maybeSingle();if(r.error)throw r.error;return r.data}
+ async function push(){const now=new Date().toISOString();const r=await sb.from('pe_board_state').upsert({id:ROW,data:payload(),updated_at:now});if(r.error)throw r.error;meta.at=now;meta.pending=false;keep()}
+ async function sync(){if(!on||busy)return;busy=true;try{
+   const rem=await pull();
+   if(!rem){await push()}
+   else if(!meta.at){apply(rem.data);meta.at=rem.updated_at;meta.pending=false;keep()}
+   else if(meta.pending){if(meta.at&&rem.updated_at>meta.at){S.att=mergeAtt(S.att,rem.data.att);}await push()}
+   else if(!meta.at||rem.updated_at>meta.at){apply(rem.data);meta.at=rem.updated_at;keep()}
+   chip('☁️ متزامنة ✓');
+  }catch(e){chip(navigator.onLine?'⚠️ المزامنة':'📴 بدون إنترنت');console.warn(e);if(/pe_board_state|PGRST205|42P01|relation/i.test((e.message||'')+(e.code||'')))chip('⚠️ جدول المزامنة غير موجود')}
+  busy=false}
+ function dirty(){meta.pending=true;keep();if(!on)return;chip('⏳ حفظ...');clearTimeout(timer);timer=setTimeout(sync,900)}
+ async function start(){if(!/github\.io$/.test(location.hostname)){chip('☁️ المزامنة');return}
+  try{await client();const g=await sb.auth.getSession();if(!(g.data&&g.data.session)){chip('☁️ ادخلي للمزامنة');return}
+   const t=await sb.rpc('is_teacher');if(t.data!==true){chip('⚠️ ليس حساب المعلمة');return}
+   on=true;chip('⏳ مزامنة...');await sync();
+   setInterval(()=>{if(document.visibilityState==='visible')sync()},12000);
+   document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')sync()});
+   window.addEventListener('online',sync);
+  }catch(e){chip('⚠️ المزامنة')}}
+ function state(){const el=$('#cloudState');
+  if(!/github\.io$/.test(location.hostname)){el.innerHTML='المزامنة تعمل عند فتح اللوحة من رابطك على GitHub:<br><a href="https://wed-harbi20.github.io/wedad-social/pe-board.html" target="_blank" rel="noopener">wed-harbi20.github.io/wedad-social/pe-board.html</a>';$('#cloudLogin').style.display='none';$('#cloudOn').style.display='none';return}
+  el.textContent=on?'✅ المزامنة مفعّلة: كل نجمة وتحضير يُحفظ في حسابك ويظهر في الجوال والآيباد.':'المزامنة غير مفعّلة على هذا الجهاز.';
+  $('#cloudLogin').style.display=on?'none':'block';$('#cloudOn').style.display=on?'block':'none'}
+ $('#cloudBtn').onclick=()=>{state();open('#mCloud')};
+ $('#cEye').onclick=()=>{const p=$('#cPw');p.type=p.type==='password'?'text':'password'};
+ $('#cLogin').onclick=async()=>{const em=$('#cEm').value.trim(),pw=$('#cPw').value;if(!em||!pw){toast('اكتبي البريد وكلمة المرور');return}
+  try{await client();const a=await sb.auth.signInWithPassword({email:em,password:pw});if(a.error){toast(/invalid/i.test(a.error.message)?'البريد أو كلمة المرور غير صحيحة':'تعذّر الدخول');return}
+   $('#cPw').value='';$('#cEm').value='';await start();state();toast(on?'☁️ تم تفعيل المزامنة':'تعذّر التفعيل')}catch(e){toast('تعذّر الاتصال، تأكدي من الإنترنت')}};
+ $('#cNow').onclick=async()=>{await sync();toast('🔄 تمت المزامنة')};
+ $('#cOut').onclick=()=>confirmBox('خروج من المزامنة على هذا الجهاز؟ (تبقى بياناتك محفوظة في حسابك)',async()=>{try{await sb.auth.signOut()}catch(e){}on=false;chip('☁️ ادخلي للمزامنة');close('#mCloud')});
+ return {start,dirty,sync}
+})();
+window.Cloud=Cloud;
 
 /* ===================== التنقل والإعدادات ===================== */
 function go(v){$$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));$$('.view').forEach(s=>s.classList.toggle('on',s.id==='v-'+v));if(v!=='games')exitGame();if(v==='heroes')renderHeroes();if(v==='att')renderAtt();SFX.click()}
@@ -763,7 +888,7 @@ $('#saveSet').onclick=()=>{const lines=$('#namesTa').value.split('\n').map(x=>x.
 function renderAll(){renderGrid();renderGoal();if($('#v-heroes').classList.contains('on'))renderHeroes();if(S.teams.length)renderTeams()}
 $('#soundBtn').textContent=S.sound?'🔊 الأصوات':'🔇 بدون صوت';
 renderGoal.done=totalPts()>=S.goal;
-renderGames();renderLesson();renderChSrc();renderTeamBtns();renderTeams();renderAll();
+renderGames();renderLesson();renderChSrc();renderTeamBtns();renderHist();Cloud.start();renderTeams();renderAll();
 </script>
 </body>
 </html>
