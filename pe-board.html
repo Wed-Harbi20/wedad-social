@@ -221,6 +221,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin:24px 0 8px}
   <button class="btn purple" id="lbPpt">📊 عرض الدرس</button>
   <button class="btn sky" id="lbGame">🎮 لعبة الدرس</button>
   <button class="btn pink" id="lbCh">🎯 تحدي الدرس</button>
+  <button class="btn sky" id="lbRv">🧠 مراجعة الدرس</button>
 </div>
 
 <nav id="nav">
@@ -341,6 +342,8 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin:24px 0 8px}
   <div id="gameHome">
     <h2 class="sec fun">📚 لعبة درس الأسبوع</h2>
     <div class="games" id="lessonGame"></div>
+    <div id="reviewSec"><h2 class="sec fun">🧠 ألعاب مراجعة الدرس</h2>
+    <div class="games" id="reviewGames"></div></div>
     <h2 class="sec fun">📺 ألعاب على الشاشة (للعرض على السبورة)</h2>
     <div class="games" id="screenGames"></div>
     <h2 class="sec fun">🏃‍♀️ ألعاب الساحة</h2>
@@ -718,6 +721,121 @@ function renderGames(){const s=$('#screenGames');s.innerHTML='';SCREEN.forEach(g
  const f=$('#fieldGames');f.innerHTML='';FIELD.forEach(g=>{const d=document.createElement('div');d.className='game';d.style.borderColor=g.c+'55';
   d.innerHTML=`<span class="tag" style="background:${g.c}">${g.tag}</span><div class="ge">${g.e}</div><h3 class="fun">${g.n}</h3><p class="muted">${g.rules}</p><p style="margin-top:8px;font-weight:700">🧰 ${g.tools} · ⏱️ ${fmt(g.t)}</p>`;d.onclick=()=>playField(g);f.appendChild(d)})}
 let gameStop=null;
+/* ===================== بنك مراجعة الدروس ===================== */
+const REVIEW={
+1:{tf:[['الاتزان يعني أن أثبت دون أن أسقط',1],['المرونة تعني أن أجري بسرعة فقط',0],['الرشاقة هي تغيير الاتجاه بسرعة',1],['أبدأ النشاط دون إحماء',0]],
+ mc:[['أي حركة تحتاج إلى اتزان؟',['الوقوف على قدم واحدة','الجلوس على الكرسي','النوم']],['لمس أصابع القدمين يدل على:',['المرونة','السرعة','النوم']],['الجري المتعرج بين الأقماع يدل على:',['الرشاقة','الأكل','النوم']]]},
+2:{tf:[['عندما أجري يصبح تنفسي أسرع',1],['في الجو الحار ألبس ملابس ثقيلة داكنة',0],['أشرب الماء قبل النشاط وبعده',1],['قلبي ينبض أبطأ عندما أجري',0]],
+ mc:[['ماذا يحدث لتنفسي عندما أجري؟',['يصبح أسرع','يتوقف','يصبح أبطأ']],['ماذا ألبس في الجو الحار؟',['ملابس قطنية فاتحة','معطف صوف','قفازات']],['أين أرتاح إذا تعبت في الحر؟',['في الظل','تحت الشمس','في سيارة مغلقة']]]},
+3:{tf:[['في البرد ألبس ملابس دافئة على طبقات',1],['الغذاء الصحي لا يعطيني طاقة',0],['أخلع الطبقة الزائدة إذا شعرت بالحرارة',1]],
+ mc:[['ماذا ألبس في الجو البارد؟',['جاكيت وقفازات','ملابس خفيفة فقط','حذاء البحر']],['لماذا نأكل الطعام الصحي؟',['ليعطينا الطاقة والقوة','لنشعر بالنعاس','لا فائدة منه']],['ما الذي يحمي يديّ من البرد؟',['القفازات','القبعة','الحذاء']]]},
+4:{tf:[['الماء أفضل مشروب أثناء الرياضة',1],['المشروبات الغازية أفضل من الحليب',0],['أغسل يديّ قبل الأكل',1],['الحلويات أفضل غذاء كل يوم',0]],
+ mc:[['أي هذه غذاء صحي؟',['التفاح','الحلوى','رقائق البطاطس']],['ماذا أشرب أثناء الرياضة؟',['الماء','المشروب الغازي','العصير المحلّى']],['أفضل فطور قبل المدرسة:',['حليب وبيض وخبز','حلوى ومشروب غازي','لا آكل شيئًا']]]},
+5:{tf:[['في الانزلاق الجانبي تتقاطع قدماي',0],['قدم تنزلق والأخرى تلحقها',1],['عند سحب الحبل يكون ظهري مستقيمًا',1],['أنظر إلى الأرض طوال الانزلاق',0]],
+ mc:[['في الانزلاق الجانبي يكون جسمي:',['جانبيًا','للخلف','مستلقيًا']],['أين ذراعاي في الانزلاق؟',['للجانبين للتوازن','خلف ظهري','في جيبي']],['كيف أسحب الحبل بأمان؟',['ظهري مستقيم وركبتاي مثنيتان','ظهري منحنٍ','بيد واحدة فقط']]]},
+6:{tf:[['أمدّ ذراعيّ للأمام عندما أنهض',1],['أستند بيديّ على الأرض لأنهض',0],['أجلس التربيع وظهري مستقيم',1]],
+ mc:[['أين ذراعاي عند النهوض؟',['ممدودتان للأمام','على الأرض','خلف ظهري']],['كيف أجلس قبل النهوض؟',['جلسة التربيع','مستلقية','على ركبة واحدة']],['أين أؤدي الحركة؟',['على أرض نظيفة أو مرتبة','على الدرج','على الكرسي']]]},
+7:{tf:[['أمرر الكرة من مستوى الصدر',1],['أرمي الكرة على وجه زميلتي',0],['أنادي زميلتي قبل التمرير',1]],
+ mc:[['من أين نمرر الكرة باليدين؟',['من مستوى الصدر','من فوق الرأس','من القدم']],['كيف أستقبل الكرة؟',['بأصابع مفتوحة','بيد مغلقة','برأسي']],['ماذا أفعل قبل التمرير؟',['أنادي زميلتي','أغمض عينيّ','أجري بعيدًا']]]},
+8:{tf:[['في الحجل أقفز وأهبط على القدم نفسها',1],['في الحجل أقفز بالقدمين معًا',0],['أستخدم ذراعيّ للتوازن',1],['أهبط على كعبي بقوة',0]],
+ mc:[['على كم قدم نحجل؟',['قدم واحدة','قدمين','ثلاث أقدام']],['في أي اتجاه نحجل؟',['للأمام والخلف والمتعرج','للأعلى فقط','لا نتحرك']],['ماذا أفعل إذا تعبت قدمي؟',['أبدّل القدم','أستمر بقوة','أسقط على الأرض']]]},
+9:{tf:[['أقف قدمًا أمام قدم عند الدفع',1],['أدفع زميلتي أثناء اللعب',0],['أمدّ ذراعيّ بقوة للأمام',1]],
+ mc:[['أين يداي قبل الدفع؟',['أمام صدري','خلف ظهري','فوق رأسي']],['ماذا ندفع في الدرس؟',['الكرة أو الأدوات','زميلتنا','المعلمة']],['كيف أقف عند الدفع؟',['قدم أمام قدم','القدمان ملتصقتان','على قدم واحدة']]]},
+10:{tf:[['في الميزان الأمامي أفتح ذراعيّ جانبًا',1],['أنزل رجلي بسرعة وقوة',0],['أثبت وأعدّ حتى ٥',1]],
+ mc:[['الميزان الأمامي يشبه:',['الطائرة','السيارة','الكرة']],['أين أؤدي الميزان الأمامي؟',['على المرتبة','على الطاولة','على الدرج']],['أين تذهب رجلي المرفوعة؟',['للخلف','للأمام','فوق رأسي']]]},
+11:{tf:[['أهبط وركبتاي مثنيتان',1],['أبدأ بأعلى حاجز مباشرة',0],['أنتظر دوري ولا أدفع زميلتي',1]],
+ mc:[['بأي حاجز نبدأ؟',['المنخفض','الأعلى','لا يهم']],['كيف أعبر الحاجز العالي؟',['أستند بيديّ','أقفز برأسي','أركله']],['كيف أهبط بعد القفز؟',['بثني الركبتين','برجلين مستقيمتين','على ظهري']]]},
+12:{tf:[['أؤدي القوس على المرتبة وبوجود المعلمة',1],['أضغط على رقبتي لأرفع جسمي',0],['أرفع الحوض إلى الأعلى',1],['أنزل بسرعة كبيرة',0]],
+ mc:[['أين أؤدي القوس المعكوس؟',['على المرتبة','على الإسفلت','على الكرسي']],['ماذا أرفع لأعمل الجسر؟',['الحوض','رأسي فقط','يدًا واحدة']],['كيف تكون قدماي؟',['على الأرض وركبتاي مثنيتان','في الهواء','مستقيمتان']]]},
+13:{tf:[['أرفع يدي فوق كتفي قبل الرمي',1],['أتقدم دائمًا بالقدم نفسها التي أرمي بها',0],['أرمي عندما تكون زميلتي مستعدة',1]],
+ mc:[['أين يدي قبل الرمي؟',['فوق كتفي','عند ركبتي','خلف ظهري']],['بأي قدم أتقدم عند الرمي؟',['القدم المعاكسة ليدي','القدم نفسها','لا أتحرك']],['ماذا أفعل قبل الرمي؟',['أتأكد أن زميلتي مستعدة','أغمض عينيّ','أرمي فورًا بقوة']]]},
+14:{tf:[['أهبط على مشط القدم مع ثني الركبتين',1],['أهبط على كعبيّ ورجلاي مستقيمتان',0],['أرجّح ذراعيّ قبل القفز',1]],
+ mc:[['كيف أقف قبل القفز؟',['القدمان معًا','على قدم واحدة','مستلقية']],['كيف أهبط بأمان؟',['على مشط القدم مع ثني الركبتين','على الكعبين','على يديّ']],['ماذا أفعل بذراعيّ قبل القفز؟',['أرجّحهما','أضعهما في جيبي','أثبتهما خلفي']]]},
+15:{tf:[['أثني ركبتيّ وظهري مستقيم عند الرفع',1],['أثني ظهري وأرفع بسرعة',0],['أمسك الشيء قريبًا من جسمي',1],['ألفّ ظهري وأنا أحمل',0]],
+ mc:[['كيف أرفع الصندوق؟',['أثني ركبتيّ وظهري مستقيم','أنحني بظهري','أرفعه بإصبع']],['أين أمسك الثقل؟',['قريبًا من جسمي','بعيدًا عن جسمي','فوق رأسي']],['إذا كان الشيء ثقيلًا جدًا:',['أطلب المساعدة','أرفعه وحدي','أسحبه بقدمي']]]},
+16:{tf:[['أركل الكرة بباطن القدم',1],['لا أنظر إلى الكرة عندما أركلها',0],['ألبس الحذاء الرياضي',1]],
+ mc:[['بأي جزء أركل الكرة؟',['باطن القدم','الكعب','الركبة']],['أين أضع قدم الارتكاز؟',['بجانب الكرة','فوق الكرة','بعيدًا جدًا']],['إلى أين أنظر عند الركل؟',['إلى الكرة القادمة','إلى السماء','إلى الخلف']]]},
+17:{tf:[['أشجّع زميلاتي بروح رياضية',1],['أتجاوز دوري في المحطات',0],['في الحجل أقفز على قدم واحدة',1],['أركل الكرة بركبتي',0]],
+ mc:[['في أي مهارة أقف مثل الطائرة؟',['الميزان الأمامي','الركل','التمرير']],['في الحجل أقفز على:',['قدم واحدة','قدمين','يديّ']],['كيف أهبط بعد القفز؟',['بثني الركبتين','برجلين مستقيمتين','على ظهري']]]},
+18:{tf:[['الرشاقة والمرونة من عناصر اللياقة',1],['الحلويات أفضل غذاء للرياضيات',0],['أهبط بثني الركبتين',1],['أرفع الثقل بثني ظهري',0]],
+ mc:[['أي هذه من عناصر اللياقة؟',['الاتزان','النوم','الحلوى']],['ماذا نشرب أثناء الرياضة؟',['الماء','المشروب الغازي','القهوة']],['بأي جزء نركل الكرة؟',['باطن القدم','الكعب','الرأس']]]}
+};
+const REVIEW_OQ={"1": [["ما عناصر اللياقة الحركية الأربعة؟", "الرشاقة، المرونة، الاتزان، التوافق"], ["ما معنى الاتزان؟", "أن أثبت دون أن أسقط"], ["لماذا نقوم بالإحماء قبل النشاط؟", "لنجهّز عضلاتنا ونحميها من الإصابة"]], "2": [["ماذا يحدث لتنفسنا عندما نجري؟", "يصبح أسرع لأن الجسم يحتاج هواءً أكثر"], ["ماذا نلبس عند النشاط في الجو الحار؟", "ملابس قطنية واسعة فاتحة اللون وقبعة"], ["لماذا نشرب الماء قبل النشاط وبعده؟", "لنعوّض الماء الذي نفقده بالعرق فلا نتعب"]], "3": [["ماذا نلبس عند اللعب في الجو البارد؟", "ملابس دافئة على طبقات وجاكيت وقفازات"], ["لماذا نأكل الغذاء الصحي؟", "ليعطينا الطاقة والقوة ويساعدنا على النمو"], ["ماذا نفعل إذا شعرنا بالحرارة ونحن نلبس طبقات؟", "نخلع الطبقة الزائدة"]], "4": [["اذكري ثلاثة أطعمة صحية", "مثل الخضار والفواكه والحليب والخبز"], ["ماذا نشرب أثناء الرياضة؟", "الماء"], ["ماذا نفعل قبل الأكل؟", "نغسل أيدينا"]], "5": [["كيف نؤدي الانزلاق الجانبي؟", "الجسم جانبي، قدم تنزلق والأخرى تلحقها دون أن تتقاطعا"], ["اذكري الخطوط التي ننزلق عليها", "خط مستقيم، وخط متعرج، وخط منحنٍ"], ["كيف نسحب المقاومة بأمان؟", "الظهر مستقيم والركبتان مثنيتان"]], "6": [["كيف نجلس جلسة التربيع؟", "نثني الرجلين أمامنا متقاطعتين والظهر مستقيم"], ["أين تكون الذراعان عندما ننهض؟", "ممدودتان للأمام"], ["هل نستند بأيدينا على الأرض لننهض؟", "لا، ننهض دون الاستناد"]], "7": [["من أين نمرر الكرة باليدين؟", "من مستوى الصدر"], ["كيف نستقبل الكرة؟", "بأصابع مفتوحة"], ["ماذا نفعل قبل أن نمرر الكرة؟", "ننادي زميلتنا وننظر إليها"]], "8": [["ما هو الحجل؟", "القفز والهبوط على قدم واحدة"], ["اذكري اتجاهات الحجل", "للأمام، وللخلف، والمتعرج"], ["بماذا نستعين لنتوازن أثناء الحجل؟", "بالذراعين"]], "9": [["كيف نقف عند الدفع؟", "قدم أمام قدم"], ["أين تكون اليدان قبل الدفع؟", "أمام الصدر"], ["ما قاعدة الأمان في الدفع؟", "لا ندفع زميلاتنا، ندفع الأدوات فقط"]], "10": [["لماذا نسمّيها الميزان الأمامي؟", "لأننا نميل للأمام ونثبت متوازنين"], ["صفي وضع الذراعين في الميزان الأمامي", "مفتوحتان جانبًا"], ["أين نؤدي الميزان الأمامي؟", "على المرتبة"]], "11": [["بأي ارتفاع نبدأ القفز؟", "بالارتفاع المنخفض"], ["كيف نعبر الحاجز العالي؟", "بالاستناد على اليدين"], ["كيف نهبط بعد القفز؟", "بثني الركبتين"]], "12": [["أين نؤدي القوس المعكوس؟", "على المرتبة وبوجود المعلمة"], ["ماذا نرفع لنعمل الجسر؟", "الحوض"], ["لماذا لا نضغط على الرقبة؟", "حتى لا نتعرض للإصابة"]], "13": [["أين تكون اليد قبل رمي الكرة؟", "فوق الكتف"], ["بأي قدم نتقدم عند الرمي؟", "بالقدم المعاكسة لليد التي نرمي بها"], ["متى نرمي الكرة لزميلتنا؟", "عندما تكون مستعدة"]], "14": [["كيف نقف قبل القفز؟", "القدمان معًا"], ["كيف نهبط بأمان؟", "على مشط القدم مع ثني الركبتين"], ["لماذا تكون الحواجز خفيفة؟", "لتسقط إذا لمسناها فلا نتأذى"]], "15": [["كيف نرفع شيئًا من الأرض؟", "نثني الركبتين والظهر مستقيم"], ["أين نمسك الثقل؟", "قريبًا من الجسم"], ["ماذا نفعل إذا كان الشيء ثقيلًا جدًا؟", "نطلب المساعدة"]], "16": [["بأي جزء من القدم نركل الكرة؟", "بباطن القدم"], ["أين نضع قدم الارتكاز؟", "بجانب الكرة"], ["إلى أين ننظر عندما نركل؟", "إلى الكرة"]], "17": [["اذكري مهارتين تعلمتِهما هذا الفصل", "الحجل، التمرير، الميزان، القفز، الركل..."], ["ما معنى الروح الرياضية؟", "أن أحترم زميلاتي وأشجعهن وأتقبل الفوز والخسارة"], ["ما أهم قواعد السلامة في الحصة؟", "الإحماء، والاستماع للمعلمة، وانتظار الدور"]], "18": [["اذكري عنصرين من عناصر اللياقة الحركية", "الرشاقة، المرونة، الاتزان، التوافق"], ["اذكري غذاءً صحيًا", "الخضار، الفواكه، الحليب..."], ["كيف نرفع الثقل بطريقة صحيحة؟", "نثني الركبتين والظهر مستقيم"]]};
+for(const k in REVIEW_OQ)REVIEW[k].oq=REVIEW_OQ[k];
+const lessonF=i=>i<12?i+1:i;
+function reviewOf(i){return LESSONS[i]&&!LESSONS[i].holiday?REVIEW[lessonF(i)]:null}
+function rvItems(R){return shuffle([...R.tf.map(([t,v])=>({k:'tf',q:t,ok:!!v})),...R.mc.map(([q,o])=>({k:'mc',q,opts:shuffle(o),ans:o[0]})),...(R.oq||[]).map(([q,a])=>({k:'oq',q,ans:a}))])}
+const RVGAMES=[
+ {id:'cards',e:'🃏',n:'بطاقات الأسئلة',c:'#ffb020',d:'أسئلة شفهية عن الدرس تُعرض واحدًا واحدًا، والإجابة تظهر عند الضغط. مناسبة للحصة الحضورية وعن بُعد.'},
+ {id:'tf',e:'✅',n:'صح أم خطأ',c:'#ff6fae',d:'عبارة عن الدرس، تجيب الطالبات شفهيًا أو في الدردشة، ثم تختارين إجابتهن لتظهر النتيجة.'},
+ {id:'teams',e:'🏁',n:'تحدي الفريقين',c:'#38bdf8',d:'أسئلة اختيار من متعدد لفريقين بالتناوب، والإجابة الصحيحة نقطة للفريق.'},
+ {id:'hero',e:'🎡',n:'سؤال البطلة',c:'#a46cf5',d:'القرعة تختار طالبة وسؤالًا شفهيًا من الدرس، والإجابة الصحيحة تمنحها نجمتين.'}];
+function renderReviewCards(){const box=$('#reviewGames');if(!box)return;box.innerHTML='';const i=curLesson(),R=reviewOf(i);
+ $('#reviewSec').style.display=R?'':'none';if(!R)return;
+ RVGAMES.forEach(g=>{const d=document.createElement('div');d.className='game';d.style.borderColor=g.c+'55';
+  d.innerHTML=`<span class="tag" style="background:${g.c}">مراجعة · الأسبوع ${LESSONS[i].w}</span><div class="ge">${g.e}</div><h3 class="fun">${g.n}</h3><p style="font-weight:700;color:#0b7fae">${LESSONS[i].t}</p><p class="muted">${g.d}</p>`;
+  d.onclick=()=>playReview(g.id);box.appendChild(d)})}
+function rvHead(t,extra=''){return `<div class="row" style="justify-content:space-between">${backBtn()}<h2 class="fun">${t}</h2>${extra}</div>`}
+function playReview(mode){const i=curLesson(),L=LESSONS[i],R=reviewOf(i);if(!R)return;const items=rvItems(R);let k=0;
+ const sub=`<p class="muted" style="text-align:center;margin-top:6px">📚 مراجعة: ${L.t}</p>`;
+ if(mode==='tf'){const tf=items.filter(x=>x.k==='tf');let score=0,t=null;
+  showPlay(rvHead('✅ صح أم خطأ')+sub+`<p class="muted" style="text-align:center;margin:8px 0">اقرئي العبارة، وتجيب الطالبات شفهيًا أو في الدردشة، ثم اضغطي إجابتهن</p>
+   <div class="stage" style="min-height:280px"><div class="muted fun" id="rvN"></div><div class="ch-card" id="rvQ" style="font-size:clamp(26px,4vw,42px)"></div><div id="rvA" class="big-name" style="min-height:60px"></div></div>
+   <div class="row" style="justify-content:center;margin-top:14px"><div class="ring small" id="rvRing" style="width:130px"></div><button class="btn big" id="rvT" style="background:#2ecc8f">✅ أجبن: صح</button><button class="btn big" id="rvF" style="background:#ff5c74">❌ أجبن: خطأ</button><button class="btn sky big" id="rvShow">👀 الإجابة</button><button class="btn purple big" id="rvNext">التالي ⬅️</button></div>`);
+  const ring=makeRing($('#rvRing'),'#ff6fae','#38bdf8');
+  const reveal=(guess)=>{if(k>tf.length||$('#rvA').textContent)return;const it=tf[k-1];ring.pause();
+   const ans=it.ok?'<span style="color:#1f9e6e">العبارة صحيحة ✅</span>':'<span style="color:#d23c4d">العبارة خطأ ❌</span>';
+   if(guess===undefined){$('#rvA').innerHTML=ans;SFX.up();return}
+   const right=guess===it.ok;if(right){score++;SFX.big();confetti(60)}else SFX.down();
+   $('#rvA').innerHTML=(right?'🎉 إجابة صحيحة! ':'💡 حاولن مرة أخرى! ')+'<br>'+ans};
+  $('#rvT').onclick=()=>reveal(true);$('#rvF').onclick=()=>reveal(false);
+  ring.onEnd=()=>{};
+  const next=()=>{if(k>=tf.length){$('#rvN').textContent='';$('#rvQ').textContent='🎉 أحسنتن يا بطلات!';$('#rvA').textContent='إجابات صحيحة: '+score+' من '+tf.length;score=0;SFX.fanfare();confetti(220);$('#rvNext').textContent='🔁 من جديد';k=0;shuffle(tf);return}
+   const it=tf[k++];$('#rvN').textContent=`السؤال ${k} من ${tf.length}`;$('#rvQ').textContent=it.q;$('#rvA').textContent='';$('#rvNext').textContent='التالي ⬅️';ring.set(10);ring.start()};
+  $('#rvShow').onclick=()=>reveal();$('#rvNext').onclick=next;gameStop=()=>ring.pause();next()}
+ if(mode==='cards'){const cs=[...(R.oq||[]).map(([q,a])=>({q,a})),...R.mc.map(([q,o])=>({q,a:o[0]})),...R.tf.map(([t,v])=>({q:'صح أم خطأ: '+t,a:v?'صح ✅':'خطأ ❌'}))];let st=null;
+  showPlay(rvHead('🃏 بطاقات الأسئلة')+sub+`<div class="stage" style="min-height:320px;margin-top:10px"><div class="muted fun" id="rvN"></div><div id="rvS" class="fun" style="font-size:22px;font-weight:800;color:var(--purple);min-height:30px"></div><div class="ch-card" id="rvQ" style="font-size:clamp(26px,4vw,44px)"></div><div class="ans" id="rvAns" style="display:none;font-size:22px"></div></div>
+   <div class="row" style="justify-content:center;margin-top:14px"><button class="btn ghost big" id="rvPrev">➡️ السابق</button><button class="btn sky big" id="rvShow">👀 الإجابة</button><button class="btn purple big" id="rvWho">🎲 من تجيب؟</button><button class="btn pink big" id="rvWin">⭐ +١</button><button class="btn ghost big" id="rvNext">التالي ⬅️</button></div>`);
+  const draw=()=>{const c=cs[k];$('#rvN').textContent=`السؤال ${k+1} من ${cs.length}`;$('#rvQ').textContent=c.q;$('#rvAns').textContent='✅ '+c.a;$('#rvAns').style.display='none';$('#rvS').textContent='';st=null;SFX.click()};
+  $('#rvNext').onclick=()=>{if(k<cs.length-1){k++;draw()}else{SFX.fanfare();confetti(200);toast('🎉 انتهت أسئلة الدرس')}};
+  $('#rvPrev').onclick=()=>{if(k>0){k--;draw()}};
+  $('#rvShow').onclick=()=>{$('#rvAns').style.display='block';SFX.up()};
+  $('#rvWho').onclick=()=>{const pool=present();if(!pool.length){toast('لا توجد حاضرات');return}let n=0;const sp=()=>{const r=pool[Math.floor(Math.random()*pool.length)];$('#rvS').textContent=S.students[r].av+' '+S.students[r].name;SFX.tick();if(++n<14)setTimeout(sp,45+n*n*.8);else{st=r;SFX.big()}};sp()};
+  $('#rvWin').onclick=e=>{if(st==null){toast('اختاري الطالبة أولًا من «من تجيب؟»');return}addPts(st,1,e.target);toast('⭐ أحسنتِ يا '+S.students[st].name)};
+  draw()}
+ if(mode==='teams'){const mc=items.filter(x=>x.k==='mc').concat(items.filter(x=>x.k==='tf').map(x=>({k:'mc',q:'صح أم خطأ: '+x.q,opts:['صح ✅','خطأ ❌'],ans:x.ok?'صح ✅':'خطأ ❌'})));
+  const useTeams=S.teams.length>=2,TT=useTeams?S.teams.map((m,j)=>TEAMS[j]):[TEAMS[0],TEAMS[1]];const sc=TT.map(()=>0);let turn=0,locked=false;
+  showPlay(rvHead('🏁 تحدي الفريقين')+sub+`<div class="row" id="rvSc" style="justify-content:center;margin:10px 0"></div>
+   <div class="stage" style="min-height:300px"><div class="fun" id="rvTurn" style="font-size:22px;font-weight:800"></div><div class="ch-card" id="rvQ" style="font-size:clamp(24px,3.6vw,38px)"></div><div id="rvO" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;width:100%;max-width:900px"></div></div>
+   <div class="row" style="justify-content:center;margin-top:14px"><button class="btn purple big" id="rvNext">التالي ⬅️</button></div>`);
+  const drawSc=()=>{$('#rvSc').innerHTML=TT.map((T,j)=>`<span class="chip" style="font-size:20px;border:3px solid ${j===turn?T.c:'transparent'};color:${T.c}">${T.e} ${T.n}: ${sc[j]}</span>`).join('')};
+  const colors=['#ff6fae','#38bdf8','#a46cf5','#ffc35c'];
+  const next=()=>{if(k>=mc.length){const mx=Math.max(...sc),w=sc.map((s,j)=>s===mx?j:-1).filter(j=>j>=0);
+    $('#rvTurn').textContent='';$('#rvQ').textContent='🏆 الفائز: '+w.map(j=>TT[j].e+' '+TT[j].n).join(' و ');$('#rvO').innerHTML=useTeams&&mx>0?'<button class="btn pink big" id="rvGive" style="grid-column:1/-1">⭐ نجمتان لكل عضوة في الفريق الفائز</button>':'';
+    SFX.fanfare();confetti(260);$('#rvNext').textContent='🔁 من جديد';k=0;sc.fill(0);turn=0;
+    const gv=$('#rvGive');if(gv)gv.onclick=()=>{w.forEach(j=>S.teams[j].forEach(n=>S.students[n].pts+=2));save();renderAll();SFX.big();toast('⭐ تم منح النجوم للفائزات');gv.remove()};return}
+   const it=mc[k++];locked=false;drawSc();$('#rvTurn').innerHTML=`<span style="color:${TT[turn].c}">دور ${TT[turn].e} ${TT[turn].n}</span> · السؤال ${k} من ${mc.length}`;$('#rvQ').textContent=it.q;$('#rvNext').textContent='التالي ⬅️';
+   $('#rvO').innerHTML=it.opts.map((o,j)=>`<button class="btn big" data-o="${j}" style="background:${colors[j%4]};font-size:22px;padding:18px">${o}</button>`).join('');
+   $$('#rvO [data-o]').forEach(b=>b.onclick=()=>{if(locked)return;locked=true;const o=it.opts[+b.dataset.o];
+    $$('#rvO [data-o]').forEach(x=>{if(it.opts[+x.dataset.o]===it.ans){x.style.background='#2ecc8f';x.textContent='✅ '+x.textContent}else x.style.opacity='.45'});
+    if(o===it.ans){sc[turn]++;SFX.big();confetti(70)}else{SFX.down();b.style.background='#ff5c74';b.style.opacity='1'}
+    turn=(turn+1)%TT.length;drawSc()})};
+  $('#rvNext').onclick=next;next()}
+ if(mode==='hero'){let st=null,it=null;
+  showPlay(rvHead('🎡 سؤال البطلة')+sub+`<div class="stage" style="min-height:300px;margin-top:10px"><div class="big-emoji" id="rvE">🎡</div><div class="big-name" id="rvS">من البطلة؟</div><div class="ch-card" id="rvQ"></div><div id="rvO" class="row" style="justify-content:center"></div><div class="ans" id="rvAns" style="display:none"></div></div>
+   <div class="row" style="justify-content:center;margin-top:14px"><button class="btn purple big" id="rvSpin">🎲 اختاري بطلة وسؤالًا</button><button class="btn sky big" id="rvShow">👀 الإجابة</button><button class="btn pink big" id="rvWin">🎉 صحيحة +٢</button><button class="btn ghost big" id="rvTry">💪 محاولة +١</button></div>`);
+  $('#rvSpin').onclick=()=>{const pool=present();if(!pool.length){toast('لا توجد حاضرات');return}let n=0;$('#rvAns').style.display='none';$('#rvO').innerHTML='';
+   const sp=()=>{const r=pool[Math.floor(Math.random()*pool.length)];$('#rvS').textContent=S.students[r].name;$('#rvE').textContent=S.students[r].av;SFX.tick();
+    if(++n<18)setTimeout(sp,40+n*n*.7);else{st=r;it=items[Math.floor(Math.random()*items.length)];
+     $('#rvQ').textContent=(it.k==='tf'?'صح أم خطأ: ':'')+it.q;
+     $('#rvO').innerHTML=(it.k==='oq'?[]:it.k==='tf'?['صح ✅','خطأ ❌']:it.opts).map(o=>`<span class="chip" style="font-size:20px">${o}</span>`).join('');
+     $('#rvAns').textContent='✅ '+(it.k==='tf'?(it.ok?'صح':'خطأ'):it.ans);SFX.big()}};sp()};
+  $('#rvShow').onclick=()=>{if(it){$('#rvAns').style.display='block';SFX.up()}};
+  $('#rvWin').onclick=e=>{if(st==null){toast('اختاري بطلة أولًا');return}addPts(st,2,e.target);confetti(160);toast('🎉 أحسنتِ يا '+S.students[st].name)};
+  $('#rvTry').onclick=e=>{if(st==null){toast('اختاري بطلة أولًا');return}addPts(st,1,e.target);toast('💪 محاولة رائعة يا '+S.students[st].name)};
+  $('#rvSpin').click()}
+}
+
 function backBtn(){return `<button class="btn ghost" id="gBack">↩ رجوع للألعاب</button>`}
 function showPlay(html){$('#gameHome').style.display='none';const p=$('#gamePlay');p.style.display='block';p.innerHTML=html;$('#gBack').onclick=exitGame}
 function exitGame(){gameStop&&gameStop();gameStop=null;$('#gamePlay').style.display='none';$('#gameHome').style.display='block'}
@@ -801,12 +919,14 @@ function renderLesson(){const i=curLesson(),L=LESSONS[i];
  $('#lbSel').innerHTML=LESSONS.map((l,k)=>l.holiday?'':`<option value="${k}" ${k===i?'selected':''}>الأسبوع ${l.w}${k===thisWeek?' (الحالي)':''}</option>`).join('');
  $('#lbGame').style.display=$('#lbCh').style.display=$('#lbPpt').style.display=L.game?'':'none';
  $('#lbPpt').onclick=()=>openPpt(i);
+ renderReviewCards();$('#lbRv').style.display=reviewOf(i)?'':'none';
  const lg=$('#lessonGame');lg.innerHTML='';if(L.game){const g=L.game;const d=document.createElement('div');d.className='game';d.style.borderColor='#ff6fae88';
   d.innerHTML=`<span class="tag" style="background:#ff6fae">الأسبوع ${L.w}</span><div class="ge">${g.e}</div><h3 class="fun">${g.n}</h3><p style="font-weight:700;color:#0b7fae">${L.t}</p><p class="muted" style="margin-top:4px">${g.rules}</p><p style="margin-top:8px;font-weight:700">🧰 ${g.tools} · ⏱️ ${fmt(g.t)}</p>`;d.onclick=()=>playField(g);lg.appendChild(d)}
  const ll=$('#lessonList');ll.innerHTML='';LESSONS.forEach((l,k)=>{const d=document.createElement('div');d.className='les'+(l.holiday?' hol':'')+(k===thisWeek?' cur':'')+(k===i&&k!==thisWeek?' act':'');
   d.innerHTML=l.holiday?`<span class="wk" style="background:#ffb020">إجازة</span><h3>${l.t}</h3>`:`<span class="wk">الأسبوع ${l.w}</span><div class="muted" style="font-size:13px;margin-top:6px">${l.u}${l.note?' · '+l.note:''}</div><h3>${l.t}</h3><div style="font-weight:700;color:var(--pink)">${l.game.e} ${l.game.n}</div><button class="btn ghost ppt-open" data-k="${k}" style="margin-top:8px;font-size:14px;padding:7px 12px">📊 عرض الدرس</button>`;
   const pb=d.querySelector('.ppt-open');if(pb)pb.onclick=e=>{e.stopPropagation();openPpt(k)};
   if(!l.holiday)d.onclick=()=>{setLesson(k);SFX.up();toast('📚 تم اختيار درس الأسبوع '+l.w)};ll.appendChild(d)})}
+$('#lbRv').onclick=()=>{go('games');setTimeout(()=>$('#reviewSec').scrollIntoView({behavior:'smooth'}),50)};
 $('#lbSel').onchange=e=>setLesson(+e.target.value);
 $('#lbGame').onclick=()=>{go('games');const L=LESSONS[curLesson()];if(L.game)playField(L.game)};
 $('#lbCh').onclick=()=>{S.chSrc='lesson';save();renderChSrc();go('ch')};
