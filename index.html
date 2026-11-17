@@ -581,7 +581,7 @@ ${padletCard()}
 ${boardCard()}
 ${awardsCard()}
 ${chatBoxS()}
-<div class="card"><h2>إعلانات</h2>${h.announcements.map(a => `<div class="an">${esc(a.body)}<div class="mu">${dt(a.at)}</div></div>`).join('') || '<p class="mu">لا توجد إعلانات</p>'}</div>
+<div class="card"><h2>إعلانات</h2>${h.announcements.filter(a => annFor(a.body, h.cls)).map(a => `<div class="an">${annBody(a.body, true)}<div class="mu">${dt(a.at)}</div></div>`).join('') || '<p class="mu">لا توجد إعلانات</p>'}</div>
 <div class="card reg"><div class="rh"><span>﷽</span><h2>سجل متابعتي</h2><span>${esc(CN[h.cls] || '')}</span></div><div class="rb"><div class="sc"><table><tr><th>العمل</th><th>الدرجة</th><th>الحالة</th><th>ملاحظة المعلمة</th></tr>
 ${h.works.map(w => `<tr><td>${esc(w.title)}</td><td>${w.max}</td><td class="${w.rating ? rcls(w.rating) : ''}">${w.rating ? esc(w.rating) : ''}</td><td>${esc(w.note || '')}</td></tr>`).join('')}</table></div></div></div>
 <div class="card"><h2>🏆 إنجازاتي</h2><p class="mu">اختاري نوع العمل ثم ارفعي صورته (الصور فقط) لتُرصد لكِ الدرجات تلقائيًا.</p><div class="row"><select id="ak" style="min-width:130px"><option value="">نوع العمل…</option><option value="ws">📄 ورقة عمل</option><option value="pt">🎯 مهمة أدائية</option></select><input id="at2" placeholder="عنوان العمل (اختياري)" maxlength="60" style="flex:1"><label style="cursor:pointer;padding:8px 14px;border-radius:10px;background:var(--pr);color:#fff">⬆ رفع صورة<input type="file" accept="image/*" multiple hidden onchange="addAch(this)"></label></div>
@@ -1241,8 +1241,19 @@ function exp() {
 }
 
 /* ---------- الإعلانات ---------- */
+// إعلان استبيان قياس الأثر: [[impact:رقم:الصف]]
+const IMPACT_RE = /\[\[impact:(\d+):(\d)\]\]/;
+function annFor(body, cls) { const m = String(body).match(IMPACT_RE); return !m || +m[2] === stageOf(cls); }
+function annBody(body, student) {
+  const m = String(body).match(IMPACT_RE);
+  const txt = esc(String(body).replace(IMPACT_RE, '').trim()).replace(/\n/g, '<br>');
+  if (!m) return txt;
+  return txt + (student
+    ? `<div style="margin-top:10px"><a href="survey.html?id=${m[1]}" style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font-weight:800;padding:10px 20px;border-radius:14px;text-decoration:none">📊 ابدئي الاستبيان</a></div>`
+    : `<div class="mu" style="margin-top:4px">📊 استبيان قياس أثر (يظهر لطالبات الصف المعني فقط)</div>`);
+}
 function annTab() {
-  return `<div class="card"><h2>إعلان جديد</h2><div class="row"><input id="at" placeholder="نص الإعلان" style="flex:1"><button onclick="addA()">نشر</button></div>${D.ann.map(a => `<div class="an">${esc(a.body)}<div class="mu">${dt(a.created_at)} <a style="cursor:pointer;color:var(--bad)" onclick="delA(${a.id})">حذف</a></div></div>`).join('') || '<p class="mu">لا توجد إعلانات</p>'}</div>`;
+  return `<div class="card"><h2>إعلان جديد</h2><div class="row"><input id="at" placeholder="نص الإعلان" style="flex:1"><button onclick="addA()">نشر</button></div>${D.ann.map(a => `<div class="an">${annBody(a.body, false)}<div class="mu">${dt(a.created_at)} <a style="cursor:pointer;color:var(--bad)" onclick="delA(${a.id})">حذف</a></div></div>`).join('') || '<p class="mu">لا توجد إعلانات</p>'}</div>`;
 }
 async function addA() {
   const t = $('at').value.trim(); if (!t) return;
