@@ -240,6 +240,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin:24px 0 8px}
     <div class="row">
       <button class="btn pink" id="allPlus">🌟 نجمة للجميع</button>
       <button class="btn sky" id="presentPlus">💙 نجمة للحاضرات</button>
+      <button class="btn purple addSt">➕ إضافة طالبة</button>
     </div>
     <div class="row">
       <span class="muted">ترتيب:</span>
@@ -266,6 +267,7 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin:24px 0 8px}
       <h2 class="title">📋 تحضير الطالبات <span class="muted" id="attDate" style="font-size:16px"></span></h2>
       <div class="row">
         <input type="date" id="attPick" style="border:2px solid var(--purple-l);border-radius:12px;padding:8px;font-family:Tajawal">
+        <button class="btn purple addSt">➕ إضافة طالبة</button>
         <button class="btn sky" id="allPresent">✅ الكل حاضرات</button>
         <button class="btn pink" id="attStar">⭐ نجمة الحضور</button>
       </div>
@@ -445,6 +447,19 @@ footer{text-align:center;color:var(--muted);font-size:13px;margin:24px 0 8px}
     </div>
   </div>
   <div id="pptWrap" style="position:relative;width:100%;aspect-ratio:16/9.6;background:#f6f0ff;border-radius:18px;overflow:hidden"></div>
+</div></div>
+
+<div class="modal" id="mAdd"><div class="box">
+  <h2 class="fun">➕ إضافة طالبة جديدة</h2>
+  <p class="muted" style="margin:6px 0 12px">تُضاف في آخر القائمة، وتبدأ نجومها من الصفر</p>
+  <input id="aFull" placeholder="اسم الطالبة الكامل" autocomplete="off" style="width:100%;border:2px solid var(--purple-l);border-radius:12px;padding:10px;font-family:Tajawal;font-size:16px;margin-bottom:8px">
+  <input id="aShort" placeholder="الاسم المختصر على البطاقة (اختياري)" autocomplete="off" style="width:100%;border:2px solid var(--purple-l);border-radius:12px;padding:10px;font-family:Tajawal;font-size:16px">
+  <p class="muted" style="margin:10px 0 6px">اختاري رمزها:</p>
+  <div id="aAv" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+  <div class="row" style="margin-top:14px">
+    <button class="btn pink" id="aSave">💾 إضافة</button>
+    <button class="btn ghost" data-close>إلغاء</button>
+  </div>
 </div></div>
 
 <div class="modal" id="mCloud"><div class="box">
@@ -810,6 +825,19 @@ function openPpt(i){const L=LESSONS[i],url=pptUrl(i);
  open('#mPpt');SFX.click()}
 $('#pptFs').onclick=()=>{const w=$('#pptWrap');try{(w.requestFullscreen||w.webkitRequestFullscreen).call(w)}catch(e){toast('ملء الشاشة غير متاح هنا')}};
 $('#mPpt').addEventListener('click',e=>{if(e.target.matches('[data-close]')||e.target.id==='mPpt')$('#pptWrap').innerHTML=''});
+
+/* ===================== إضافة طالبة ===================== */
+let addAv=null;
+function openAdd(){$('#aFull').value='';$('#aShort').value='';const used=S.students.map(x=>x.av);addAv=AV.find(a=>!used.includes(a))||AV[S.students.length%AV.length];
+ $('#aAv').innerHTML=AV.map(a=>`<button type="button" class="btn ghost" data-av="${a}" style="font-size:24px;padding:6px 10px;${a===addAv?'outline:3px solid var(--pink)':''}">${a}</button>`).join('');
+ $$('#aAv [data-av]').forEach(b=>b.onclick=()=>{addAv=b.dataset.av;$$('#aAv [data-av]').forEach(x=>x.style.outline='');b.style.outline='3px solid var(--pink)'});
+ open('#mAdd');setTimeout(()=>$('#aFull').focus(),100)}
+$$('.addSt').forEach(b=>b.onclick=openAdd);
+$('#aSave').onclick=()=>{const full=$('#aFull').value.replace(/\s+/g,' ').trim();if(!full){toast('اكتبي اسم الطالبة');return}
+ if(S.students.some(x=>x.full===full)){toast('هذا الاسم موجود في القائمة');return}
+ const name=$('#aShort').value.trim()||full.split(' ').slice(0,2).join(' ');
+ S.students.push({full,name,pts:0,av:addAv||'⭐'});save();close('#mAdd');SFX.big();confetti(80);
+ renderAll();renderHist();if($('#v-att').classList.contains('on'))renderAtt();toast('🎉 أهلًا بـ'+name+' في فصلنا')};
 
 /* ===================== سجل الحضور ===================== */
 function attHistory(){const days=Object.keys(S.att).filter(d=>Object.keys(S.att[d]||{}).length).sort();
