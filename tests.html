@@ -179,7 +179,7 @@ function render(){
    <table><tr><th>الطالبة</th><th>الفصل</th><th>الدرجة</th><th>المستوى</th><th>الحالة</th><th class="noprint"></th></tr>`+
    [...rows].sort((a,b)=>b.score-a.score).map(r=>{const p=r.score/r.total;return `<tr><td class="n">${esc(r.student_name)}</td><td>${esc(r.class_name)}</td><td><b>${AR(r.score)}</b> / ${AR(r.total)}</td>
    <td><span class="tag" style="background:${LCOL[level(p)]}22;color:${LCOL[level(p)]}">${level(p)}</span></td>
-   <td>${r.published?'<span class="tag t-ok">أُرسلت</span>':'<span class="tag t-w">بانتظار اعتمادك</span>'}${r.auto_submitted?' <span class="tag t-no">انتهى وقتها</span>':''}</td>
+   <td>${r.published?'<span class="tag t-ok">أُرسلت</span>':'<span class="tag t-w">بانتظار اعتمادك</span>'}${r.auto_submitted&&!r.leaves?' <span class="tag t-no">انتهى وقتها</span>':''}${r.leaves?` <span class="tag t-no" title="خرجت من صفحة الاختبار أثناء الحل، فأُقفل وسُلّمت ورقتها بما أجابت">🔒 أُقفل لخروجها</span>`:''}</td>
    <td class="noprint"><button class="btn" style="padding:3px 10px;font-size:.82rem" onclick="sendOne('${r.student_id}')">🔁 إعادة إرسال</button></td></tr>`;}).join("")+`</table></div>`;
   /* العلاج */
   const fails=rows.filter(r=>r.score/r.total<C.failRatio);
