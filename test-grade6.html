@@ -41,6 +41,15 @@ body{margin:0;font-family:'Tajawal',system-ui,sans-serif;background:var(--sand);
 .tf .opt{flex:0 0 110px}
 .match{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .match select{font:inherit;padding:8px 12px;border-radius:10px;border:1.5px solid var(--line);min-width:170px;background:#fff}
+.bank{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;background:var(--sand);border:2px dashed var(--line);border-radius:14px;padding:12px;margin-bottom:6px;min-height:58px}
+.bank-t{text-align:center;font-size:.85rem;color:#6b5843;margin-bottom:4px}
+.chip{background:var(--green);color:#fff;font-weight:700;padding:6px 16px;border-radius:999px;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;box-shadow:0 2px 6px #0002}
+.chip.pick{outline:3px solid #e8a33d}
+.chip.ghost{position:fixed;z-index:99;pointer-events:none;opacity:.9;transform:scale(1.08)}
+.dragrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.slot{min-width:150px;min-height:40px;border:2px dashed var(--brown);border-radius:12px;display:flex;align-items:center;justify-content:center;padding:3px;background:#fffdf9;color:#a08a70;font-size:.85rem}
+.slot.over{background:#fff0d6}
+.slot .chip{cursor:pointer}
 .line{width:100%;font:inherit;padding:9px 12px;border:none;border-bottom:2px dotted var(--brown);background:#fffdf9;border-radius:8px 8px 0 0}
 .line:focus{outline:none;background:#fff6e6}
 .ok{background:#e3f3ea!important;border-color:var(--green)!important;color:var(--green)!important}
@@ -102,6 +111,8 @@ const PLATFORM = {
   supabaseKey: "",      // المفتاح العام anon key
   table: "quiz_results" // جدول نتائج الاختبارات
 };
+/* الدرجة لا تظهر للطالبة ولا تُعتمد تلقائياً؛ تُحفظ كمسودة (published:false) وتعتمدها المعلمة متى شاءت */
+const SHOW_RESULT_TO_STUDENT = false;
 const QUIZ_ID = "g6-saudi2-test1";
 const QUIZ_TITLE = "اختبار الدولة السعودية الثانية – سادس";
 const DURATION = 35*60;
@@ -123,18 +134,20 @@ const Q = [
   {s:"بدأت الصناعة الوطنية لكسوة الكعبة في الأحساء في عهد الإمام سعود بن عبدالعزيز.", a:true},
   {s:"وُلد الملك عبدالعزيز في الكويت عام ١٢٩٣هـ.", a:false}
  ]},
- {title:"السؤال الثالث", hint:"اختاري فترة حكم كل إمام من أئمة الدولة السعودية الثانية", type:"match",
-  pool:["١٢٤٠ – ١٢٤٩هـ","١٢٤٩ – ١٢٨٢هـ","١٢٨٢ – ١٣٠٧هـ","١٣٠٧ – ١٣٠٩هـ"], items:[
-  {s:"الإمام عبدالله بن فيصل", a:"١٢٨٢ – ١٣٠٧هـ"},
-  {s:"الإمام تركي بن عبدالله", a:"١٢٤٠ – ١٢٤٩هـ"},
-  {s:"الإمام عبدالرحمن بن فيصل", a:"١٣٠٧ – ١٣٠٩هـ"},
-  {s:"الإمام فيصل بن تركي", a:"١٢٤٩ – ١٢٨٢هـ"}
+ {title:"السؤال الثالث", hint:"اسحبي الإجابة المناسبة وأفلتيها في مكانها", type:"drag",
+  pool:["الأجرب","إسماعيل آغا","محمد بن رشيد","١٢٤٠هـ","الجافورة","خورشيد باشا"], items:[
+  {s:"السيف الذي اشتهر به الإمام تركي بن عبدالله يُسمى", a:"الأجرب"},
+  {s:"قائد الحملة العثمانية المعتدية التي هُزمت في معركة الحلوة", a:"إسماعيل آغا"},
+  {s:"أمير حائل الذي استغل الخلافات للاستيلاء على الحكم", a:"محمد بن رشيد"},
+  {s:"أسس الإمام تركي بن عبدالله الدولة السعودية الثانية عام", a:"١٢٤٠هـ"},
+  {s:"الصحراء التي أقام فيها الملك عبدالعزيز ورجاله ٥٠ يوماً قبل استرداد الرياض", a:"الجافورة"}
  ]},
  {title:"السؤال الرابع", hint:"أجيبي في حدود سطر واحد", type:"short", items:[
   {s:"لماذا استسلم الإمام فيصل بن تركي للقوات المعتدية؟", k:[["دم","دماء","الدماء","دماءهم","حقنا"]], model:"حقناً لدماء المواطنين"},
   {s:"كم كان عدد رجال الملك عبدالعزيز عند استرداد الرياض؟", k:[["63","٦٣","ثلاثه وستون","ثلاثه وستين","ثلاث وستين","ثلاث وستون"]], model:"٦٣ رجلاً"},
   {s:"ما اسم القصر الذي اقتحمه الملك عبدالعزيز ورجاله لاسترداد الرياض؟", k:[["مصمك","مسمك"]], model:"قصر المصمك"},
-  {s:"ما اسم الوقف الذي أسسه الإمام عبدالعزيز بن محمد في الطريف للمحتاجين وطلبة العلم باسم والدته؟", img:"sabala", cap:"سبالة موضي", k:[["موضي","موضى"]], model:"سبالة موضي"}
+  {s:"ما اسم الوقف الذي أسسه الإمام عبدالعزيز بن محمد في الطريف للمحتاجين وطلبة العلم باسم والدته؟", img:"sabala", cap:"سبالة موضي", k:[["موضي","موضى"]], model:"سبالة موضي"},
+  {s:"في أي مدينة تُوفي الملك عبدالعزيز رحمه الله؟", k:[["طائف"]], model:"الطائف"}
  ]}
 ];
 
@@ -159,6 +172,9 @@ const quiz=$("quiz");
 Q.forEach((q,qi)=>{
   const sec=document.createElement("section");sec.className="q";
   sec.innerHTML=`<h2>${q.title} <small>– ${q.hint}</small></h2>`;
+  if(q.type==="drag"){
+    sec.insertAdjacentHTML("beforeend",`<div class="bank-t">بنك الإجابات (اسحبي الكلمة إلى الفراغ، أو المسيها ثم المسي الفراغ)</div><div class="bank" id="bank${qi}">`+shuffle(q.pool).map(w=>`<span class="chip">${w}</span>`).join("")+`</div>`);
+  }
   q.items.forEach((it,ii)=>{
     const id=qi+"_"+ii;
     const d=document.createElement("div");d.className="item";d.id="it"+id;
@@ -166,7 +182,7 @@ Q.forEach((q,qi)=>{
     if(it.img&&IMG[it.img])h+=`<img src="${IMG[it.img]}" alt="${it.cap||""}" title="${it.cap||""}">`;
     if(q.type==="mcq"){h+=`<div class="opts">`+it.o.map((o,oi)=>`<div class="opt" data-v="${oi}">${o}</div>`).join("")+`</div>`;}
     if(q.type==="tf"){h+=`<div class="tf"><div class="opt" data-v="1">صح ✓</div><div class="opt" data-v="0">خطأ ✗</div></div>`;}
-    if(q.type==="match"){h+=`<div class="match">← <select><option value="">اختاري الفترة</option>`+shuffle(q.pool).map(p=>`<option>${p}</option>`).join("")+`</select></div>`;}
+    if(q.type==="drag"){h=`<div class="stem dragrow"><span class="num">${(ii+1).toLocaleString("ar-SA")}</span><span>${it.s}</span><span class="slot" data-id="${id}" data-bank="bank${qi}">أفلتي هنا</span></div>`;}
     if(q.type==="short"){h+=`<input class="line" maxlength="70" placeholder="اكتبي إجابتك هنا…" autocomplete="off">`;}
     h+=`<div class="fb"></div>`;
     d.innerHTML=h;sec.appendChild(d);
@@ -176,6 +192,44 @@ Q.forEach((q,qi)=>{
   });
   quiz.appendChild(sec);
 });
+
+/* السحب والإفلات (يعمل باللمس والفأرة) */
+let picked=null;
+function place(chip,slot){
+  const id=slot.dataset.id,bank=$(slot.dataset.bank);
+  const old=slot.querySelector(".chip"); if(old&&old!==chip) bank.appendChild(old);
+  document.querySelectorAll(".slot").forEach(s=>{if(s!==slot&&s.contains(chip)){s.textContent="أفلتي هنا";delete ans[s.dataset.id];}});
+  slot.textContent=""; slot.appendChild(chip); ans[id]=chip.textContent;
+  chip.classList.remove("pick"); picked=null;
+}
+function unplace(chip){
+  const slot=chip.closest(".slot"); if(!slot)return;
+  $(slot.dataset.bank).appendChild(chip); slot.textContent="أفلتي هنا"; delete ans[slot.dataset.id];
+}
+document.addEventListener("pointerdown",e=>{
+  const chip=e.target.closest(".chip"); if(!chip||done)return;
+  e.preventDefault();
+  const sx=e.clientX,sy=e.clientY; let ghost=null,moved=false,overSlot=null;
+  const mv=ev=>{
+    if(!moved&&Math.hypot(ev.clientX-sx,ev.clientY-sy)<6)return;
+    if(!moved){moved=true;ghost=chip.cloneNode(true);ghost.classList.add("ghost");document.body.appendChild(ghost);chip.style.opacity=".35";}
+    ghost.style.left=(ev.clientX-ghost.offsetWidth/2)+"px";ghost.style.top=(ev.clientY-ghost.offsetHeight/2)+"px";
+    const el=document.elementFromPoint(ev.clientX,ev.clientY); const s=el&&el.closest(".slot");
+    if(overSlot&&overSlot!==s)overSlot.classList.remove("over"); overSlot=s; if(s)s.classList.add("over");
+  };
+  const up=ev=>{
+    document.removeEventListener("pointermove",mv);document.removeEventListener("pointerup",up);
+    chip.style.opacity="";
+    if(moved){ghost.remove(); if(overSlot){overSlot.classList.remove("over");place(chip,overSlot);} else {const el=document.elementFromPoint(ev.clientX,ev.clientY); if(el&&el.closest(".bank"))unplace(chip);} }
+    else{ /* لمسة: اختيار الكلمة أو إرجاعها */
+      if(chip.closest(".slot")){unplace(chip);return;}
+      document.querySelectorAll(".chip.pick").forEach(c=>c.classList.remove("pick"));
+      if(picked===chip){picked=null;}else{picked=chip;chip.classList.add("pick");}
+    }
+  };
+  document.addEventListener("pointermove",mv);document.addEventListener("pointerup",up);
+});
+document.addEventListener("click",e=>{const s=e.target.closest(".slot"); if(s&&picked&&!done&&!e.target.closest(".chip"))place(picked,s);});
 
 /* المؤقت */
 let left=DURATION,done=false;
@@ -208,7 +262,7 @@ function finish(auto){
       d.querySelectorAll(".opt").forEach(o=>{if(+o.dataset.v===it.a)o.classList.add("ok");else if(o.classList.contains("sel"))o.classList.add("bad");});}
     if(q.type==="tf"){ok=v!==undefined&&(v==="1")===it.a;right=it.a?"صح":"خطأ";
       d.querySelectorAll(".opt").forEach(o=>{if((o.dataset.v==="1")===it.a)o.classList.add("ok");else if(o.classList.contains("sel"))o.classList.add("bad");});}
-    if(q.type==="match"){ok=v===it.a;right=it.a;d.querySelector("select").classList.add(ok?"ok":"bad");}
+    if(q.type==="drag"){ok=v===it.a;right=it.a;if(SHOW_RESULT_TO_STUDENT)d.querySelector(".slot").classList.add(ok?"ok":"bad");}
     if(q.type==="short"){const n=norm(v);ok=n.length>0&&it.k.every(g=>g.some(w=>n.includes(norm(w))));right=it.model;d.querySelector("input").classList.add(ok?"ok":"bad");}
     if(ok)score++;
     fb.className="fb "+(ok?"g":"r");fb.textContent=ok?"إجابة صحيحة ✔ (درجة)":"الإجابة الصحيحة: "+right;
@@ -217,28 +271,36 @@ function finish(auto){
   document.querySelectorAll("input,select").forEach(e=>e.disabled=true);
   $("sendBtn").style.display="none";
   $("result").style.display="block";
-  $("scoreTxt").textContent=score.toLocaleString("ar-SA")+" / "+total.toLocaleString("ar-SA");
-  const p=score/total;
-  $("praise").textContent=p===1?"ممتازة! أداء رائع 🌟":p>=.8?"أحسنتِ! أداء متميز 👏":p>=.6?"جيد، واصلي التقدم 💪":"راجعي الدروس وستتقدمين بإذن الله 🌱";
-  if(auto)$("praise").textContent="انتهى الوقت وأُرسلت إجاباتك تلقائياً – "+$("praise").textContent;
+  if(SHOW_RESULT_TO_STUDENT){
+    $("scoreTxt").textContent=score.toLocaleString("ar-SA")+" / "+total.toLocaleString("ar-SA");
+    const p=score/total;
+    $("praise").textContent=p===1?"ممتازة! أداء رائع 🌟":p>=.8?"أحسنتِ! أداء متميز 👏":p>=.6?"جيد، واصلي التقدم 💪":"راجعي الدروس وستتقدمين بإذن الله 🌱";
+  }else{
+    document.querySelectorAll(".ok,.bad").forEach(e=>e.classList.remove("ok","bad"));
+    document.querySelectorAll(".fb").forEach(e=>e.textContent="");
+    $("result").firstElementChild.textContent="";
+    $("scoreTxt").textContent="✔ تم استلام إجاباتك";
+    $("praise").textContent="شكراً لكِ، ستظهر درجتك عندما تعتمدها المعلمة 🌷";
+  }
+  if(auto)$("praise").textContent="انتهى الوقت وسُلّمت ورقتك تلقائياً – "+$("praise").textContent;
   $("result").scrollIntoView({behavior:"smooth"});
   saveResult({student_name:$("sName").value.trim(),class_name:$("sClass").value,quiz_id:QUIZ_ID,quiz_title:QUIZ_TITLE,
-    score,total,answers:detail,duration_sec:DURATION-Math.max(left,0),auto_submitted:auto,submitted_at:new Date().toISOString()});
+    score,total,answers:detail,duration_sec:DURATION-Math.max(left,0),auto_submitted:auto,published:false,submitted_at:new Date().toISOString()});
 }
 
 /* رصد الدرجة في المنصة */
 async function saveResult(r){
   const st=$("sendState");
   try{localStorage.setItem("result_"+QUIZ_ID,JSON.stringify(r));}catch(e){}
-  if(!PLATFORM.supabaseUrl||!PLATFORM.supabaseKey){st.textContent="تم حفظ نتيجتك.";return;}
-  st.textContent="جارٍ رصد الدرجة في المنصة…";
+  if(!PLATFORM.supabaseUrl||!PLATFORM.supabaseKey){st.textContent="";return;}
+  st.textContent="جارٍ تسليم الورقة…";
   try{
     const res=await fetch(PLATFORM.supabaseUrl.replace(/\/$/,"")+"/rest/v1/"+PLATFORM.table,{method:"POST",
       headers:{"apikey":PLATFORM.supabaseKey,"Authorization":"Bearer "+PLATFORM.supabaseKey,"Content-Type":"application/json","Prefer":"return=minimal"},
       body:JSON.stringify(r)});
     if(!res.ok)throw new Error(res.status);
-    st.textContent="✔ تم رصد درجتك في منصة الدراسات الاجتماعية.";
-  }catch(e){st.textContent="تم حفظ نتيجتك، وتعذّر الاتصال بالمنصة الآن. أخبري معلمتك.";}
+    st.textContent="✔ وصلت ورقتك إلى المعلمة.";
+  }catch(e){st.textContent="حُفظت إجاباتك، وتعذّر الاتصال بالمنصة الآن. أخبري معلمتك.";}
 }
 </script>
 </body>
