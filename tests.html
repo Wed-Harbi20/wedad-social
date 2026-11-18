@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>الاختبارات – لوحة المعلمة</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--brown:#7a4a26;--sand:#f6ecdc;--sand2:#efe0c6;--green:#1f6f4a;--red:#b23a2e;--amber:#c98a1b;--ink:#2e2218;--line:#d9c3a0}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Tajawal',system-ui,sans-serif;background:var(--sand);color:var(--ink);line-height:1.6}
+.wrap{max-width:1050px;margin:0 auto;padding:16px 14px 60px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:#fffaf2;border:2px solid var(--line);border-radius:18px;padding:14px 18px;position:relative;overflow:hidden}
+header:before{content:"";position:absolute;inset:0 0 auto 0;height:7px;background:repeating-linear-gradient(90deg,var(--brown) 0 18px,var(--sand2) 18px 24px,var(--green) 24px 42px,var(--sand2) 42px 48px)}
+header h1{margin:6px 0 0;font-size:1.4rem;color:var(--brown)}
+header small{color:#6b5843}
+.btn{font:inherit;font-weight:700;border:none;border-radius:12px;padding:8px 16px;cursor:pointer;background:var(--sand2);color:var(--ink);text-decoration:none;display:inline-block}
+.btn.g{background:var(--green);color:#fff}.btn.b{background:var(--brown);color:#fff}.btn.r{background:var(--red);color:#fff}
+.btn:disabled{opacity:.5}
+.demo{background:#fff4d6;border:1.5px dashed var(--amber);border-radius:12px;padding:8px 14px;margin-top:12px;font-size:.92rem;display:none}
+.tabs{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap}
+.tab{flex:1;min-width:120px;text-align:center;background:#fff;border:2px solid var(--line);border-radius:14px;padding:10px;cursor:pointer;font-weight:800;font-size:1.1rem;color:var(--brown)}
+.tab.on{background:var(--brown);color:#fff;border-color:var(--brown)}
+.sub{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center}
+.chip{background:#fff;border:1.5px solid var(--line);border-radius:999px;padding:5px 16px;cursor:pointer;font-weight:700}
+.chip.on{background:var(--green);color:#fff;border-color:var(--green)}
+select{font:inherit;padding:7px 12px;border-radius:10px;border:1.5px solid var(--line);background:#fff}
+.card{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:16px 18px;margin-top:16px}
+.card h2{margin:0 0 12px;font-size:1.12rem;color:#fff;background:var(--brown);display:inline-block;padding:3px 14px;border-radius:10px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px}
+.stat{background:var(--sand);border-radius:14px;padding:10px;text-align:center}
+.stat b{display:block;font-size:1.5rem;color:var(--brown)}
+.stat span{font-size:.85rem;color:#6b5843}
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{padding:8px 6px;border-bottom:1px solid var(--sand2);text-align:center}
+th{background:var(--sand);color:var(--brown)}
+td.n{text-align:right}
+.bar{height:14px;background:var(--sand2);border-radius:99px;overflow:hidden;min-width:90px}
+.bar i{display:block;height:100%;border-radius:99px}
+.tag{border-radius:999px;padding:2px 10px;font-size:.82rem;font-weight:700;white-space:nowrap}
+.t-ok{background:#e3f3ea;color:var(--green)}.t-no{background:#fbe6e3;color:var(--red)}.t-w{background:#fff1d6;color:#8a5b07}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.empty{text-align:center;color:#8a7a66;padding:20px}
+.login{max-width:380px;margin:40px auto;background:#fff;border:2px solid var(--line);border-radius:18px;padding:22px;text-align:center}
+.login input{font:inherit;width:100%;margin:6px 0;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line)}
+.pw{position:relative}.pw button{position:absolute;left:8px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:1.1rem;cursor:pointer}
+.note{font-size:.88rem;color:#6b5843;margin-top:8px}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:10px 20px;border-radius:12px;font-weight:700;display:none;z-index:9}
+@media print{.noprint{display:none!important}body{background:#fff}.card{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <header>
+    <div><h1>📝 الاختبارات</h1><small>الدراسات الاجتماعية – المعلمة وداد محمد الكحيلي</small></div>
+    <div class="noprint" style="display:flex;gap:8px;flex-wrap:wrap">
+      <a class="btn" href="index.html?t">↩ لوحتي</a>
+      <button class="btn b" onclick="print()">🖨️ طباعة</button>
+    </div>
+  </header>
+  <div class="demo" id="demo">وضع المعاينة: البيانات المعروضة تجريبية. بعد ربط المنصة ستظهر نتائج طالباتك الحقيقية.</div>
+  <div class="tabs noprint" id="gradeTabs"></div>
+  <div class="sub noprint" id="quizBar"></div>
+  <div id="content"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="tests-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const C=window.TESTS_CONFIG;
+const $=id=>document.getElementById(id);
+const AR=n=>Number(n).toLocaleString("ar-SA");
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const PREVIEW=/[?&]preview/.test(location.search)||!window.supabase;
+const sb=PREVIEW?null:supabase.createClient(C.supabaseUrl,C.supabaseKey);
+let ALL=[],REM=[],STU=[],WORKS=[],GR={},TRIED={},state={grade:null,quiz:null,cls:0};
+const CLS=Object.fromEntries(C.grades.flatMap(g=>g.classes));
+
+function toast(t){const e=$("toast");e.textContent=t;e.style.display="block";setTimeout(()=>e.style.display="none",2600);}
+function mask(n){const p=String(n||"").trim().split(/\s+/);return p[0]+(p[1]?" "+p[1][0]+".":"");}
+function level(p){return p>=.9?"ممتاز":p>=.8?"جيد جداً":p>=.65?"جيد":p>=.5?"مقبول":"يحتاج دعماً";}
+const LEVELS=["ممتاز","جيد جداً","جيد","مقبول","يحتاج دعماً"];
+const LCOL={"ممتاز":"#1f6f4a","جيد جداً":"#3d8f5f","جيد":"#c98a1b","مقبول":"#d9822b","يحتاج دعماً":"#b23a2e"};
+
+/* ===== بيانات المعاينة ===== */
+function demo(){
+  const names=["سارة أحمد","ريم خالد","جود محمد","لمى سعد","رهف علي","شهد فهد","نوف عبدالله","غلا ناصر","لين ماجد","دانة سلطان","جنى بندر","رغد عمر","تالا حسن","ليان يوسف","مها إبراهيم","هيا تركي","وعد صالح","أريج فيصل","بشرى منصور","حلا سامي","نورة سعيد","جوري عادل"];
+  STU=names.map((n,i)=>({id:"s"+i,name:n,cls:i<11?6:7}));
+  WORKS=[{id:"w1",title:"اختبار قصير ١",max_score:10},{id:"w2",title:"اختبار الفترة",max_score:20}];
+  const q=C.quizzes[0],keys=Object.keys(q.items);
+  ALL=STU.filter((s,i)=>i%11!==10).map((s,i)=>{const skill=.35+((i*37)%60)/100;
+    const answers=keys.map((k,j)=>({q:+k[0],i:+k[2],correct:((j*7+i*3)%100)/100<skill+(k[0]==="2"?.12:0)-(k==="3_2"||k==="4_2"?.25:0)}));
+    return {id:i+1,quiz_id:q.id,quiz_title:q.title,stage:6,cls:s.cls,class_name:CLS[s.cls],student_id:s.id,student_name:s.name,score:answers.filter(a=>a.correct).length,total:20,answers,published:false,created_at:new Date().toISOString()};});
+}
+
+/* ===== التحميل ===== */
+async function start(){
+  if(PREVIEW){$("demo").style.display="block";demo();return render();}
+  const {data:{session}}=await sb.auth.getSession();
+  const ok=session&&(await sb.rpc("is_teacher")).data===true;
+  if(!ok){$("content").innerHTML=`<div class="card empty">ادخلي إلى المنصة بحساب المعلمة أولاً، ثم افتحي «الاختبارات» من لوحتك.<br><a class="btn g" style="margin-top:10px" href="index.html?t">دخول المعلمة</a></div>`;return;}
+  await load();
+}
+async function all(table,cols){let out=[],f=0;for(;;){const r=await sb.from(table).select(cols).range(f,f+999);if(r.error)throw r.error;out=out.concat(r.data);if(r.data.length<1000)break;f+=1000;}return out;}
+async function load(){
+  try{
+    [ALL,REM,STU,WORKS]=await Promise.all([all("quiz_results","*"),all("remedial_assignments","*"),all("students","id,name,cls"),all("works","id,title,max_score,sort_order")]);
+    ALL.sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));WORKS.sort((a,b)=>a.sort_order-b.sort_order);
+  }catch(e){$("content").innerHTML=`<div class="card empty">تعذّر تحميل البيانات. تأكدي من تنفيذ كود الجداول في Supabase ثم حدّثي الصفحة.</div>`;return;}
+  render();
+}
+
+/* ===== التحليل ===== */
+function latest(rows){const m={};rows.forEach(r=>{m[r.student_id]=r;});return Object.values(m);}
+function analyse(rows,quiz){
+  const n=rows.length;if(!n)return null;
+  const pct=rows.map(r=>r.score/r.total),avg=pct.reduce((a,b)=>a+b,0)/n;
+  const failed=rows.filter(r=>r.score/r.total<C.failRatio).length;
+  const dist={};LEVELS.forEach(l=>dist[l]=0);pct.forEach(p=>dist[level(p)]++);
+  const items=Object.keys(quiz.items).map(k=>({key:k,label:quiz.items[k],section:quiz.sections[+k[0]-1],
+    pct:rows.filter(r=>(r.answers||[]).some(a=>a.q+"_"+a.i===k&&a.correct)).length/n}));
+  return {n,avg,max:Math.max(...rows.map(r=>+r.score)),min:Math.min(...rows.map(r=>+r.score)),total:+rows[0].total,
+    mastery:rows.filter(r=>r.score/r.total>=.8).length/n,passed:n-failed,failed,dist,items};
+}
+
+/* ===== العرض ===== */
+function render(){
+  const gt=$("gradeTabs");gt.innerHTML="";
+  C.grades.forEach(g=>{const b=document.createElement("div");b.className="tab"+(state.grade===g.name?" on":"");
+    const cnt=C.quizzes.filter(q=>q.stage===g.stage).length;
+    b.innerHTML=`الصف ${g.name}<div style="font-size:.8rem;font-weight:500">${g.classes.map(c=>c[1]).join(" · ")}<br>${cnt?AR(cnt)+" اختبار":"لا توجد اختبارات بعد"}</div>`;
+    b.onclick=()=>{state.grade=g.name;state.cls=0;state.quiz=(C.quizzes.find(q=>q.stage===g.stage)||{}).id||null;render();};gt.appendChild(b);});
+  if(!state.grade){const g=C.grades.find(g=>C.quizzes.some(q=>q.stage===g.stage))||C.grades[0];state.grade=g.name;state.quiz=(C.quizzes.find(q=>q.stage===g.stage)||{}).id||null;return render();}
+  const grade=C.grades.find(g=>g.name===state.grade);
+  const quizzes=C.quizzes.filter(q=>q.stage===grade.stage);
+  const qb=$("quizBar");
+  if(!quizzes.length){qb.innerHTML="";$("content").innerHTML=`<div class="card empty">لا توجد اختبارات للصف ${grade.name} بعد.</div>`;return;}
+  qb.innerHTML=`<select onchange="state.quiz=this.value;render()">${quizzes.map(q=>`<option value="${q.id}" ${q.id===state.quiz?"selected":""}>${esc(q.title)}</option>`).join("")}</select>`+
+    [[0,"كل الفصول"],...grade.classes].map(c=>`<span class="chip ${state.cls===c[0]?"on":""}" onclick="state.cls=${c[0]};render()">${c[1]}</span>`).join("");
+  const quiz=C.quizzes.find(q=>q.id===state.quiz);
+  const clsIds=grade.classes.map(c=>c[0]);
+  const rowsAll=latest(ALL.filter(r=>r.quiz_id===quiz.id&&clsIds.includes(+r.cls)));
+  const inCls=r=>!state.cls||+r.cls===state.cls;
+  const rows=rowsAll.filter(inCls);
+  const roster=STU.filter(s=>clsIds.includes(+s.cls)&&(!state.cls||+s.cls===state.cls));
+  const missing=roster.filter(s=>!rowsAll.some(r=>r.student_id===String(s.id)));
+  const label=state.cls?CLS[state.cls]:"الصف "+grade.name;
+  let h="";
+  /* حالة التسليم */
+  h+=`<div class="card"><div class="row"><h2>📥 تسليم الأوراق – ${label}</h2><a class="btn noprint" href="${quiz.file}" target="_blank">فتح الاختبار ↗</a></div>
+  <div class="stats"><div class="stat"><b>${AR(rows.length)}</b><span>سلّمت</span></div><div class="stat"><b style="color:${missing.length?"var(--red)":"var(--green)"}">${AR(missing.length)}</b><span>لم تختبر بعد</span></div><div class="stat"><b>${AR(roster.length)}</b><span>عدد الطالبات</span></div></div>
+  ${missing.length?`<p class="note"><b>لم تختبر بعد:</b> ${missing.map(s=>esc(s.name)).join("، ")}</p>`:roster.length?`<p class="note" style="color:var(--green);font-weight:700">✔ اختبرت جميع الطالبات.</p>`:""}</div>`;
+  if(!rows.length){$("content").innerHTML=h+`<div class="card empty">لم تُسلَّم أي ورقة بعد.</div>`;return;}
+  const A=analyse(rows,quiz);
+  h+=`<div class="card"><h2>📊 إحصائية ${label}</h2>
+  <div class="stats"><div class="stat"><b>${AR(Math.round(A.avg*100))}٪</b><span>متوسط الأداء</span></div><div class="stat"><b>${AR(A.max)}/${AR(A.total)}</b><span>أعلى درجة</span></div>
+   <div class="stat"><b>${AR(A.min)}/${AR(A.total)}</b><span>أدنى درجة</span></div><div class="stat"><b>${AR(Math.round(A.mastery*100))}٪</b><span>نسبة الإتقان (٨٠٪ فأكثر)</span></div>
+   <div class="stat"><b style="color:var(--red)">${AR(A.failed)}</b><span>أخفقت (أقل من ${AR(C.failRatio*100)}٪)</span></div></div>`;
+  if(!state.cls){
+    h+=`<table style="margin-top:14px"><tr><th>الفصل</th><th>سلّمت</th><th>المتوسط</th><th>الإتقان</th><th>أخفقت</th><th></th></tr>`+
+    grade.classes.map(([id,nm])=>{const a=analyse(rowsAll.filter(x=>+x.cls===id),quiz);
+      return a?`<tr><td>${nm}</td><td>${AR(a.n)}</td><td>${AR(Math.round(a.avg*100))}٪</td><td>${AR(Math.round(a.mastery*100))}٪</td><td>${AR(a.failed)}</td><td><div class="bar"><i style="width:${a.avg*100}%;background:var(--green)"></i></div></td></tr>`
+      :`<tr><td>${nm}</td><td colspan="5" style="color:#8a7a66">لم تختبر بعد</td></tr>`;}).join("")+`</table>`;
+  }
+  h+=`<div style="margin-top:14px"><b>توزيع المستويات</b><table>`+LEVELS.map(l=>`<tr><td class="n" style="width:110px">${l}</td><td><div class="bar"><i style="width:${A.dist[l]/A.n*100}%;background:${LCOL[l]}"></i></div></td><td style="width:70px">${AR(A.dist[l])}</td></tr>`).join("")+`</table></div></div>`;
+  h+=`<div class="card"><h2>🔎 تحليل الفقرات (الأضعف أولاً)</h2><table><tr><th>الفقرة</th><th>نوع السؤال</th><th>نسبة الإجابة الصحيحة</th><th></th></tr>`+
+   [...A.items].sort((a,b)=>a.pct-b.pct).map(it=>`<tr><td class="n">${it.label}</td><td>${it.section}</td><td><div class="bar"><i style="width:${it.pct*100}%;background:${it.pct<.5?"var(--red)":it.pct<.75?"var(--amber)":"var(--green)"}"></i></div></td><td>${AR(Math.round(it.pct*100))}٪</td></tr>`).join("")+`</table>
+   <p class="note">الفقرات التي نسبتها أقل من ٥٠٪ تحتاج إعادة شرح للفصل كاملاً.</p></div>`;
+  /* الدرجات والاعتماد */
+  const unpub=rows.filter(r=>!r.published);
+  h+=`<div class="card"><h2>👩‍🎓 درجات الطالبات</h2>
+   <div class="noprint" style="background:var(--sand);border-radius:12px;padding:10px 12px;margin-bottom:10px">
+   <b>اعتماد الدرجات وإرسالها:</b> تُرصد درجة الاختبار في سجل المتابعة في العمود الذي تختارينه، وتُحوَّل تلقائياً إلى درجة ذلك العمود.<br>
+   <div class="sub" style="margin-top:6px"><select id="wsel"><option value="">اختاري عمود الرصد…</option>${WORKS.map(w=>`<option value="${w.id}">${esc(w.title)} (من ${AR(w.max_score)})</option>`).join("")}</select>
+   <label style="font-size:.88rem"><input type="checkbox" id="ovr"> استبدال الدرجات الموجودة</label>
+   <button class="btn g" ${unpub.length?"":"disabled"} onclick="publish()">✔ اعتماد وإرسال (${AR(unpub.length)})</button></div></div>
+   <table><tr><th>الطالبة</th><th>الفصل</th><th>الدرجة</th><th>المستوى</th><th>الحالة</th></tr>`+
+   [...rows].sort((a,b)=>b.score-a.score).map(r=>{const p=r.score/r.total;return `<tr><td class="n">${esc(r.student_name)}</td><td>${esc(r.class_name)}</td><td><b>${AR(r.score)}</b> / ${AR(r.total)}</td>
+   <td><span class="tag" style="background:${LCOL[level(p)]}22;color:${LCOL[level(p)]}">${level(p)}</span></td>
+   <td>${r.published?'<span class="tag t-ok">أُرسلت</span>':'<span class="tag t-w">بانتظار اعتمادك</span>'}</td></tr>`;}).join("")+`</table></div>`;
+  /* العلاج */
+  const fails=rows.filter(r=>r.score/r.total<C.failRatio);
+  h+=`<div class="card"><h2>🩹 الخطة العلاجية لمن أخفقت</h2>`;
+  if(!fails.length)h+=`<div class="empty">لا توجد طالبات أخفقن في هذا الاختبار 🌟</div>`;
+  else{
+    h+=`<p class="note" style="margin-top:0">يُبنى لكل طالبة اختبار علاجي من الفقرات التي أخطأت فيها، ويظهر لها في صفحتها بالمنصة مع أوراق العمل والألعاب.</p>
+    <table><tr><th>الطالبة</th><th>الفصل</th><th>الدرجة الأولى</th><th>الفقرات الضعيفة</th><th>العلاجي</th></tr>`+
+    fails.map(r=>{const rm=REM.find(x=>x.quiz_id===quiz.id&&x.student_id===r.student_id);
+      const wrong=(r.answers||[]).filter(a=>!a.correct).map(a=>quiz.items[a.q+"_"+a.i]);
+      return `<tr><td class="n">${esc(r.student_name)}</td><td>${esc(r.class_name)}</td><td>${AR(r.score)}/${AR(r.total)}</td><td class="n" style="font-size:.82rem">${wrong.slice(0,4).join("، ")}${wrong.length>4?"…":""}</td>
+      <td>${!rm?'<span class="tag t-w">يُجهَّز</span>':rm.status==="done"?`<span class="tag t-ok">أنجزته ${AR(rm.score)}/${AR(rm.total)}</span>`:'<span class="tag t-no">أُرسل – لم تحله بعد</span>'}</td></tr>`;}).join("")+`</table>`;
+    h+=`<div style="margin-top:10px"><b>المواد المرسلة مع العلاجي:</b> `+(quiz.resources.length?quiz.resources.map(x=>`<a href="${x.url}" target="_blank">${esc(x.type)}: ${esc(x.title)}</a>`).join(" · "):`<span class="note">لم تُضف روابط أوراق العمل والألعاب بعد.</span>`)+`</div>`;
+  }
+  h+=`</div><div class="card noprint"><h2>📁 ملف شواهد الأداء الوظيفي</h2><p style="margin:0">يُحدَّث تلقائياً: <b>البند ١٠ – الفقرة ١</b> (تحليل النتائج) و<b>البند ٥ – الفقرة ١</b> (تقرير الخطة العلاجية).</p><p class="note" id="pstate"></p></div>`;
+  $("content").innerHTML=h;
+  sync(quiz,grade,rowsAll);
+}
+
+/* ===== الاعتماد: رصد في سجل المتابعة ثم إظهارها للطالبة ===== */
+async function publish(){
+  const wid=$("wsel").value;if(!wid){toast("اختاري عمود الرصد أولاً");return;}
+  const W=WORKS.find(w=>String(w.id)===wid),ovr=$("ovr").checked;
+  const grade=C.grades.find(g=>g.name===state.grade),clsIds=grade.classes.map(c=>c[0]);
+  const rows=latest(ALL.filter(r=>r.quiz_id===state.quiz&&clsIds.includes(+r.cls))).filter(r=>(!state.cls||+r.cls===state.cls)&&!r.published);
+  let gr=[];
+  if(!PREVIEW){const ids=rows.map(r=>r.student_id);const g=await sb.from("grades").select("student_id,score").eq("work_id",W.id).in("student_id",ids);gr=g.data||[];}
+  const up=rows.filter(r=>ovr||!gr.some(x=>String(x.student_id)===r.student_id&&x.score!=null))
+    .map(r=>({student_id:r.student_id,work_id:W.id,score:Math.round(r.score/r.total*W.max_score*2)/2}));
+  if(!PREVIEW&&up.length){const {error}=await sb.from("grades").upsert(up,{onConflict:"student_id,work_id"});if(error){toast("تعذّر رصد الدرجات، حاولي مرة أخرى");return;}}
+  const ids=rows.map(r=>r.id);
+  if(!PREVIEW){const {error}=await sb.from("quiz_results").update({published:true}).in("id",ids);if(error){toast("رُصدت الدرجات، وتعذّر تحديث الحالة");return;}}
+  ALL.forEach(r=>{if(ids.includes(r.id))r.published=true;});
+  toast(`✔ رُصدت ${AR(up.length)} درجة في «${W.title}»`+(rows.length>up.length?` (تُركت ${AR(rows.length-up.length)} درجة موجودة)`:""));render();
+}
+
+/* ===== العلاج + ملف الشواهد (تلقائي) ===== */
+async function sync(quiz,grade,rowsAll){
+  const ps=$("pstate");
+  const fails=rowsAll.filter(r=>r.score/r.total<C.failRatio);
+  const newRem=fails.filter(r=>!REM.some(x=>x.quiz_id===quiz.id&&x.student_id===r.student_id))
+    .map(r=>({quiz_id:quiz.id,quiz_title:quiz.title,stage:r.stage,cls:r.cls,class_name:r.class_name,student_id:r.student_id,student_name:r.student_name,
+      first_score:r.score,first_total:r.total,items:(r.answers||[]).filter(a=>!a.correct).map(a=>a.q+"_"+a.i),resources:quiz.resources,status:"sent"}));
+  if(newRem.length&&!TRIED[quiz.id]){TRIED[quiz.id]=1;
+    if(!PREVIEW){const {data,error}=await sb.from("remedial_assignments").upsert(newRem,{onConflict:"quiz_id,student_id",ignoreDuplicates:true}).select();if(!error&&data)REM.push(...data);}
+    else REM.push(...newRem);
+    return render();
+  }
+  if(!rowsAll.length)return;
+  const A=analyse(rowsAll,quiz);
+  const roster=STU.filter(s=>grade.classes.some(c=>c[0]===+s.cls));
+  const perClass=grade.classes.map(([id,nm])=>{const a=analyse(rowsAll.filter(r=>+r.cls===id),quiz),all=roster.filter(s=>+s.cls===id).length;
+    return a?{cls:nm,n:a.n,of:all,avg:a.avg,mastery:a.mastery,failed:a.failed,max:a.max,min:a.min}:{cls:nm,n:0,of:all};});
+  const r10={item:"10-1",quiz_id:quiz.id,quiz_title:quiz.title,grade:grade.name,updated_at:new Date().toISOString(),
+    data:{date:new Date().toISOString(),complete:roster.length>0&&rowsAll.length>=roster.length,overall:{n:A.n,of:roster.length,avg:A.avg,mastery:A.mastery,failed:A.failed,passed:A.passed,max:A.max,min:A.min,total:A.total},
+      dist:A.dist,perClass,items:A.items.map(i=>({label:i.label,section:i.section,pct:i.pct})),failRatio:C.failRatio}};
+  const remRows=REM.filter(x=>x.quiz_id===quiz.id&&grade.classes.some(c=>c[0]===+x.cls));
+  const r5={item:"5-1",quiz_id:quiz.id,quiz_title:quiz.title,grade:grade.name,updated_at:new Date().toISOString(),
+    data:{date:new Date().toISOString(),failRatio:C.failRatio,total:A.total,resources:quiz.resources,
+      weakItems:[...A.items].sort((a,b)=>a.pct-b.pct).slice(0,5).map(i=>({label:i.label,pct:i.pct})),
+      students:remRows.map(x=>({name:mask(x.student_name),cls:x.class_name,first:x.first_score,firstTotal:x.first_total,
+        weak:(x.items||[]).map(k=>quiz.items[k]),status:x.status,score:x.score,rTotal:x.total}))}};
+  if(PREVIEW){ps.textContent="في وضع المعاينة لا يُرسل شيء إلى ملف الشواهد.";return;}
+  const {error}=await sb.from("portfolio_reports").upsert([r10,r5],{onConflict:"item,quiz_id,grade"});
+  ps.textContent=error?"تعذّر تحديث ملف الشواهد الآن.":"✔ حُدِّث ملف الشواهد ("+new Date().toLocaleTimeString("ar-SA",{hour:"numeric",minute:"2-digit"})+")";
+}
+start();
+</script>
+</body>
+</html>
