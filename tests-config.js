@@ -19,7 +19,7 @@ window.TESTS_CONFIG = {
   quizzes: [
     {
       id: "g6-saudi2-test1",
-      title: "اختبار الدولة السعودية الثانية واسترداد الرياض",
+      title: "اختبار الفترة الثانية – الجزء الأول من المقرر (الفصل الدراسي الأول)",
       grade: "السادس",
       stage: 6,
       file: "test-grade6.html",
