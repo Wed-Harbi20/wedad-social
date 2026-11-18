@@ -153,7 +153,8 @@ function render(){
   /* حالة التسليم */
   h+=`<div class="card"><div class="row"><h2>📥 تسليم الأوراق – ${label}</h2><button class="btn b noprint" onclick="previewQ()">👁 معاينة الاختبار</button></div>
   <div class="stats"><div class="stat"><b>${AR(rows.length)}</b><span>سلّمت</span></div><div class="stat"><b style="color:${missing.length?"var(--red)":"var(--green)"}">${AR(missing.length)}</b><span>لم تختبر بعد</span></div><div class="stat"><b>${AR(roster.length)}</b><span>عدد الطالبات</span></div></div>
-  ${missing.length?`<p class="note"><b>لم تختبر بعد</b> (اضغطي الاسم لإرسال الاختبار لها وحدها):</p><div class="sub">${missing.map(s=>`<span class="chip" onclick="sendOne('${s.id}')">📨 ${esc(s.name)}</span>`).join("")}</div>`:roster.length?`<p class="note" style="color:var(--green);font-weight:700">✔ اختبرت جميع الطالبات.</p>`:""}</div>`+accessCard(quiz,grade);
+  ${missing.length?`<p class="note"><b>لم تختبر بعد</b> (اضغطي الاسم لإرسال الاختبار لها وحدها):</p><div class="sub">${missing.map(s=>`<span class="chip" onclick="sendOne('${s.id}')">📨 ${esc(s.name)}</span>`).join("")}</div>`:roster.length?`<p class="note" style="color:var(--green);font-weight:700">✔ اختبرت جميع الطالبات.</p>`:""}
+  ${rows.length?`<p class="note"><b>سلّمت</b> (اضغطي الاسم لعرض ورقتها، أو لحذف استجابتها وإعادة الاختبار لها):</p><div class="sub">${[...rows].sort((a,b)=>a.student_name.localeCompare(b.student_name,"ar")).map(r=>`<span class="chip" style="border-color:var(--green)" onclick="subMenu(${r.id})">✅ ${esc(r.student_name)}</span>`).join("")}</div>`:""}</div>`+accessCard(quiz,grade);
   if(!rows.length){$("content").innerHTML=h+`<div class="card empty">لم تُسلَّم أي ورقة بعد.</div>`;return;}
   const A=analyse(rows,quiz);
   h+=`<div class="card"><h2>📊 إحصائية ${label}</h2>
@@ -417,6 +418,28 @@ function delPaper(id){
       await sb.from("remedial_assignments").delete().eq("student_id",r.student_id).eq("quiz_id",r.quiz_id);}
     ALL=ALL.filter(x=>!(x.student_id===r.student_id&&x.quiz_id===r.quiz_id));REM=REM.filter(x=>!(x.student_id===r.student_id&&x.quiz_id===r.quiz_id));
     toast("🗑 حُذفت الورقة");render();});
+}
+/* ===== قائمة خيارات الطالبة التي سلّمت ===== */
+function subMenu(id){
+  const r=ALL.find(x=>x.id===id);if(!r)return;
+  const o=document.createElement("div");
+  o.style.cssText="position:fixed;inset:0;background:#0007;z-index:30;display:flex;align-items:center;justify-content:center;padding:12px";
+  o.innerHTML=`<div class="card" style="max-width:400px;width:100%;margin:0;text-align:center"><h2>${esc(r.student_name)}</h2>
+   <p style="margin:4px 0 12px">${esc(r.class_name)} · الدرجة <b>${AR(r.score)} / ${AR(r.total)}</b></p>
+   <div style="display:flex;flex-direction:column;gap:8px">
+    <button class="btn b" id="m1">📄 عرض ورقتها</button>
+    <button class="btn r" id="m2">🗑 حذف الاستجابة وإعادة الاختبار لها</button>
+    <button class="btn" id="m3">إلغاء</button></div></div>`;
+  document.body.appendChild(o);
+  o.querySelector("#m1").onclick=()=>{o.remove();paper(id);};
+  o.querySelector("#m3").onclick=()=>o.remove();
+  o.querySelector("#m2").onclick=()=>{o.remove();
+    confirmBox("حذف استجابة «"+r.student_name+"» نهائياً، ثم إرسال الاختبار لها من جديد؟",async()=>{
+      if(!PREVIEW){const a=await sb.from("quiz_results").delete().eq("student_id",r.student_id).eq("quiz_id",r.quiz_id);
+        if(a.error){toast("تعذّر الحذف");return;}
+        await sb.from("remedial_assignments").delete().eq("student_id",r.student_id).eq("quiz_id",r.quiz_id);}
+      ALL=ALL.filter(x=>!(x.student_id===r.student_id&&x.quiz_id===r.quiz_id));REM=REM.filter(x=>!(x.student_id===r.student_id&&x.quiz_id===r.quiz_id));
+      render();toast("🗑 حُذفت الاستجابة، حدّدي وقت الإعادة");sendOne(r.student_id);});};
 }
 start();
 </script>
