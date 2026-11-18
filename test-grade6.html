@@ -68,6 +68,8 @@ body{margin:0;font-family:'Tajawal',system-ui,sans-serif;background:var(--sand);
 .result{background:#fff;border:2px solid var(--green);border-radius:18px;padding:18px;margin-top:18px;text-align:center;display:none}
 .result .score{font-size:2.4rem;font-weight:800;color:var(--green)}
 .result .st{font-size:.95rem;margin-top:6px}
+.gate{background:#fff;border:2px solid var(--line);border-radius:18px;padding:24px;margin-top:18px;text-align:center;font-weight:700;font-size:1.05rem}
+.gate a{display:inline-block;margin-top:12px;background:var(--green);color:#fff;text-decoration:none;padding:10px 26px;border-radius:12px}
 .err{color:var(--red);font-size:.9rem;margin-top:6px;display:none}
 @media(max-width:560px){.info{grid-template-columns:1fr}.opts{grid-template-columns:1fr}}
 </style>
@@ -80,19 +82,19 @@ body{margin:0;font-family:'Tajawal',system-ui,sans-serif;background:var(--sand);
       <p>الصف السادس الابتدائي – الدولة السعودية الثانية واسترداد الرياض</p>
     </div>
     <div class="info">
-      <label>اسم الطالبة<input id="sName" placeholder="اكتبي اسمك الثلاثي" autocomplete="off"></label>
-      <label>الصف<select id="sClass"><option value="">اختاري فصلك</option><option>السادس ١</option><option>السادس ٢</option></select></label>
+      <label>اسم الطالبة<div class="ro" id="sName">—</div></label>
+      <label>الصف<div class="ro" id="sClass">—</div></label>
       <label>اليوم<div class="ro" id="dDay"></div></label>
       <label>التاريخ<div class="ro" id="dDate"></div></label>
     </div>
-    <div class="err" id="infoErr">فضلاً اكتبي اسمك واختاري فصلك قبل الإرسال.</div>
     <div class="meta"><span>زمن الاختبار: ٣٥ دقيقة</span><span>الدرجة الكلية: <b id="totTop"></b></span><span>المعلمة: وداد محمد الكحيلي</span></div>
   </div>
 
   <div class="timer"><div id="clock">35:00</div></div>
 
-  <div id="quiz"></div>
-  <button class="send" id="sendBtn">إرسال الإجابات ✔</button>
+  <div class="gate" id="gate">جارٍ التحميل…</div>
+  <div id="quiz" style="display:none"></div>
+  <button class="send" id="sendBtn" style="display:none">إرسال الإجابات ✔</button>
 
   <div class="result" id="result">
     <div>درجتك</div>
@@ -104,13 +106,12 @@ body{margin:0;font-family:'Tajawal',system-ui,sans-serif;background:var(--sand);
 
 <div class="modal" id="modal"><div class="box"><h3 id="mT"></h3><div id="mB"></div><div class="btns" id="mBtns"></div></div></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="tests-config.js"></script>
 <script>
 /* ===== إعداد ربط المنصة (Supabase) ===== */
-const PLATFORM = {
-  supabaseUrl: "",      // رابط مشروع Supabase الخاص بالمنصة
-  supabaseKey: "",      // المفتاح العام anon key
-  table: "quiz_results" // جدول نتائج الاختبارات
-};
+const _C = window.TESTS_CONFIG || {};
+const PLATFORM = { supabaseUrl: _C.supabaseUrl || "", supabaseKey: _C.supabaseKey || "", table: "quiz_results" };
 /* الدرجة لا تظهر للطالبة ولا تُعتمد تلقائياً؛ تُحفظ كمسودة (published:false) وتعتمدها المعلمة متى شاءت */
 const SHOW_RESULT_TO_STUDENT = false;
 const QUIZ_ID = "g6-saudi2-test1";
@@ -231,23 +232,36 @@ document.addEventListener("pointerdown",e=>{
 });
 document.addEventListener("click",e=>{const s=e.target.closest(".slot"); if(s&&picked&&!done&&!e.target.closest(".chip"))place(picked,s);});
 
+/* الطالبة الداخلة من المنصة */
+let ME=null; try{ME=JSON.parse(localStorage.getItem("stu")||"null");}catch(e){}
+const CLSN={1:"رابع ١",2:"رابع ٢",3:"خامس ١",4:"خامس ٢",5:"خامس ٣",6:"سادس ١",7:"سادس ٢"};
+const SB=(PLATFORM.supabaseUrl&&window.supabase)?supabase.createClient(PLATFORM.supabaseUrl,PLATFORM.supabaseKey):null;
+const PREVIEW=/[?&]preview/.test(location.search);
+function gate(html){$("gate").innerHTML=html;$("gate").style.display="block";}
+async function init(){
+  if(PREVIEW&&!ME)ME={sid:"preview",name:"طالبة تجريبية",cls:6,stage:6};
+  if(!ME||!ME.sid){gate('ادخلي إلى منصة الدراسات الاجتماعية أولاً، ثم افتحي الاختبار من صفحتك 🌷<br><a href="index.html">الدخول إلى المنصة</a>');return;}
+  $("sName").textContent=ME.name;$("sClass").textContent=CLSN[ME.cls]||"";
+  if(+ME.stage!==6){gate("هذا الاختبار خاص بالصف السادس.");return;}
+  if(SB&&!PREVIEW){try{const r=await SB.rpc("my_quizzes",{p_sid:String(ME.sid)});if((r.data||[]).some(x=>x.quiz_id===QUIZ_ID)){gate("✔ سلّمتِ هذا الاختبار من قبل، وستظهر درجتك في سجل متابعتك عندما تعتمدها المعلمة.<br><a href=\"index.html\">العودة إلى صفحتي</a>");return;}}catch(e){}}
+  $("gate").style.display="none";$("quiz").style.display="block";$("sendBtn").style.display="block";startTimer();
+}
 /* المؤقت */
-let left=DURATION,done=false;
+let left=DURATION,done=false,tick=null;
 const clock=$("clock");
-const tick=setInterval(()=>{
+function startTimer(){tick=setInterval(()=>{
   if(done)return;left--;
   const m=Math.floor(left/60),s=left%60;
   clock.textContent=String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
   if(left<=300)clock.classList.add("warn");
   if(left<=0){clearInterval(tick);finish(true);}
-},1000);
+},1000);}
+init();
 
 /* نافذة */
 function modal(t,b,btns){$("mT").textContent=t;$("mB").innerHTML=b;const c=$("mBtns");c.innerHTML="";btns.forEach(([txt,cls,fn])=>{const x=document.createElement("button");x.textContent=txt;x.className=cls;x.onclick=()=>{$("modal").classList.remove("on");fn&&fn();};c.appendChild(x);});$("modal").classList.add("on");}
 
 $("sendBtn").onclick=()=>{
-  if(!$("sName").value.trim()||!$("sClass").value){$("infoErr").style.display="block";window.scrollTo({top:0,behavior:"smooth"});return;}
-  $("infoErr").style.display="none";
   const empty=total-Object.values(ans).filter(v=>String(v).trim()!=="").length;
   modal("تأكيد الإرسال",empty?`لديكِ <b>${empty.toLocaleString("ar-SA")}</b> فقرة بدون إجابة. هل تريدين الإرسال الآن؟`:"هل أنتِ متأكدة من إرسال إجاباتك؟",[["نعم، أرسلي","b1",()=>finish(false)],["أراجع إجاباتي","b2"]]);
 };
@@ -269,6 +283,7 @@ function finish(auto){
     detail.push({q:qi+1,i:ii+1,answer:v??"",correct:ok});
   }));
   document.querySelectorAll("input,select").forEach(e=>e.disabled=true);
+  $("result").insertAdjacentHTML("beforeend",'<a href="index.html" style="display:inline-block;margin-top:10px;background:var(--brown);color:#fff;text-decoration:none;padding:8px 22px;border-radius:12px">العودة إلى صفحتي</a>');
   $("sendBtn").style.display="none";
   $("result").style.display="block";
   if(SHOW_RESULT_TO_STUDENT){
@@ -284,7 +299,7 @@ function finish(auto){
   }
   if(auto)$("praise").textContent="انتهى الوقت وسُلّمت ورقتك تلقائياً – "+$("praise").textContent;
   $("result").scrollIntoView({behavior:"smooth"});
-  saveResult({student_name:$("sName").value.trim(),class_name:$("sClass").value,quiz_id:QUIZ_ID,quiz_title:QUIZ_TITLE,
+  saveResult({stage:6,cls:+ME.cls,class_name:CLSN[ME.cls]||"",student_id:String(ME.sid),student_name:ME.name,quiz_id:QUIZ_ID,quiz_title:QUIZ_TITLE,
     score,total,answers:detail,duration_sec:DURATION-Math.max(left,0),auto_submitted:auto,published:false,submitted_at:new Date().toISOString()});
 }
 
@@ -292,13 +307,11 @@ function finish(auto){
 async function saveResult(r){
   const st=$("sendState");
   try{localStorage.setItem("result_"+QUIZ_ID,JSON.stringify(r));}catch(e){}
-  if(!PLATFORM.supabaseUrl||!PLATFORM.supabaseKey){st.textContent="";return;}
+  if(!SB||PREVIEW){st.textContent=PREVIEW?"(معاينة: لم تُرسل الورقة)":"";return;}
   st.textContent="جارٍ تسليم الورقة…";
   try{
-    const res=await fetch(PLATFORM.supabaseUrl.replace(/\/$/,"")+"/rest/v1/"+PLATFORM.table,{method:"POST",
-      headers:{"apikey":PLATFORM.supabaseKey,"Authorization":"Bearer "+PLATFORM.supabaseKey,"Content-Type":"application/json","Prefer":"return=minimal"},
-      body:JSON.stringify(r)});
-    if(!res.ok)throw new Error(res.status);
+    const {error}=await SB.from(PLATFORM.table).insert(r);
+    if(error)throw error;
     st.textContent="✔ وصلت ورقتك إلى المعلمة.";
   }catch(e){st.textContent="حُفظت إجاباتك، وتعذّر الاتصال بالمنصة الآن. أخبري معلمتك.";}
 }
