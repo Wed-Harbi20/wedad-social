@@ -127,7 +127,7 @@ body.lock img{-webkit-user-drag:none;pointer-events:none}
 const _C = window.TESTS_CONFIG || {};
 const PLATFORM = { supabaseUrl: _C.supabaseUrl || "", supabaseKey: _C.supabaseKey || "", table: "quiz_results" };
 /* الدرجة لا تظهر للطالبة ولا تُعتمد تلقائياً؛ تُحفظ كمسودة (published:false) وتعتمدها المعلمة متى شاءت */
-const SHOW_RESULT_TO_STUDENT = /[?&]preview/.test(location.search);
+let SHOW_RESULT_TO_STUDENT = /[?&]preview/.test(location.search);
 const QUIZ_ID = "g6-saudi2-test1";
 const QUIZ_TITLE = "اختبار الفترة الثانية – الجزء الأول من المقرر (الصف السادس)";
 let DURATION = 35*60;
@@ -256,7 +256,7 @@ document.addEventListener("click",e=>{const s=e.target.closest(".slot"); if(s&&p
 let ME=null; try{ME=JSON.parse(localStorage.getItem("stu")||"null");}catch(e){}
 const CLSN={1:"رابع ١",2:"رابع ٢",3:"خامس ١",4:"خامس ٢",5:"خامس ٣",6:"سادس ١",7:"سادس ٢"};
 const SB=(PLATFORM.supabaseUrl&&window.supabase)?supabase.createClient(PLATFORM.supabaseUrl,PLATFORM.supabaseKey):null;
-const PREVIEW=/[?&]preview/.test(location.search);
+let PREVIEW=/[?&]preview/.test(location.search);
 function gate(html){$("gate").innerHTML=html;$("gate").style.display="block";}
 async function loadContent(){
   if(!SB)return;
@@ -264,6 +264,8 @@ async function loadContent(){
     if(r.data&&r.data.data&&Array.isArray(r.data.data.sections))Q=r.data.data.sections;}catch(e){}
 }
 async function init(){
+  /* جهاز المعلمة: يتحول الاختبار إلى معاينة تلقائياً ولا يُحسب لأي طالبة */
+  if(!PREVIEW&&SB){try{const s=await SB.auth.getSession();if(s.data&&s.data.session){const r=await SB.rpc("is_teacher");if(r.data===true){PREVIEW=true;SHOW_RESULT_TO_STUDENT=true;}}}catch(e){}}
   await loadContent();buildQuiz();
   if(PREVIEW){ME={sid:"preview",name:"معاينة المعلمة",cls:6,stage:6};document.title="معاينة – "+document.title;}
   if(!ME||!ME.sid){gate('ادخلي إلى منصة الدراسات الاجتماعية أولاً، ثم افتحي الاختبار من صفحتك 🌷<br><a href="index.html">الدخول إلى المنصة</a>');return;}
@@ -292,9 +294,11 @@ async function init(){
    🪪 الورقة تحمل اسمك.<br>
    🔒 <b>إذا خرجتِ من صفحة الاختبار</b> (إلى تطبيق آخر، أو تبويب آخر، أو الصور، أو إغلاق الصفحة) <b>يُقفل الاختبار فوراً</b> وتُسلَّم ورقتك بما أجبتِ، ولا يُفتح إلا من المعلمة.</div>
    <a href="#" onclick="begin(${JSON.stringify(KEY).replace(/"/g,"&quot;")});return false">ابدئي الاختبار ✏️</a>`);
-  window.__G=G;
+  window.__G=G;logEv("open");
 }
+function logEv(ev){if(!SB||PREVIEW||!ME)return;try{SB.from("quiz_events").insert({quiz_id:QUIZ_ID,student_id:String(ME.sid),student_name:ME.name,cls:+ME.cls,event:ev}).then(()=>{},()=>{});}catch(e){}}
 function begin(KEY){
+  logEv("start");
   const G=window.__G,t0=Date.now();if(!PREVIEW)try{localStorage.setItem(KEY,t0);localStorage.removeItem("lock_"+QUIZ_ID+"_"+ME.sid);}catch(e){}
   left=DURATION;
   if(G.until)left=Math.min(left,Math.floor((new Date(G.until)-Date.now())/1000));
