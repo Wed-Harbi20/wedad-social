@@ -167,7 +167,6 @@ body{overflow-x:hidden}.card{background:rgba(255,253,247,.96)}
 })();
 </script><div id="bg"></div><div class="w" id="app"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="tests-config.js"></script>
 <script>
 /* ============================================================
    منصة مادة الدراسات الاجتماعية - الواجهة (متصلة بـ Supabase)
@@ -397,7 +396,7 @@ function loginV() {
 <div class="row"><input id="u" type="text" readonly onfocus="this.removeAttribute('readonly')" name="sname" placeholder="اسم الطالبة بالعربية" style="width:100%" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"></div>
 <div class="row"><div class="eyew"><input id="pwS" type="text" readonly onfocus="this.removeAttribute('readonly')" name="spw" placeholder="كلمة المرور" onkeydown="if(event.key==='Enter')loginS()" style="width:100%;-webkit-text-security:disc;text-security:disc" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" data-lpignore="true" data-1p-ignore="true" data-form-type="other"><button type="button" class="eyeb" tabindex="-1" aria-label="إظهار" onclick="eyeT('pwS',this)">${EYE_H}</button></div></div>
 <button onclick="loginS()" style="width:100%" ${busy ? 'disabled' : ''}>دخول</button><p class="t-bad">${esc(msg)}</p>
-<button class="g" onclick="tm_=true;roleSet(true);msg='';app()">👩‍🏫 دخول المعلمة</button>`}</div><p class="mu" style="text-align:center;font-size:.7rem;opacity:.6">إصدار ٢٠٢٦.١١.١٦-ي</p>` + img;
+<button class="g" onclick="tm_=true;roleSet(true);msg='';app()">👩‍🏫 دخول المعلمة</button>`}</div><p class="mu" style="text-align:center;font-size:.7rem;opacity:.6">إصدار ٢٠٢٦.١١.١٨-ك</p>` + img;
 }
 async function loginS() {
   const u = ($('u').value || '').trim(), p = ($('pwS').value || '').trim(); if (!u || busy) return;
@@ -478,7 +477,6 @@ async function loadStudent() {
     sb.rpc('awards_list', { p_token: me.token }),
     sb.rpc('leaderboard', { p_token: me.token })]);
   if (h.error || !h.data || h.data.error) { localStorage.removeItem('stu'); return false; }
-  try { await loadQuizS(); } catch (e) { QZ = { done: [], rem: [] }; }
   SV = { home: h.data, chat: (c.data && !c.data.error) ? c.data : null, ach: (a.data && !a.data.error) ? a.data : [], awards: (aw && Array.isArray(aw.data)) ? aw.data : [], lb: (lb && lb.data && !lb.data.error) ? lb.data : null };
   return true;
 }
@@ -572,34 +570,18 @@ const PADLET = 'https://padlet.com/doodym_n_k/padlet-s0253r8d0cpridgoj77e';
 function padletCard() {
   return `<div class="card"><h2>📌 لوحة بادلت لرفع أعمالك</h2><p class="mu">ارفعي هنا ملخصك أو حلّ ورقة العمل، وسترصد معلمتك درجة المشاركة وأوراق العمل لمن رفعت.</p><a href="${PADLET}" target="_blank" rel="noopener" style="text-decoration:none"><button style="width:100%">فتح لوحة بادلت ↗</button></a></div>`;
 }
-/* ---------- الاختبارات الإلكترونية (صفحة الطالبة) ---------- */
-let QZ = { done: [], rem: [] };
-async function loadQuizS() {
-  const [d, r] = await Promise.all([sb.rpc('quiz_status', { p_sid: String(me.sid) }), sb.rpc('get_remedial', { p_sid: String(me.sid) })]);
-  QZ = { done: (d && Array.isArray(d.data)) ? d.data : [], rem: (r && Array.isArray(r.data)) ? r.data : [] };
-}
-function testsCardS() {
-  const C = window.TESTS_CONFIG; if (!C || !me || me.t) return '';
-  const L = C.quizzes.filter(q => QZ.done.some(x => x.quiz_id === q.id && (x.can_take || x.submitted)));
-  const R = QZ.rem.filter(x => x.status === 'sent');
-  if (!L.length && !R.length) return '';
-  return `<div class="card"><h2>📝 اختباراتي</h2>${L.map(q => { const d = QZ.done.find(x => x.quiz_id === q.id);
-    return `<div class="an" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><div><b>${esc(q.title)}</b>${d.can_take ? `<div class="mu">⏱ ${d.duration_min} دقيقة${d.until ? ' · متاح حتى ' + new Date(d.until).toLocaleString('ar-SA', { weekday: 'long', hour: 'numeric', minute: '2-digit' }) : ''}</div>` : ''}</div>${d.can_take ? `<a href="${esc(q.file)}" style="text-decoration:none"><button>ابدئي الاختبار ✏️</button></a>` : d.published ? `<span class="tag t-ok">رُصدت درجتك في سجل متابعتي ✔</span>` : `<span class="tag t-wa">سُلّم ✔ بانتظار اعتماد المعلمة</span>`}</div>`; }).join('')}
-${R.map(x => `<div class="an" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border:2px dashed var(--pr)"><div><b>🌱 اختبار علاجي: ${esc(x.quiz_title || '')}</b><div class="mu">معلمتك جهّزت لكِ أسئلة وأوراق عمل وألعاباً لتتقوّي فيها</div></div><a href="remedial.html?q=${encodeURIComponent(x.quiz_id)}" style="text-decoration:none"><button>ابدئي ✨</button></a></div>`).join('')}</div>`;
-}
 function studentV() {
   const h = SV.home;
   const pr = h.done ? h.progress + '%' : '—';
   return `<div class="top"><h1>${esc(greetS(h.name))} <span class="tag">${esc(CN[h.cls] || '')}</span></h1><div>${TG} <button class="g" onclick="chpwS()">🔑 كلمة المرور</button> <button class="g" onclick="out()">خروج</button></div></div>
 <div class="stats"><div class="st" style="grid-column:1/-1"><span>نسبة تقدمك</span><b>${pr}</b><div style="height:10px;background:var(--bd);border-radius:99px;overflow:hidden;margin-top:6px"><div style="width:${h.done ? h.progress : 0}%;height:100%;background:var(--pr)"></div></div>${h.done ? '' : '<span>لم تُرصد أعمال بعد</span>'}</div><div class="stx"><b>${h.done}</b><span>أعمال مصحّحة</span></div><div class="st"><b>${h.left}</b><span>متبقية</span></div></div>
-${testsCardS()}
 ${badgesHtml(h.works)}
 ${gradCard()}
 ${padletCard()}
 ${boardCard()}
 ${awardsCard()}
 ${chatBoxS()}
-<div class="card"><h2>إعلانات</h2>${h.announcements.filter(a => annFor(a.body, h.cls)).map(a => `<div class="an">${annBody(a.body, true)}<div class="mu">${dt(a.at)}</div></div>`).join('') || '<p class="mu">لا توجد إعلانات</p>'}</div>
+<div class="card"><h2>إعلانات</h2>${h.announcements.map(a => `<div class="an">${esc(a.body)}<div class="mu">${dt(a.at)}</div></div>`).join('') || '<p class="mu">لا توجد إعلانات</p>'}</div>
 <div class="card reg"><div class="rh"><span>﷽</span><h2>سجل متابعتي</h2><span>${esc(CN[h.cls] || '')}</span></div><div class="rb"><div class="sc"><table><tr><th>العمل</th><th>الدرجة</th><th>الحالة</th><th>ملاحظة المعلمة</th></tr>
 ${h.works.map(w => `<tr><td>${esc(w.title)}</td><td>${w.max}</td><td class="${w.rating ? rcls(w.rating) : ''}">${w.rating ? esc(w.rating) : ''}</td><td>${esc(w.note || '')}</td></tr>`).join('')}</table></div></div></div>
 <div class="card"><h2>🏆 إنجازاتي</h2><p class="mu">اختاري نوع العمل ثم ارفعي صورته (الصور فقط) لتُرصد لكِ الدرجات تلقائيًا.</p><div class="row"><select id="ak" style="min-width:130px"><option value="">نوع العمل…</option><option value="ws">📄 ورقة عمل</option><option value="pt">🎯 مهمة أدائية</option></select><input id="at2" placeholder="عنوان العمل (اختياري)" maxlength="60" style="flex:1"><label style="cursor:pointer;padding:8px 14px;border-radius:10px;background:var(--pr);color:#fff">⬆ رفع صورة<input type="file" accept="image/*" multiple hidden onchange="addAch(this)"></label></div>
@@ -735,6 +717,20 @@ async function loadVisits() {
   const r = await sb.rpc('visit_stats'); VS = (r.error || !r.data || r.data.error) ? 'err' : r.data;
   const q = await sb.rpc('student_visit_stats'); SVS = (q.error || !q.data || q.data.error) ? 'err' : q.data;
 }
+let vcf = 'all';
+const agoTx = r => r.last == null ? 'لم تدخل بعد' : (+r.ago === 0 ? 'اليوم' : (+r.ago === 1 ? 'أمس' : 'منذ ' + r.ago + ' يومًا'));
+function absentCard() {
+  if (!SVS || SVS === 'err' || !SVS.all) return '';
+  const A = SVS.all, cl = [...new Set(A.map(x => +x.cls))].sort((a, b) => a - b);
+  const rows = A.filter(x => vcf === 'all' || +x.cls === +vcf);
+  const nev = A.filter(x => x.last == null).length;
+  const stat = cl.map(c => { const t = A.filter(x => +x.cls === c), n = t.filter(x => x.last == null).length; return `<div class="pill">${esc(CN[c] || c)}: <b>${n}</b> لم يدخلن من ${t.length}</div>`; }).join('');
+  return `<div class="card"><h2>⏳ من لم يدخلن المنصة ومدة الغياب</h2>
+<div class="row" style="flex-wrap:wrap;gap:10px"><div class="pill">لم يدخلن بعد: <b>${nev}</b> من ${A.length}</div>${stat}</div>
+<div class="row"><b>الفصل:</b><select onchange="vcf=this.value;app()"><option value="all">الكل</option>${cl.map(c => `<option value="${c}" ${String(vcf) === String(c) ? 'selected' : ''}>${esc(CN[c] || c)}</option>`).join('')}</select></div>
+<div class="sc"><table><tr><th>م</th><th>الطالبة</th><th>الفصل</th><th>آخر دخول</th></tr>${rows.map((x, i) => `<tr><td>${i + 1}</td><td>${esc(x.name)}</td><td>${esc(CN[x.cls] || '')}</td><td class="${x.last == null ? 'bad' : ''}">${agoTx(x)}</td></tr>`).join('')}</table></div>
+<p class="mu" style="font-size:.72rem">الترتيب: الأطول غيابًا أولًا. العدّ يبدأ من تفعيل الملف 11، فمن دخلت قبل ذلك تظهر «لم تدخل بعد» إلى أن تدخل مرة أخرى.</p></div>`;
+}
 function stuVisitsCard() {
   if (SVS === 'err' || !SVS) return '<div class="card"><h2>🌟 الطالبات الأكثر زيارة</h2><p class="mu">تعذّر التحميل. تأكدي من تشغيل ملف 11_student_visits.sql في Supabase.</p></div>';
   const mx = Math.max(1, ...SVS.top.map(x => +x.days));
@@ -748,14 +744,14 @@ function visitsTab() {
   return `<div class="card"><h2>📊 زيارات الصفحة</h2><div class="row" style="flex-wrap:wrap;gap:10px">
 <div class="pill">إجمالي الزيارات: <b>${fmtN(+VS.total)}</b></div><div class="pill">عدد الزوّار (أجهزة): <b>${fmtN(+VS.uniq)}</b></div><div class="pill">اليوم: <b>${fmtN(+VS.today_u)}</b> زائر · ${fmtN(+VS.today)} زيارة</div><div class="pill">آخر ٧ أيام: <b>${fmtN(+VS.week_u)}</b> زائر</div></div>
 <p class="mu">آخر ١٤ يومًا (عدد الزوّار كل يوم):</p>${VS.days.map(x => `<div class="lb-r lbb"><span class="lb-n" style="min-width:86px;font-size:.75rem">${esc(String(x.day).slice(5))}</span><div class="lbm"><div class="lbt"><span></span><b>${fmtN(+x.visitors)}</b></div><div class="lbbar"><i style="width:${Math.max(4, Math.round(+x.visitors / mx * 100))}%"></i></div></div></div>`).join('') || '<p class="mu">لا توجد زيارات بعد</p>'}
-<p class="mu" style="font-size:.72rem">هذا العدّاد عام للزوّار ولا يحفظ أسماء، وزياراتك أنتِ لا تُحسب.</p></div>${stuVisitsCard()}`;
+<p class="mu" style="font-size:.72rem">هذا العدّاد عام للزوّار ولا يحفظ أسماء، وزياراتك أنتِ لا تُحسب.</p></div>${absentCard()}${stuVisitsCard()}`;
 }
 function teacherV() {
-  const T = [['chat', '💬 الدردشة'], ['tests', '📝 الاختبارات'], ['grades', 'رصد الدرجات'], ['students', 'الطالبات'], ['works', 'الأعمال'], ['reports', 'التقارير'], ['board', '🏆 المتصدرات'], ['awards', '🎖️ الشهادات'], ['ann', 'الإعلانات'], ['visits', '📊 الزيارات']];
+  const T = [['chat', '💬 الدردشة'], ['grades', 'رصد الدرجات'], ['students', 'الطالبات'], ['works', 'الأعمال'], ['reports', 'التقارير'], ['board', '🏆 المتصدرات'], ['awards', '🎖️ الشهادات'], ['ann', 'الإعلانات'], ['visits', '📊 الزيارات']];
   return `<div class="top"><h1>لوحة المعلمة</h1><div>${TG} <button class="g" onclick="chpw()">تغيير كلمة المرور</button> <button class="g" onclick="out()">خروج</button></div></div>
 <div class="tabs">${T.map(t => `<button class="${tab === t[0] ? '' : 'g'}" onclick="goTab('${t[0]}')">${t[1]}</button>`).join('')}</div>${tabV()}`;
 }
-async function goTab(t) { if (t === 'tests') { location.href = 'tests.html'; return; } tab = t; if (t === 'chat') { await loadTeacherChat(); } if (t === 'awards') { await loadAwards(); } if (t === 'visits') { await loadVisits(); } app(); }
+async function goTab(t) { tab = t; if (t === 'chat') { await loadTeacherChat(); } if (t === 'awards') { await loadAwards(); } if (t === 'visits') { await loadVisits(); } app(); }
 function tabV() {
   if (tab === 'chat') return chatTab();
   if (tab === 'grades') return gradesTab();
@@ -1259,19 +1255,8 @@ function exp() {
 }
 
 /* ---------- الإعلانات ---------- */
-// إعلان استبيان قياس الأثر: [[impact:رقم:الصف]]
-const IMPACT_RE = /\[\[impact:(\d+):(\d)\]\]/;
-function annFor(body, cls) { const m = String(body).match(IMPACT_RE); return !m || +m[2] === stageOf(cls); }
-function annBody(body, student) {
-  const m = String(body).match(IMPACT_RE);
-  const txt = esc(String(body).replace(IMPACT_RE, '').trim()).replace(/\n/g, '<br>');
-  if (!m) return txt;
-  return txt + (student
-    ? `<div style="margin-top:10px"><a href="survey.html?id=${m[1]}" style="display:inline-block;background:linear-gradient(135deg,#7c3aed,#db2777);color:#fff;font-weight:800;padding:10px 20px;border-radius:14px;text-decoration:none">📊 ابدئي الاستبيان</a></div>`
-    : `<div class="mu" style="margin-top:4px">📊 استبيان قياس أثر (يظهر لطالبات الصف المعني فقط)</div>`);
-}
 function annTab() {
-  return `<div class="card"><h2>إعلان جديد</h2><div class="row"><input id="at" placeholder="نص الإعلان" style="flex:1"><button onclick="addA()">نشر</button></div>${D.ann.map(a => `<div class="an">${annBody(a.body, false)}<div class="mu">${dt(a.created_at)} <a style="cursor:pointer;color:var(--bad)" onclick="delA(${a.id})">حذف</a></div></div>`).join('') || '<p class="mu">لا توجد إعلانات</p>'}</div>`;
+  return `<div class="card"><h2>إعلان جديد</h2><div class="row"><input id="at" placeholder="نص الإعلان" style="flex:1"><button onclick="addA()">نشر</button></div>${D.ann.map(a => `<div class="an">${esc(a.body)}<div class="mu">${dt(a.created_at)} <a style="cursor:pointer;color:var(--bad)" onclick="delA(${a.id})">حذف</a></div></div>`).join('') || '<p class="mu">لا توجد إعلانات</p>'}</div>`;
 }
 async function addA() {
   const t = $('at').value.trim(); if (!t) return;
