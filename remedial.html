@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>اختباري العلاجي</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--brown:#7a4a26;--sand:#f6ecdc;--sand2:#efe0c6;--green:#1f6f4a;--red:#b23a2e;--ink:#2e2218;--line:#d9c3a0}
+*{box-sizing:border-box}
+body{margin:0;font-family:'Tajawal',system-ui,sans-serif;background:var(--sand);color:var(--ink);line-height:1.7}
+.wrap{max-width:820px;margin:0 auto;padding:16px 14px 80px}
+.head{background:#fffaf2;border:2px solid var(--line);border-radius:18px;padding:16px 18px;text-align:center;position:relative;overflow:hidden}
+.head:before{content:"";position:absolute;inset:0 0 auto 0;height:7px;background:repeating-linear-gradient(90deg,var(--brown) 0 18px,var(--sand2) 18px 24px,var(--green) 24px 42px,var(--sand2) 42px 48px)}
+h1{margin:6px 0 0;color:var(--brown);font-size:1.4rem}
+.card{background:#fff;border:1.5px solid var(--line);border-radius:18px;padding:16px 18px;margin-top:16px}
+.card h2{margin:0 0 10px;font-size:1.1rem;color:#fff;background:var(--brown);display:inline-block;padding:3px 14px;border-radius:10px}
+input,select{font:inherit;padding:9px 12px;border:1.5px solid var(--line);border-radius:10px;background:#fff;width:100%;margin:5px 0}
+.btn{font:inherit;font-weight:800;border:none;border-radius:12px;padding:10px 26px;cursor:pointer;background:var(--green);color:#fff}
+.res a{display:flex;align-items:center;gap:10px;background:var(--sand);border-radius:12px;padding:10px 14px;margin:6px 0;color:var(--ink);text-decoration:none;font-weight:700}
+.item{border-top:1px dashed var(--line);padding:12px 0}.item:first-of-type{border-top:0}
+.stem{font-weight:700;margin-bottom:8px}
+.opts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.opt{border:1.5px solid var(--line);border-radius:12px;padding:8px;text-align:center;cursor:pointer;background:#fffdf9}
+.opt.sel{background:var(--brown);color:#fff;border-color:var(--brown)}
+.ok{background:#e3f3ea!important;border-color:var(--green)!important;color:var(--green)!important}
+.bad{background:#fbe6e3!important;border-color:var(--red)!important;color:var(--red)!important}
+.fb{font-size:.9rem;font-weight:700;margin-top:4px}
+.msg{text-align:center;color:#6b5843}
+@media(max-width:560px){.opts{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head"><h1>🌱 اختباري العلاجي</h1><div>الدراسات الاجتماعية – المعلمة وداد محمد الكحيلي</div></div>
+  <div class="card" id="who"><p class="msg" id="wmsg">جارٍ التحميل…</p></div>
+  <div id="main"></div>
+</div>
+<script src="tests-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const C=window.TESTS_CONFIG,$=id=>document.getElementById(id),AR=n=>Number(n).toLocaleString("ar-SA");
+const DEMO=/[?&]preview/.test(location.search)||!window.supabase;
+let ME=null;try{ME=JSON.parse(localStorage.getItem("stu")||"null");}catch(e){}
+const sb=DEMO?null:supabase.createClient(C.supabaseUrl,C.supabaseKey);
+
+/* بنك الأسئلة العلاجية: سؤال مكافئ لكل فقرة من الاختبار الأصلي */
+const BANK={
+ "g6-saudi2-test1":{
+  "1_1":{t:"mcq",s:"الإمام الذي أعاد تأسيس الدولة السعودية عام ١٢٤٠هـ هو:",o:["الإمام عبدالرحمن بن فيصل","الإمام تركي بن عبدالله","الإمام سعود بن عبدالعزيز"],a:1},
+  "1_2":{t:"mcq",s:"اتخذ الإمام تركي بن عبدالله عاصمةً لدولته مدينة:",o:["حائل","الدرعية","الرياض"],a:2},
+  "1_3":{t:"mcq",s:"وقعت معركة الحلوة عام:",o:["١٢٥٣هـ","١٣٠٨هـ","١٣١٩هـ"],a:0},
+  "1_4":{t:"mcq",s:"من أسس الإدارة والحكم في الدولة السعودية:",o:["بناء الأسبلة","بيت المال لموارد الدولة ومصروفاتها","حياكة كسوة الكعبة"],a:1},
+  "1_5":{t:"mcq",s:"استرد الملك عبدالعزيز الرياض في:",o:["١ شعبان ١٣١٩هـ","٢٠ رمضان ١٣١٩هـ","٥ شوال ١٣١٩هـ"],a:2},
+  "2_1":{t:"tf",s:"كان الإمام تركي بن عبدالله يقود المعارك بنفسه.",a:true},
+  "2_2":{t:"tf",s:"تمكن الإمام فيصل بن تركي من الفرار من سجنه في مصر.",a:true},
+  "2_3":{t:"tf",s:"انتصر محمد بن رشيد في معركة المليداء عام ١٣٠٨هـ.",a:true},
+  "2_4":{t:"tf",s:"أمر الإمام سعود بن عبدالعزيز بحياكة كسوة الكعبة في الدرعية.",a:false},
+  "2_5":{t:"tf",s:"وُلد الملك عبدالعزيز في الرياض عام ١٢٩٣هـ.",a:true},
+  "3_1":{t:"mcq",s:"السيف الذي اشتهر به الإمام تركي بن عبدالله اسمه:",o:["الأجرب","الرشيد","المصمك"],a:0},
+  "3_2":{t:"mcq",s:"قاد الحملة العثمانية المعتدية على الرياض عام ١٢٥٠هـ:",o:["خورشيد باشا","إسماعيل آغا","عجلان"],a:1},
+  "3_3":{t:"mcq",s:"أمير حائل الذي استغل الخلافات للاستيلاء على الحكم:",o:["مبارك الصباح","عجلان","محمد بن رشيد"],a:2},
+  "3_4":{t:"mcq",s:"تأسست الدولة السعودية الثانية عام:",o:["١٢٤٠هـ","١٢٨٢هـ","١٣٠٩هـ"],a:0},
+  "3_5":{t:"mcq",s:"أقام الملك عبدالعزيز ورجاله ٥٠ يوماً في صحراء:",o:["النفود","الجافورة","الدهناء"],a:1},
+  "4_1":{t:"short",s:"ماذا فعل الإمام فيصل بن تركي حقناً لدماء المواطنين؟",k:["استسلم","الاستسلام","سلم نفسه"],m:"استسلم"},
+  "4_2":{t:"short",s:"كم يوماً أقام الملك عبدالعزيز في صحراء الجافورة؟",k:["50","٥٠","خمسين","خمسون"],m:"٥٠ يوماً"},
+  "4_3":{t:"short",s:"من حاكم الرياض الذي انتصر عليه الملك عبدالعزيز عند قصر المصمك؟",k:["عجلان"],m:"عجلان"},
+  "4_4":{t:"short",s:"في أي موقع بالدرعية أُسست سبالة موضي؟",k:["طريف"],m:"الطريف"},
+  "4_5":{t:"short",s:"من تولى الحكم بعد وفاة الملك عبدالعزيز؟",k:["سعود"],m:"الملك سعود بن عبدالعزيز"}
+ }
+};
+const norm=s=>String(s||"").replace(/[٠-٩]/g,d=>"٠١٢٣٤٥٦٧٨٩".indexOf(d)).replace(/[ً-ْـ]/g,"").replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي").trim();
+
+let A=null,ans={},done=false;
+async function find(){
+  if(DEMO&&!ME)ME={sid:"preview",name:"طالبة تجريبية"};
+  if(!ME||!ME.sid){$("wmsg").innerHTML='ادخلي إلى المنصة أولاً 🌷<br><a class="btn" style="display:inline-block;margin-top:10px;text-decoration:none" href="index.html">الدخول إلى المنصة</a>';return;}
+  let list=[];
+  if(DEMO){list=[{id:1,quiz_id:"g6-saudi2-test1",quiz_title:C.quizzes[0].title,student_id:"preview",status:"sent",first_score:8,first_total:20,items:["1_3","2_3","3_2","3_5","4_1","4_2"],resources:C.quizzes[0].resources}];}
+  else{const {data,error}=await sb.rpc("get_remedial",{p_sid:String(ME.sid)});if(error){$("wmsg").textContent="تعذّر الاتصال، حاولي لاحقاً.";return;}list=data||[];}
+  const want=new URLSearchParams(location.search).get("q");
+  A=list.find(x=>x.status==="sent"&&(!want||x.quiz_id===want));
+  if(!A){$("wmsg").innerHTML='لا يوجد لكِ اختبار علاجي الآن 🌟<br><a class="btn" style="display:inline-block;margin-top:10px;text-decoration:none" href="index.html">العودة إلى صفحتي</a>';return;}
+  $("who").style.display="none";show();
+}
+find();
+function show(){
+  const bank=BANK[A.quiz_id]||{};const res=A.resources||[];
+  let h=`<div class="card"><h2>📚 قبل أن تبدئي</h2><p style="margin:0 0 6px">راجعي أوراق العمل والألعاب، ثم أجيبي عن الأسئلة.</p><div class="res">`+
+   (res.length?res.map(r=>`<a href="${r.url}" target="_blank">${r.type==="لعبة"?"🎮":"📄"} ${r.type}: ${r.title} ↗</a>`).join(""):`<p class="msg">ستضيف معلمتك أوراق العمل والألعاب قريباً.</p>`)+`</div></div>`;
+  h+=`<div class="card"><h2>✏️ ${A.quiz_title}</h2>`;
+  A.items.forEach((k,i)=>{const q=bank[k];if(!q)return;
+    h+=`<div class="item" id="r${k}"><div class="stem">${AR(i+1)}. ${q.s}</div>`;
+    if(q.t==="mcq")h+=`<div class="opts">`+q.o.map((o,oi)=>`<div class="opt" data-k="${k}" data-v="${oi}">${o}</div>`).join("")+`</div>`;
+    if(q.t==="tf")h+=`<div class="opts" style="grid-template-columns:repeat(2,120px)"><div class="opt" data-k="${k}" data-v="1">صح ✓</div><div class="opt" data-k="${k}" data-v="0">خطأ ✗</div></div>`;
+    if(q.t==="short")h+=`<input data-k="${k}" maxlength="60" placeholder="اكتبي إجابتك في سطر واحد…" autocomplete="off">`;
+    h+=`<div class="fb"></div></div>`;});
+  h+=`<div style="text-align:center;margin-top:12px"><button class="btn" id="sb" onclick="submit()">إرسال ✔</button></div><p class="msg" id="out"></p></div>`;
+  $("main").innerHTML=h;
+  document.querySelectorAll(".opt").forEach(o=>o.onclick=()=>{if(done)return;const k=o.dataset.k;document.querySelectorAll(`.opt[data-k="${k}"]`).forEach(x=>x.classList.remove("sel"));o.classList.add("sel");ans[k]=o.dataset.v;});
+  document.querySelectorAll("input[data-k]").forEach(i=>i.oninput=()=>ans[i.dataset.k]=i.value);
+}
+async function submit(){
+  if(done)return;done=true;const bank=BANK[A.quiz_id];let s=0,t=0;
+  A.items.forEach(k=>{const q=bank[k];if(!q)return;t++;const v=ans[k],d=$("r"+k);let ok=false;
+    if(q.t==="mcq")ok=String(v)===String(q.a);
+    if(q.t==="tf")ok=v!==undefined&&(v==="1")===q.a;
+    if(q.t==="short")ok=q.k.some(w=>norm(v).includes(norm(w)));
+    if(ok)s++;
+    d.querySelectorAll(".opt").forEach(o=>{const right=q.t==="mcq"?+o.dataset.v===q.a:(o.dataset.v==="1")===q.a;if(right)o.classList.add("ok");else if(o.classList.contains("sel"))o.classList.add("bad");});
+    const inp=d.querySelector("input");if(inp){inp.disabled=true;inp.classList.add(ok?"ok":"bad");}
+    const fb=d.querySelector(".fb");fb.style.color=ok?"var(--green)":"var(--red)";fb.textContent=ok?"أحسنتِ ✔":"الإجابة الصحيحة: "+(q.t==="mcq"?q.o[q.a]:q.t==="tf"?(q.a?"صح":"خطأ"):q.m);});
+  $("sb").style.display="none";
+  $("out").innerHTML=`<b style="font-size:1.3rem;color:var(--green)">${AR(s)} / ${AR(t)}</b><br>${s===t?"رائع! تجاوزتِ الصعوبة 🌟":"أحسنتِ المحاولة، راجعي الإجابات الصحيحة 💪"}`;
+  if(!DEMO)await sb.rpc("submit_remedial",{p_id:A.id,p_sid:String(ME.sid),p_score:s,p_total:t});
+  $("out").insertAdjacentHTML("beforeend",'<br><a class="btn" style="display:inline-block;margin-top:10px;text-decoration:none" href="index.html">العودة إلى صفحتي</a>');
+}
+</script>
+</body>
+</html>
