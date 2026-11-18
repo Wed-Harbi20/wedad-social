@@ -167,6 +167,7 @@ body{overflow-x:hidden}.card{background:rgba(255,253,247,.96)}
 })();
 </script><div id="bg"></div><div class="w" id="app"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="tests-config.js"></script>
 <script>
 /* ============================================================
    منصة مادة الدراسات الاجتماعية - الواجهة (متصلة بـ Supabase)
@@ -477,6 +478,7 @@ async function loadStudent() {
     sb.rpc('awards_list', { p_token: me.token }),
     sb.rpc('leaderboard', { p_token: me.token })]);
   if (h.error || !h.data || h.data.error) { localStorage.removeItem('stu'); return false; }
+  try { await loadQuizS(); } catch (e) { QZ = { done: [], rem: [] }; }
   SV = { home: h.data, chat: (c.data && !c.data.error) ? c.data : null, ach: (a.data && !a.data.error) ? a.data : [], awards: (aw && Array.isArray(aw.data)) ? aw.data : [], lb: (lb && lb.data && !lb.data.error) ? lb.data : null };
   return true;
 }
@@ -570,11 +572,27 @@ const PADLET = 'https://padlet.com/doodym_n_k/padlet-s0253r8d0cpridgoj77e';
 function padletCard() {
   return `<div class="card"><h2>📌 لوحة بادلت لرفع أعمالك</h2><p class="mu">ارفعي هنا ملخصك أو حلّ ورقة العمل، وسترصد معلمتك درجة المشاركة وأوراق العمل لمن رفعت.</p><a href="${PADLET}" target="_blank" rel="noopener" style="text-decoration:none"><button style="width:100%">فتح لوحة بادلت ↗</button></a></div>`;
 }
+/* ---------- الاختبارات الإلكترونية (صفحة الطالبة) ---------- */
+let QZ = { done: [], rem: [] };
+async function loadQuizS() {
+  const [d, r] = await Promise.all([sb.rpc('my_quizzes', { p_sid: String(me.sid) }), sb.rpc('get_remedial', { p_sid: String(me.sid) })]);
+  QZ = { done: (d && Array.isArray(d.data)) ? d.data : [], rem: (r && Array.isArray(r.data)) ? r.data : [] };
+}
+function testsCardS() {
+  const C = window.TESTS_CONFIG; if (!C || !me || me.t) return '';
+  const L = C.quizzes.filter(q => +q.stage === +me.stage);
+  const R = QZ.rem.filter(x => x.status === 'sent');
+  if (!L.length && !R.length) return '';
+  return `<div class="card"><h2>📝 اختباراتي</h2>${L.map(q => { const d = QZ.done.find(x => x.quiz_id === q.id);
+    return `<div class="an" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>${esc(q.title)}</b>${!d ? `<a href="${esc(q.file)}" style="text-decoration:none"><button>ابدئي الاختبار ✏️</button></a>` : d.published ? `<span class="tag t-ok">رُصدت درجتك في سجل متابعتي ✔</span>` : `<span class="tag t-wa">سُلّم ✔ بانتظار اعتماد المعلمة</span>`}</div>`; }).join('')}
+${R.map(x => `<div class="an" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border:2px dashed var(--pr)"><div><b>🌱 اختبار علاجي: ${esc(x.quiz_title || '')}</b><div class="mu">معلمتك جهّزت لكِ أسئلة وأوراق عمل وألعاباً لتتقوّي فيها</div></div><a href="remedial.html?q=${encodeURIComponent(x.quiz_id)}" style="text-decoration:none"><button>ابدئي ✨</button></a></div>`).join('')}</div>`;
+}
 function studentV() {
   const h = SV.home;
   const pr = h.done ? h.progress + '%' : '—';
   return `<div class="top"><h1>${esc(greetS(h.name))} <span class="tag">${esc(CN[h.cls] || '')}</span></h1><div>${TG} <button class="g" onclick="chpwS()">🔑 كلمة المرور</button> <button class="g" onclick="out()">خروج</button></div></div>
 <div class="stats"><div class="st" style="grid-column:1/-1"><span>نسبة تقدمك</span><b>${pr}</b><div style="height:10px;background:var(--bd);border-radius:99px;overflow:hidden;margin-top:6px"><div style="width:${h.done ? h.progress : 0}%;height:100%;background:var(--pr)"></div></div>${h.done ? '' : '<span>لم تُرصد أعمال بعد</span>'}</div><div class="stx"><b>${h.done}</b><span>أعمال مصحّحة</span></div><div class="st"><b>${h.left}</b><span>متبقية</span></div></div>
+${testsCardS()}
 ${badgesHtml(h.works)}
 ${gradCard()}
 ${padletCard()}
@@ -733,11 +751,11 @@ function visitsTab() {
 <p class="mu" style="font-size:.72rem">هذا العدّاد عام للزوّار ولا يحفظ أسماء، وزياراتك أنتِ لا تُحسب.</p></div>${stuVisitsCard()}`;
 }
 function teacherV() {
-  const T = [['chat', '💬 الدردشة'], ['grades', 'رصد الدرجات'], ['students', 'الطالبات'], ['works', 'الأعمال'], ['reports', 'التقارير'], ['board', '🏆 المتصدرات'], ['awards', '🎖️ الشهادات'], ['ann', 'الإعلانات'], ['visits', '📊 الزيارات']];
+  const T = [['chat', '💬 الدردشة'], ['tests', '📝 الاختبارات'], ['grades', 'رصد الدرجات'], ['students', 'الطالبات'], ['works', 'الأعمال'], ['reports', 'التقارير'], ['board', '🏆 المتصدرات'], ['awards', '🎖️ الشهادات'], ['ann', 'الإعلانات'], ['visits', '📊 الزيارات']];
   return `<div class="top"><h1>لوحة المعلمة</h1><div>${TG} <button class="g" onclick="chpw()">تغيير كلمة المرور</button> <button class="g" onclick="out()">خروج</button></div></div>
 <div class="tabs">${T.map(t => `<button class="${tab === t[0] ? '' : 'g'}" onclick="goTab('${t[0]}')">${t[1]}</button>`).join('')}</div>${tabV()}`;
 }
-async function goTab(t) { tab = t; if (t === 'chat') { await loadTeacherChat(); } if (t === 'awards') { await loadAwards(); } if (t === 'visits') { await loadVisits(); } app(); }
+async function goTab(t) { if (t === 'tests') { location.href = 'tests.html'; return; } tab = t; if (t === 'chat') { await loadTeacherChat(); } if (t === 'awards') { await loadAwards(); } if (t === 'visits') { await loadVisits(); } app(); }
 function tabV() {
   if (tab === 'chat') return chatTab();
   if (tab === 'grades') return gradesTab();
