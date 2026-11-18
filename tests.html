@@ -75,7 +75,7 @@ const AR=n=>Number(n).toLocaleString("ar-SA");
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const PREVIEW=/[?&]preview/.test(location.search)||!window.supabase;
 const sb=PREVIEW?null:supabase.createClient(C.supabaseUrl,C.supabaseKey);
-let ALL=[],REM=[],STU=[],WORKS=[],ACC=[],GR={},TRIED={},state={grade:null,quiz:null,cls:0};
+let ALL=[],REM=[],STU=[],WORKS=[],ACC=[],CONT={},EDIT=false,GR={},TRIED={},state={grade:null,quiz:null,cls:0};
 const CLS=Object.fromEntries(C.grades.flatMap(g=>g.classes));
 
 function toast(t){const e=$("toast");e.textContent=t;e.style.display="block";setTimeout(()=>e.style.display="none",2600);}
@@ -107,6 +107,7 @@ async function all(table,cols){let out=[],f=0;for(;;){const r=await sb.from(tabl
 async function load(){
   try{
     [ALL,REM,STU,WORKS,ACC]=await Promise.all([all("quiz_results","*"),all("remedial_assignments","*"),all("students","id,name,cls"),all("works","id,title,max_score,sort_order"),all("quiz_access","*")]);
+    try{(await all("quiz_content","*")).forEach(c=>{CONT[c.quiz_id]={sections:c.data.sections,at:c.updated_at};});}catch(e){}
     ALL.sort((a,b)=>new Date(a.created_at)-new Date(b.created_at));WORKS.sort((a,b)=>a.sort_order-b.sort_order);
   }catch(e){$("content").innerHTML=`<div class="card empty">تعذّر تحميل البيانات. تأكدي من تنفيذ كود الجداول في Supabase ثم حدّثي الصفحة.</div>`;return;}
   render();
@@ -140,6 +141,7 @@ function render(){
   qb.innerHTML=`<select onchange="state.quiz=this.value;render()">${quizzes.map(q=>`<option value="${q.id}" ${q.id===state.quiz?"selected":""}>${esc(q.title)}</option>`).join("")}</select>`+
     [[0,"كل الفصول"],...grade.classes].map(c=>`<span class="chip ${state.cls===c[0]?"on":""}" onclick="state.cls=${c[0]};render()">${c[1]}</span>`).join("");
   const quiz=C.quizzes.find(q=>q.id===state.quiz);
+  applyLabels(quiz);
   const clsIds=grade.classes.map(c=>c[0]);
   const rowsAll=latest(ALL.filter(r=>r.quiz_id===quiz.id&&clsIds.includes(+r.cls)));
   const inCls=r=>!state.cls||+r.cls===state.cls;
@@ -147,7 +149,7 @@ function render(){
   const roster=STU.filter(s=>clsIds.includes(+s.cls)&&(!state.cls||+s.cls===state.cls));
   const missing=roster.filter(s=>!rowsAll.some(r=>r.student_id===String(s.id)));
   const label=state.cls?CLS[state.cls]:"الصف "+grade.name;
-  let h="";
+  let h=editorCard(quiz);
   /* حالة التسليم */
   h+=`<div class="card"><div class="row"><h2>📥 تسليم الأوراق – ${label}</h2><a class="btn noprint" href="${quiz.file}" target="_blank">فتح الاختبار ↗</a></div>
   <div class="stats"><div class="stat"><b>${AR(rows.length)}</b><span>سلّمت</span></div><div class="stat"><b style="color:${missing.length?"var(--red)":"var(--green)"}">${AR(missing.length)}</b><span>لم تختبر بعد</span></div><div class="stat"><b>${AR(roster.length)}</b><span>عدد الطالبات</span></div></div>
@@ -318,6 +320,65 @@ function confirmBox(msg,ok){
   document.body.appendChild(o);o.querySelector("#cno").onclick=()=>o.remove();o.querySelector("#cok").onclick=()=>{o.remove();ok();};
   return false;
 }
+/* ===== معاينة الاختبار وتعديل الأسئلة ===== */
+const secs=quiz=>JSON.parse(JSON.stringify((CONT[quiz.id]&&CONT[quiz.id].sections)||quiz.questions||[]));
+function applyLabels(quiz){const S=CONT[quiz.id]&&CONT[quiz.id].sections;if(!S)return;
+  S.forEach((s,si)=>s.items.forEach((it,ii)=>{const k=(si+1)+"_"+(ii+1);let l=String(it.s||"").replace(/[:؟?]\s*$/,"");if(l.length>45)l=l.slice(0,45)+"…";quiz.items[k]=l;}));}
+function editorCard(quiz){
+  const c=CONT[quiz.id];
+  let h=`<div class="card noprint"><div class="row"><h2>✏️ الاختبار وأسئلته</h2><div style="display:flex;gap:8px;flex-wrap:wrap">
+   <a class="btn b" href="${quiz.file}?preview" target="_blank">👁 معاينة الاختبار</a>
+   <button class="btn ${EDIT?"":"g"}" onclick="EDIT=!EDIT;render()">${EDIT?"✖ إغلاق التعديل":"✏️ تعديل الأسئلة"}</button></div></div>
+   <p class="note" style="margin:0">${c?"آخر تعديل منكِ: "+fmt(c.at):"الأسئلة الأصلية (لم تُعدَّل بعد)"} · المعاينة تعرض الورقة كما تراها الطالبة، ولا تُرسل شيئاً.</p>`;
+  if(!EDIT)return h+`</div>`;
+  const S=secs(quiz),IM=quiz.images||{};
+  const inp=(id,v,ph,w)=>`<input id="${id}" value="${esc(v??"")}" placeholder="${ph||""}" style="width:${w||"100%"};font:inherit;padding:7px 10px;border-radius:9px;border:1.5px solid var(--line);margin:3px 0">`;
+  const done=ALL.some(r=>r.quiz_id===quiz.id);
+  h+=done?`<p class="note" style="color:var(--red);font-weight:700">⚠️ بعض الطالبات سلّمن هذا الاختبار. إذا عدّلتِ سؤالاً، فلا تتغير درجات من سلّمت قبل التعديل.</p>`:"";
+  S.forEach((s,si)=>{
+    h+=`<div style="border:2px solid var(--sand2);border-radius:14px;padding:12px;margin-top:12px"><b style="color:var(--brown)">${esc(s.title)}</b> – ${inp(`h${si}`,s.hint,"تعليمات السؤال","70%")}`;
+    if(s.type==="drag"){const ans=s.items.map(i=>i.a),dis=(s.pool||[]).filter(p=>!ans.includes(p));
+      h+=`<div class="note">كلمات للتمويه في بنك الإجابات (افصلي بينها بفاصلة):</div>${inp(`x${si}`,dis.join("، "),"مثال: خورشيد باشا")}`;}
+    s.items.forEach((it,ii)=>{const id=si+"_"+ii;
+      h+=`<div style="border-top:1px dashed var(--line);padding:8px 0;margin-top:6px"><b>${AR(si+1)}-${AR(ii+1)}</b> ${inp(`s${id}`,it.s,"نص السؤال")}`;
+      if(s.type==="mcq"){h+=it.o.map((o,oi)=>`<div style="display:flex;align-items:center;gap:6px"><label style="white-space:nowrap;font-size:.85rem"><input type="radio" name="a${id}" value="${oi}" ${it.a===oi?"checked":""}> الصحيحة</label>${inp(`o${id}_${oi}`,o,"الخيار "+AR(oi+1))}</div>`).join("");
+        h+=`<div class="note">الصورة: <select id="i${id}"><option value="">بدون صورة</option>${Object.entries(IM).map(([k,v])=>`<option value="${k}" ${it.img===k?"selected":""}>${esc(v)}</option>`).join("")}</select></div>`;}
+      if(s.type==="tf")h+=`<div class="note">الإجابة الصحيحة: <select id="a${id}"><option value="1" ${it.a?"selected":""}>صح</option><option value="0" ${!it.a?"selected":""}>خطأ</option></select></div>`;
+      if(s.type==="drag")h+=`<div class="note">الإجابة (تظهر في بنك الإجابات):</div>${inp(`a${id}`,it.a,"الكلمة الصحيحة","60%")}`;
+      if(s.type==="short"){h+=`<div class="note">الإجابة النموذجية (تظهر في المعاينة):</div>${inp(`m${id}`,it.model,"الإجابة النموذجية")}
+        <div class="note">تُقبل إجابة الطالبة إذا احتوت <b>إحدى</b> هذه الكلمات (افصلي بينها بفاصلة):</div>${inp(`k${id}`,(it.k&&it.k[0]||[]).join("، "),"مثال: الطائف، طائف")}
+        <div class="note">الصورة: <select id="i${id}"><option value="">بدون صورة</option>${Object.entries(IM).map(([k,v])=>`<option value="${k}" ${it.img===k?"selected":""}>${esc(v)}</option>`).join("")}</select></div>`;}
+      h+=`</div>`;});
+    h+=`</div>`;});
+  h+=`<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="btn g" onclick="saveQ()">💾 حفظ التعديلات</button>${c?`<button class="btn r" onclick="resetQ()">↩ استرجاع الأسئلة الأصلية</button>`:""}</div>
+  <p class="note">عدد الفقرات ثابت (٢٠ فقرة، لكل فقرة درجة). بعد الحفظ اضغطي «👁 معاينة الاختبار» لتري التعديل.</p></div>`;
+  return h;
+}
+const splitW=v=>String(v||"").split(/[،,]/).map(x=>x.trim()).filter(Boolean);
+async function saveQ(){
+  const quiz=C.quizzes.find(q=>q.id===state.quiz),S=secs(quiz),IM=quiz.images||{};let err="";
+  S.forEach((s,si)=>{
+    s.hint=$("h"+si).value.trim()||s.hint;
+    s.items.forEach((it,ii)=>{const id=si+"_"+ii,lab=AR(si+1)+"-"+AR(ii+1);
+      it.s=$("s"+id).value.trim();if(!it.s)err=err||"اكتبي نص السؤال "+lab;
+      if(s.type==="mcq"){it.o=it.o.map((_,oi)=>$(`o${id}_${oi}`).value.trim());if(it.o.some(x=>!x))err=err||"أكملي خيارات السؤال "+lab;
+        const r=document.querySelector(`input[name="a${id}"]:checked`);it.a=r?+r.value:0;
+        it.img=$("i"+id).value||undefined;it.cap=it.img?IM[it.img]:undefined;}
+      if(s.type==="tf")it.a=$("a"+id).value==="1";
+      if(s.type==="drag"){it.a=$("a"+id).value.trim();if(!it.a)err=err||"اكتبي إجابة السؤال "+lab;}
+      if(s.type==="short"){it.model=$("m"+id).value.trim();let k=splitW($("k"+id).value);if(!k.length&&it.model)k=[it.model];
+        if(!k.length)err=err||"اكتبي الإجابة المقبولة للسؤال "+lab;it.k=[k];it.img=$("i"+id).value||undefined;it.cap=it.img?IM[it.img]:undefined;}
+    });
+    if(s.type==="drag"){const ans=s.items.map(i=>i.a);if(new Set(ans).size!==ans.length)err=err||"إجابات السحب والإفلات يجب أن تكون مختلفة";s.pool=[...ans,...splitW($("x"+si).value).filter(w=>!ans.includes(w))];}
+  });
+  if(err){toast("⚠️ "+err);return;}
+  if(!PREVIEW){const {error}=await sb.from("quiz_content").upsert({quiz_id:quiz.id,data:{sections:S},updated_at:new Date().toISOString()});
+    if(error){toast("تعذّر الحفظ، تأكدي من تنفيذ كود قاعدة البيانات الجديد");return;}}
+  CONT[quiz.id]={sections:S,at:new Date().toISOString()};EDIT=false;toast("✔ حُفظت الأسئلة");render();
+}
+function resetQ(){confirmBox("استرجاع الأسئلة الأصلية وحذف تعديلاتك؟",async()=>{
+  if(!PREVIEW){const {error}=await sb.from("quiz_content").delete().eq("quiz_id",state.quiz);if(error){toast("تعذّر الاسترجاع");return;}}
+  delete CONT[state.quiz];EDIT=false;location.reload();});}
 start();
 </script>
 </body>
