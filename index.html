@@ -575,16 +575,16 @@ function padletCard() {
 /* ---------- الاختبارات الإلكترونية (صفحة الطالبة) ---------- */
 let QZ = { done: [], rem: [] };
 async function loadQuizS() {
-  const [d, r] = await Promise.all([sb.rpc('my_quizzes', { p_sid: String(me.sid) }), sb.rpc('get_remedial', { p_sid: String(me.sid) })]);
+  const [d, r] = await Promise.all([sb.rpc('quiz_status', { p_sid: String(me.sid) }), sb.rpc('get_remedial', { p_sid: String(me.sid) })]);
   QZ = { done: (d && Array.isArray(d.data)) ? d.data : [], rem: (r && Array.isArray(r.data)) ? r.data : [] };
 }
 function testsCardS() {
   const C = window.TESTS_CONFIG; if (!C || !me || me.t) return '';
-  const L = C.quizzes.filter(q => +q.stage === +me.stage);
+  const L = C.quizzes.filter(q => QZ.done.some(x => x.quiz_id === q.id && (x.can_take || x.submitted)));
   const R = QZ.rem.filter(x => x.status === 'sent');
   if (!L.length && !R.length) return '';
   return `<div class="card"><h2>📝 اختباراتي</h2>${L.map(q => { const d = QZ.done.find(x => x.quiz_id === q.id);
-    return `<div class="an" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><b>${esc(q.title)}</b>${!d ? `<a href="${esc(q.file)}" style="text-decoration:none"><button>ابدئي الاختبار ✏️</button></a>` : d.published ? `<span class="tag t-ok">رُصدت درجتك في سجل متابعتي ✔</span>` : `<span class="tag t-wa">سُلّم ✔ بانتظار اعتماد المعلمة</span>`}</div>`; }).join('')}
+    return `<div class="an" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap"><div><b>${esc(q.title)}</b>${d.can_take ? `<div class="mu">⏱ ${d.duration_min} دقيقة${d.until ? ' · متاح حتى ' + new Date(d.until).toLocaleString('ar-SA', { weekday: 'long', hour: 'numeric', minute: '2-digit' }) : ''}</div>` : ''}</div>${d.can_take ? `<a href="${esc(q.file)}" style="text-decoration:none"><button>ابدئي الاختبار ✏️</button></a>` : d.published ? `<span class="tag t-ok">رُصدت درجتك في سجل متابعتي ✔</span>` : `<span class="tag t-wa">سُلّم ✔ بانتظار اعتماد المعلمة</span>`}</div>`; }).join('')}
 ${R.map(x => `<div class="an" style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;border:2px dashed var(--pr)"><div><b>🌱 اختبار علاجي: ${esc(x.quiz_title || '')}</b><div class="mu">معلمتك جهّزت لكِ أسئلة وأوراق عمل وألعاباً لتتقوّي فيها</div></div><a href="remedial.html?q=${encodeURIComponent(x.quiz_id)}" style="text-decoration:none"><button>ابدئي ✨</button></a></div>`).join('')}</div>`;
 }
 function studentV() {
